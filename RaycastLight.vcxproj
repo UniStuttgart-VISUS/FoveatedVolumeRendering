@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{EC8BDCEC-7A9F-3418-B197-999FEA6571D6}</ProjectGuid>
+    <ProjectGuid>{9BC9D9FE-2812-32FD-B74C-72DB4074F090}</ProjectGuid>
     <RootNamespace>RaycastLight</RootNamespace>
     <Keyword>Qt4VSv1.0</Keyword>
     <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
@@ -66,7 +66,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>inc;.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;.;..\..\..\..\QT\5.10.1\MSVC2017_64\include;..\..\..\..\QT\5.10.1\MSVC2017_64\include\QtOpenGL;..\..\..\..\QT\5.10.1\MSVC2017_64\include\QtWidgets;..\..\..\..\QT\5.10.1\MSVC2017_64\include\QtGui;..\..\..\..\QT\5.10.1\MSVC2017_64\include\QtANGLE;..\..\..\..\QT\5.10.1\MSVC2017_64\include\QtConcurrent;..\..\..\..\QT\5.10.1\MSVC2017_64\include\QtCore;release;\include;..\..\..\..\QT\5.10.1\MSVC2017_64\mkspecs\win32-msvc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;.;..\..\..\..\QT\5.10.1\MSVC2017_64\include;..\..\..\..\QT\5.10.1\MSVC2017_64\include\QtOpenGL;..\..\..\..\QT\5.10.1\MSVC2017_64\include\QtWidgets;..\..\..\..\QT\5.10.1\MSVC2017_64\include\QtGui;..\..\..\..\QT\5.10.1\MSVC2017_64\include\QtANGLE;..\..\..\..\QT\5.10.1\MSVC2017_64\include\QtConcurrent;..\..\..\..\QT\5.10.1\MSVC2017_64\include\QtCore;release;\include;..\..\..\..\QT\5.10.1\MSVC2017_64\mkspecs\win32-msvc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -std=c++17 -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
       <AssemblerListingLocation>release\</AssemblerListingLocation>
       <BrowseInformation>false</BrowseInformation>
@@ -85,8 +85,8 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>C:\QT\5.10.1\MSVC2017_64\lib\qtmain.lib;shell32.lib;OpenCL.lib;C:\QT\5.10.1\MSVC2017_64\lib\Qt5OpenGL.lib;C:\QT\5.10.1\MSVC2017_64\lib\Qt5Widgets.lib;C:\QT\5.10.1\MSVC2017_64\lib\Qt5Gui.lib;C:\QT\5.10.1\MSVC2017_64\lib\Qt5Concurrent.lib;C:\QT\5.10.1\MSVC2017_64\lib\Qt5Core.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(INTELOCLSDKROOT)\lib\x64;C:\QT\5.10.1\MSVC2017_64\lib;C:\utils\my_sql\my_sql\lib;C:\utils\postgresql\pgsql\lib;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>C:\QT\5.10.1\MSVC2017_64\lib\qtmain.lib;shell32.lib;GL.lib;OpenCL.lib;C:\QT\5.10.1\MSVC2017_64\lib\Qt5OpenGL.lib;C:\QT\5.10.1\MSVC2017_64\lib\Qt5Widgets.lib;C:\QT\5.10.1\MSVC2017_64\lib\Qt5Gui.lib;C:\QT\5.10.1\MSVC2017_64\lib\Qt5Concurrent.lib;C:\QT\5.10.1\MSVC2017_64\lib\Qt5Core.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\QT\5.10.1\MSVC2017_64\lib;C:\utils\my_sql\my_sql\lib;C:\utils\postgresql\pgsql\lib;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>-fopenmp "/MANIFESTDEPENDENCY:type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' publicKeyToken='6595b64144ccf1df' language='*' processorArchitecture='*'" %(AdditionalOptions)</AdditionalOptions>
       <DataExecutionPrevention>true</DataExecutionPrevention>
       <GenerateDebugInformation>false</GenerateDebugInformation>
@@ -114,7 +114,7 @@
       <ExecutionDescription>Moc'ing %(Identity)...</ExecutionDescription>
       <InputFile>%(FullPath)</InputFile>
       <DynamicSource>output</DynamicSource>
-      <IncludePath>inc;.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;.;..\..\..\..\QT\5.10.1\MSVC2017_64\include;..\..\..\..\QT\5.10.1\MSVC2017_64\include\QtOpenGL;..\..\..\..\QT\5.10.1\MSVC2017_64\include\QtWidgets;..\..\..\..\QT\5.10.1\MSVC2017_64\include\QtGui;..\..\..\..\QT\5.10.1\MSVC2017_64\include\QtANGLE;..\..\..\..\QT\5.10.1\MSVC2017_64\include\QtConcurrent;..\..\..\..\QT\5.10.1\MSVC2017_64\include\QtCore;release;\include;..\..\..\..\QT\5.10.1\MSVC2017_64\mkspecs\win32-msvc;%(AdditionalIncludeDirectories)</IncludePath>
+      <IncludePath>.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;C:/QT/5.10.1/MSVC2017_64/mkspecs/win32-msvc;.;C:/QT/5.10.1/MSVC2017_64/include;C:/QT/5.10.1/MSVC2017_64/include/QtOpenGL;C:/QT/5.10.1/MSVC2017_64/include/QtWidgets;C:/QT/5.10.1/MSVC2017_64/include/QtGui;C:/QT/5.10.1/MSVC2017_64/include/QtANGLE;C:/QT/5.10.1/MSVC2017_64/include/QtConcurrent;C:/QT/5.10.1/MSVC2017_64/include/QtCore;C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.12.25827\ATLMFC\include;C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.12.25827\include;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um;C:\Program Files (x86)\Windows Kits\10\include\10.0.16299.0\ucrt;C:\Program Files (x86)\Windows Kits\10\include\10.0.16299.0\shared;C:\Program Files (x86)\Windows Kits\10\include\10.0.16299.0\um;C:\Program Files (x86)\Windows Kits\10\include\10.0.16299.0\winrt</IncludePath>
     </QtMoc>
     <QtRcc>
       <InitFuncName>kernels</InitFuncName>
@@ -188,7 +188,7 @@
       <ExecutionDescription>Moc'ing %(Identity)...</ExecutionDescription>
       <InputFile>%(FullPath)</InputFile>
       <DynamicSource>output</DynamicSource>
-      <IncludePath>.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;.;..\..\..\..\QT\5.10.1\MSVC2017_64\include;..\..\..\..\QT\5.10.1\MSVC2017_64\include\QtOpenGL;..\..\..\..\QT\5.10.1\MSVC2017_64\include\QtWidgets;..\..\..\..\QT\5.10.1\MSVC2017_64\include\QtGui;..\..\..\..\QT\5.10.1\MSVC2017_64\include\QtANGLE;..\..\..\..\QT\5.10.1\MSVC2017_64\include\QtConcurrent;..\..\..\..\QT\5.10.1\MSVC2017_64\include\QtCore;debug;\include;..\..\..\..\QT\5.10.1\MSVC2017_64\mkspecs\win32-msvc;%(AdditionalIncludeDirectories)</IncludePath>
+      <IncludePath>.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;C:/QT/5.10.1/MSVC2017_64/mkspecs/win32-msvc;.;C:/QT/5.10.1/MSVC2017_64/include;C:/QT/5.10.1/MSVC2017_64/include/QtOpenGL;C:/QT/5.10.1/MSVC2017_64/include/QtWidgets;C:/QT/5.10.1/MSVC2017_64/include/QtGui;C:/QT/5.10.1/MSVC2017_64/include/QtANGLE;C:/QT/5.10.1/MSVC2017_64/include/QtConcurrent;C:/QT/5.10.1/MSVC2017_64/include/QtCore;C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.12.25827\ATLMFC\include;C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.12.25827\include;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um;C:\Program Files (x86)\Windows Kits\10\include\10.0.16299.0\ucrt;C:\Program Files (x86)\Windows Kits\10\include\10.0.16299.0\shared;C:\Program Files (x86)\Windows Kits\10\include\10.0.16299.0\um;C:\Program Files (x86)\Windows Kits\10\include\10.0.16299.0\winrt</IncludePath>
     </QtMoc>
     <QtUic>
       <QTDIR>C:\QT\5.10.1\MSVC2017_64</QTDIR>
