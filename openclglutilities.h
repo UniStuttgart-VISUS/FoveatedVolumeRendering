@@ -49,7 +49,7 @@
     #include <GL\GL.h>
     #include <GL\GLU.h>
     #include <CL\cl_gl.h>
-    
+
     #pragma comment(lib, "opengl32.lib")
     #pragma comment(lib, "glu32.lib")
     #pragma warning( disable : 4996)
