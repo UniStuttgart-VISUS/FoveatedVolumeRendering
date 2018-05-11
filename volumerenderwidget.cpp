@@ -899,6 +899,12 @@ void VolumeRenderWidget::mouseDoubleClickEvent(QMouseEvent *event)
  */
 void VolumeRenderWidget::keyReleaseEvent(QKeyEvent *event)
 {
+	// print translation (debug)
+	if (/* TODO: check for specific key to trigger debug msg */ false) {
+		qDebug() << "translation.xyz: " << static_cast<int>(_translation.x()) << "," << static_cast<int>(_translation.y()) << "," << static_cast<int>(_translation.z()) << "\n";
+	}
+
+
     // nothing yet
     event->accept();
 }

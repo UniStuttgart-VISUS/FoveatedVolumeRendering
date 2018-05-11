@@ -11,14 +11,14 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{9BC9D9FE-2812-32FD-B74C-72DB4074F090}</ProjectGuid>
+    <ProjectGuid>{DDA7FD51-43D8-3ABF-A9E3-2CBA1321E686}</ProjectGuid>
     <RootNamespace>RaycastLight</RootNamespace>
     <Keyword>Qt4VSv1.0</Keyword>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <OutputDirectory>release\</OutputDirectory>
     <ATLMinimizesCRunTimeLibraryUsage>false</ATLMinimizesCRunTimeLibraryUsage>
     <CharacterSet>NotSet</CharacterSet>
@@ -27,7 +27,7 @@
     <PrimaryOutput>RaycastLight</PrimaryOutput>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <OutputDirectory>debug\</OutputDirectory>
     <ATLMinimizesCRunTimeLibraryUsage>false</ATLMinimizesCRunTimeLibraryUsage>
     <CharacterSet>NotSet</CharacterSet>
@@ -66,8 +66,8 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;.;..\..\..\..\QT\5.10.1\MSVC2017_64\include;..\..\..\..\QT\5.10.1\MSVC2017_64\include\QtOpenGL;..\..\..\..\QT\5.10.1\MSVC2017_64\include\QtWidgets;..\..\..\..\QT\5.10.1\MSVC2017_64\include\QtGui;..\..\..\..\QT\5.10.1\MSVC2017_64\include\QtANGLE;..\..\..\..\QT\5.10.1\MSVC2017_64\include\QtConcurrent;..\..\..\..\QT\5.10.1\MSVC2017_64\include\QtCore;release;\include;..\..\..\..\QT\5.10.1\MSVC2017_64\mkspecs\win32-msvc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -std=c++17 -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>inc;.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;.;$(QTDIR)\include;$(QTDIR)\include\QtOpenGL;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtConcurrent;$(QTDIR)\include\QtCore;release;$(QTDIR)\mkspecs\win32-msvc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -std=c++17 -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
       <AssemblerListingLocation>release\</AssemblerListingLocation>
       <BrowseInformation>false</BrowseInformation>
       <DebugInformationFormat>None</DebugInformationFormat>
@@ -75,7 +75,7 @@
       <ExceptionHandling>Sync</ExceptionHandling>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <Optimization>MaxSpeed</Optimization>
-      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;WIN64;QT_DEPRECATED_WARNINGS;QT_NO_DEBUG;QT_OPENGL_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CONCURRENT_LIB;QT_CORE_LIB;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WINDOWS;UNICODE;WIN32;WIN64;QT_DEPRECATED_WARNINGS;QT_NO_DEBUG;QT_OPENGL_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CONCURRENT_LIB;QT_CORE_LIB;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <ProgramDataBaseFileName>$(IntDir)vc$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -85,8 +85,8 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>C:\QT\5.10.1\MSVC2017_64\lib\qtmain.lib;shell32.lib;GL.lib;OpenCL.lib;C:\QT\5.10.1\MSVC2017_64\lib\Qt5OpenGL.lib;C:\QT\5.10.1\MSVC2017_64\lib\Qt5Widgets.lib;C:\QT\5.10.1\MSVC2017_64\lib\Qt5Gui.lib;C:\QT\5.10.1\MSVC2017_64\lib\Qt5Concurrent.lib;C:\QT\5.10.1\MSVC2017_64\lib\Qt5Core.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\QT\5.10.1\MSVC2017_64\lib;C:\utils\my_sql\my_sql\lib;C:\utils\postgresql\pgsql\lib;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(QTDIR)\lib\qtmain.lib;shell32.lib;OpenCL.lib;$(QTDIR)\lib\Qt5OpenGL.lib;$(QTDIR)\lib\Qt5Widgets.lib;$(QTDIR)\lib\Qt5Gui.lib;$(QTDIR)\lib\Qt5Concurrent.lib;$(QTDIR)\lib\Qt5Core.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0\lib\x64;$(QTDIR)\lib;C:\utils\my_sql\my_sql\lib;C:\utils\postgresql\pgsql\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>-fopenmp "/MANIFESTDEPENDENCY:type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' publicKeyToken='6595b64144ccf1df' language='*' processorArchitecture='*'" %(AdditionalOptions)</AdditionalOptions>
       <DataExecutionPrevention>true</DataExecutionPrevention>
       <GenerateDebugInformation>false</GenerateDebugInformation>
@@ -103,29 +103,29 @@
       <WarningLevel>0</WarningLevel>
     </Midl>
     <ResourceCompile>
-      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;WIN64;QT_DEPRECATED_WARNINGS;QT_NO_DEBUG;QT_OPENGL_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CONCURRENT_LIB;QT_CORE_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WINDOWS;UNICODE;WIN32;WIN64;QT_DEPRECATED_WARNINGS;QT_NO_DEBUG;QT_OPENGL_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CONCURRENT_LIB;QT_CORE_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
     <QtMoc>
-      <QTDIR>C:\QT\5.10.1\MSVC2017_64</QTDIR>
+      <QTDIR>$(QTDIR)</QTDIR>
       <OutputFile>.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</OutputFile>
-      <Define>UNICODE;_UNICODE;WIN32;WIN64;QT_DEPRECATED_WARNINGS;QT_NO_DEBUG;QT_OPENGL_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CONCURRENT_LIB;QT_CORE_LIB</Define>
+      <Define>UNICODE;WIN32;WIN64;QT_DEPRECATED_WARNINGS;QT_NO_DEBUG;QT_OPENGL_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CONCURRENT_LIB;QT_CORE_LIB</Define>
       <CompilerFlavor>msvc</CompilerFlavor>
       <Include>$(Configuration)/moc_predefs.h</Include>
       <ExecutionDescription>Moc'ing %(Identity)...</ExecutionDescription>
       <InputFile>%(FullPath)</InputFile>
       <DynamicSource>output</DynamicSource>
-      <IncludePath>.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;C:/QT/5.10.1/MSVC2017_64/mkspecs/win32-msvc;.;C:/QT/5.10.1/MSVC2017_64/include;C:/QT/5.10.1/MSVC2017_64/include/QtOpenGL;C:/QT/5.10.1/MSVC2017_64/include/QtWidgets;C:/QT/5.10.1/MSVC2017_64/include/QtGui;C:/QT/5.10.1/MSVC2017_64/include/QtANGLE;C:/QT/5.10.1/MSVC2017_64/include/QtConcurrent;C:/QT/5.10.1/MSVC2017_64/include/QtCore;C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.12.25827\ATLMFC\include;C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.12.25827\include;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um;C:\Program Files (x86)\Windows Kits\10\include\10.0.16299.0\ucrt;C:\Program Files (x86)\Windows Kits\10\include\10.0.16299.0\shared;C:\Program Files (x86)\Windows Kits\10\include\10.0.16299.0\um;C:\Program Files (x86)\Windows Kits\10\include\10.0.16299.0\winrt</IncludePath>
+      <IncludePath>inc;.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;.;$(QTDIR)\include;$(QTDIR)\include\QtOpenGL;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtConcurrent;$(QTDIR)\include\QtCore;release;$(QTDIR)\mkspecs\win32-msvc;%(AdditionalIncludeDirectories)</IncludePath>
     </QtMoc>
     <QtRcc>
       <InitFuncName>kernels</InitFuncName>
       <OutputFile>.\GeneratedFiles\qrc_%(Filename).cpp</OutputFile>
-      <QTDIR>C:\QT\5.10.1\MSVC2017_64</QTDIR>
+      <QTDIR>$(QTDIR)</QTDIR>
       <ExecutionDescription>Rcc'ing %(Identity)...</ExecutionDescription>
       <Compression>default</Compression>
       <InputFile>%(FullPath)</InputFile>
     </QtRcc>
     <QtUic>
-      <QTDIR>C:\QT\5.10.1\MSVC2017_64</QTDIR>
+      <QTDIR>$(QTDIR)</QTDIR>
       <InputFile>%(FullPath)</InputFile>
       <OutputFile>.\GeneratedFiles\ui_%(Filename).h</OutputFile>
       <ExecutionDescription>Uic'ing %(Identity)...</ExecutionDescription>
@@ -133,8 +133,8 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;.;..\..\..\..\QT\5.10.1\MSVC2017_64\include;..\..\..\..\QT\5.10.1\MSVC2017_64\include\QtOpenGL;..\..\..\..\QT\5.10.1\MSVC2017_64\include\QtWidgets;..\..\..\..\QT\5.10.1\MSVC2017_64\include\QtGui;..\..\..\..\QT\5.10.1\MSVC2017_64\include\QtANGLE;..\..\..\..\QT\5.10.1\MSVC2017_64\include\QtConcurrent;..\..\..\..\QT\5.10.1\MSVC2017_64\include\QtCore;debug;\include;..\..\..\..\QT\5.10.1\MSVC2017_64\mkspecs\win32-msvc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -std=c++17 -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalIncludeDirectories>inc;.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;.;$(QTDIR)\include;$(QTDIR)\include\QtOpenGL;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtConcurrent;$(QTDIR)\include\QtCore;debug;$(QTDIR)\mkspecs\win32-msvc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -std=c++17 -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 %(AdditionalOptions)</AdditionalOptions>
       <AssemblerListingLocation>debug\</AssemblerListingLocation>
       <BrowseInformation>false</BrowseInformation>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
@@ -142,7 +142,7 @@
       <ExceptionHandling>Sync</ExceptionHandling>
       <ObjectFileName>$(IntDir)</ObjectFileName>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;WIN64;QT_DEPRECATED_WARNINGS;QT_OPENGL_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CONCURRENT_LIB;QT_CORE_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WINDOWS;UNICODE;WIN32;WIN64;QT_DEPRECATED_WARNINGS;QT_OPENGL_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CONCURRENT_LIB;QT_CORE_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessToFile>false</PreprocessToFile>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -152,8 +152,8 @@
       <ProgramDataBaseFileName>$(IntDir)vc$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>C:\QT\5.10.1\MSVC2017_64\lib\qtmaind.lib;shell32.lib;GL.lib;OpenCL.lib;C:\QT\5.10.1\MSVC2017_64\lib\Qt5OpenGLd.lib;C:\QT\5.10.1\MSVC2017_64\lib\Qt5Widgetsd.lib;C:\QT\5.10.1\MSVC2017_64\lib\Qt5Guid.lib;C:\QT\5.10.1\MSVC2017_64\lib\Qt5Concurrentd.lib;C:\QT\5.10.1\MSVC2017_64\lib\Qt5Cored.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\QT\5.10.1\MSVC2017_64\lib;C:\utils\my_sql\my_sql\lib;C:\utils\postgresql\pgsql\lib;$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(QTDIR)\lib\qtmaind.lib;shell32.lib;OpenCL.lib;$(QTDIR)\lib\Qt5OpenGLd.lib;$(QTDIR)\lib\Qt5Widgetsd.lib;$(QTDIR)\lib\Qt5Guid.lib;$(QTDIR)\lib\Qt5Concurrentd.lib;$(QTDIR)\lib\Qt5Cored.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v8.0\lib\x64;$(QTDIR)\lib;C:\utils\my_sql\my_sql\lib;C:\utils\postgresql\pgsql\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalOptions>-fopenmp "/MANIFESTDEPENDENCY:type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' publicKeyToken='6595b64144ccf1df' language='*' processorArchitecture='*'" %(AdditionalOptions)</AdditionalOptions>
       <DataExecutionPrevention>true</DataExecutionPrevention>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -169,10 +169,10 @@
       <WarningLevel>0</WarningLevel>
     </Midl>
     <ResourceCompile>
-      <PreprocessorDefinitions>_WINDOWS;UNICODE;_UNICODE;WIN32;WIN64;QT_DEPRECATED_WARNINGS;QT_OPENGL_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CONCURRENT_LIB;QT_CORE_LIB;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_WINDOWS;UNICODE;WIN32;WIN64;QT_DEPRECATED_WARNINGS;QT_OPENGL_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CONCURRENT_LIB;QT_CORE_LIB;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ResourceCompile>
     <QtRcc>
-      <QTDIR>C:\QT\5.10.1\MSVC2017_64</QTDIR>
+      <QTDIR>$(QTDIR)</QTDIR>
       <ExecutionDescription>Rcc'ing %(Identity)...</ExecutionDescription>
       <Compression>default</Compression>
       <InitFuncName>kernels</InitFuncName>
@@ -180,18 +180,18 @@
       <InputFile>%(FullPath)</InputFile>
     </QtRcc>
     <QtMoc>
-      <QTDIR>C:\QT\5.10.1\MSVC2017_64</QTDIR>
+      <QTDIR>$(QTDIR)</QTDIR>
       <OutputFile>.\GeneratedFiles\$(ConfigurationName)\moc_%(Filename).cpp</OutputFile>
-      <Define>UNICODE;_UNICODE;WIN32;WIN64;QT_DEPRECATED_WARNINGS;QT_OPENGL_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CONCURRENT_LIB;QT_CORE_LIB</Define>
+      <Define>UNICODE;WIN32;WIN64;QT_DEPRECATED_WARNINGS;QT_OPENGL_LIB;QT_WIDGETS_LIB;QT_GUI_LIB;QT_CONCURRENT_LIB;QT_CORE_LIB</Define>
       <CompilerFlavor>msvc</CompilerFlavor>
       <Include>$(Configuration)/moc_predefs.h</Include>
       <ExecutionDescription>Moc'ing %(Identity)...</ExecutionDescription>
       <InputFile>%(FullPath)</InputFile>
       <DynamicSource>output</DynamicSource>
-      <IncludePath>.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;C:/QT/5.10.1/MSVC2017_64/mkspecs/win32-msvc;.;C:/QT/5.10.1/MSVC2017_64/include;C:/QT/5.10.1/MSVC2017_64/include/QtOpenGL;C:/QT/5.10.1/MSVC2017_64/include/QtWidgets;C:/QT/5.10.1/MSVC2017_64/include/QtGui;C:/QT/5.10.1/MSVC2017_64/include/QtANGLE;C:/QT/5.10.1/MSVC2017_64/include/QtConcurrent;C:/QT/5.10.1/MSVC2017_64/include/QtCore;C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.12.25827\ATLMFC\include;C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.12.25827\include;C:\Program Files (x86)\Windows Kits\NETFXSDK\4.6.1\include\um;C:\Program Files (x86)\Windows Kits\10\include\10.0.16299.0\ucrt;C:\Program Files (x86)\Windows Kits\10\include\10.0.16299.0\shared;C:\Program Files (x86)\Windows Kits\10\include\10.0.16299.0\um;C:\Program Files (x86)\Windows Kits\10\include\10.0.16299.0\winrt</IncludePath>
+      <IncludePath>inc;.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;.;$(QTDIR)\include;$(QTDIR)\include\QtOpenGL;$(QTDIR)\include\QtWidgets;$(QTDIR)\include\QtGui;$(QTDIR)\include\QtANGLE;$(QTDIR)\include\QtConcurrent;$(QTDIR)\include\QtCore;debug;$(QTDIR)\mkspecs\win32-msvc;%(AdditionalIncludeDirectories)</IncludePath>
     </QtMoc>
     <QtUic>
-      <QTDIR>C:\QT\5.10.1\MSVC2017_64</QTDIR>
+      <QTDIR>$(QTDIR)</QTDIR>
       <InputFile>%(FullPath)</InputFile>
       <OutputFile>.\GeneratedFiles\ui_%(Filename).h</OutputFile>
       <ExecutionDescription>Uic'ing %(Identity)...</ExecutionDescription>
@@ -231,15 +231,15 @@
     <CustomBuild Include="debug\moc_predefs.h.cbt">
       <FileType>Document</FileType>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">..\..\..\..\QT\5.10.1\MSVC2017_64\mkspecs\features\data\dummy.cpp;%(AdditionalInputs)</AdditionalInputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">cl -Bx"$(QTDIR)\bin\qmake.exe" -nologo -Zc:wchar_t -FS -Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -std=c++17 -fopenmp -Zi -MDd -W3 -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 -wd4577 -wd4467 -E ..\..\..\..\QT\5.10.1\MSVC2017_64\mkspecs\features\data\dummy.cpp 2&gt;NUL &gt;debug\moc_predefs.h</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(QTDIR)\mkspecs\features\data\dummy.cpp;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">cl -Bx"$(QTDIR)\bin\qmake.exe" -nologo -Zc:wchar_t -FS -Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -std=c++17 -fopenmp -Zi -MDd -W3 -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 -wd4577 -wd4467 -E -Za $(QTDIR)\mkspecs\features\data\dummy.cpp 2&gt;NUL &gt;debug\moc_predefs.h</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Generate moc_predefs.h</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">debug\moc_predefs.h;%(Outputs)</Outputs>
     </CustomBuild>
     <CustomBuild Include="release\moc_predefs.h.cbt">
       <FileType>Document</FileType>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">..\..\..\..\QT\5.10.1\MSVC2017_64\mkspecs\features\data\dummy.cpp;%(AdditionalInputs)</AdditionalInputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">cl -Bx"$(QTDIR)\bin\qmake.exe" -nologo -Zc:wchar_t -FS -Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -Zc:referenceBinding -std=c++17 -fopenmp -O2 -MD -W3 -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 -wd4577 -wd4467 -E ..\..\..\..\QT\5.10.1\MSVC2017_64\mkspecs\features\data\dummy.cpp 2&gt;NUL &gt;release\moc_predefs.h</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(QTDIR)\mkspecs\features\data\dummy.cpp;%(AdditionalInputs)</AdditionalInputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">cl -Bx"$(QTDIR)\bin\qmake.exe" -nologo -Zc:wchar_t -FS -Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -std=c++17 -fopenmp -O2 -MD -W3 -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 -wd4577 -wd4467 -E -Za $(QTDIR)\mkspecs\features\data\dummy.cpp 2&gt;NUL &gt;release\moc_predefs.h</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Generate moc_predefs.h</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">release\moc_predefs.h;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
@@ -253,7 +253,6 @@
   <ItemGroup>
     <QtRcc Include="kernels.qrc">
     </QtRcc>
-    <None Include="kernels\volumeraycast.cl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="style.qss" />
@@ -266,7 +265,7 @@
   <ImportGroup Label="ExtensionTargets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties UicDir=".\GeneratedFiles" RccDir=".\GeneratedFiles" Qt5Version_x0020_x64="QT 5.10.1" />
+      <UserProperties UicDir=".\GeneratedFiles" RccDir=".\GeneratedFiles" Qt5Version_x0020_x64="msvc2015_64" />
     </VisualStudio>
   </ProjectExtensions>
 </Project>
