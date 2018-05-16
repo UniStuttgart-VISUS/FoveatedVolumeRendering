@@ -83,6 +83,9 @@ public:
     QQuaternion getCamRotation() const;
     void setCamRotation(const QQuaternion &rotQuat);
 
+	enum RenderingMethod { STANDARD, MOUSE_SQUARE };
+	void setRenderingMethod(RenderingMethod rm);
+
 
 public slots:
     void cleanup();
@@ -134,6 +137,10 @@ private:
 
     void generateOutputTextures(int width, int height);
 
+	void renderOutput(double fps);
+	void paintGL_standard();
+	void paintGL_mouse_square();
+
     // -------Members--------
     //
     // OpenGL
@@ -171,4 +178,5 @@ private:
     double _imgSamplingRate;       // image oversampling rate
     bool _useGL;
     bool _showOverlay;
+	RenderingMethod _renderingMethod;
 };
