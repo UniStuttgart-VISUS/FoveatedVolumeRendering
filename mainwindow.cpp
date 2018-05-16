@@ -106,6 +106,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->cbIllum, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
             ui->volumeRenderWidget, &VolumeRenderWidget::setIllumination);
     connect(ui->pbBgColor, &QPushButton::released, this, &MainWindow::chooseBackgroundColor);
+	connect(ui->setrdmt, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+		ui->volumeRenderWidget, &VolumeRenderWidget::setRenderingMethod);
+	
     // check boxes
     connect(ui->chbLinear, &QCheckBox::toggled,
             ui->volumeRenderWidget, &VolumeRenderWidget::setLinearInterpolation);

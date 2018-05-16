@@ -219,6 +219,7 @@
     </QtMoc>
     <QtMoc Include="mainwindow.h">
     </QtMoc>
+    <ClInclude Include="GeneratedFiles\ui_mainwindow.h" />
     <ClInclude Include="openclglutilities.h" />
     <ClInclude Include="openclutilities.h" />
     <QtMoc Include="transferfunctionwidget.h">
@@ -244,7 +245,6 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">release\moc_predefs.h;%(Outputs)</Outputs>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </CustomBuild>
-    <ClInclude Include="ui_mainwindow.h" />
   </ItemGroup>
   <ItemGroup>
     <QtUic Include="mainwindow.ui">

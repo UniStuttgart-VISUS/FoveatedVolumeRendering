@@ -51,7 +51,10 @@ public:
         , MODEL_SCALE    // model scaling factor                     cl_float3
         , CONTOURS       // show contour lines                       cl_uint (bool)
         , AERIAL         // use aerial perspective                   cl_uint (bool)
-    };
+		, CURSOR_POS	 // float2 cursor pos
+		, RECTANGLE_EXTS // float2 rectangle extends
+		, INVERT		 // bool invert
+	};
 
     // mipmap down-scaling metric
     enum scaling_metric
@@ -194,6 +197,22 @@ public:
      * @param color
      */
     void setBackground(std::array<float, 4> color);
+	/**
+	* @brief setCursorPos normalized
+	* @param xPos
+	* @param yPos
+	*/
+	void setCursorPos(float xPos, float yPos);
+	/**
+	* @brief setRectangleExtends normalized
+	* @param color
+	*/
+	void setRectangleExtends(float width, float height);
+	/**
+	* @brief setInvert
+	* @param color
+	*/
+	void setInvert(bool inv);
 
     /**
      * @brief Get the execution time of the last kernel run.
@@ -227,6 +246,8 @@ public:
      * @param factor downsampling factor, uniform for all 3 dimensions
      */
     const std::string volumeDownsampling(const int t, const int factor);
+
+	cl::ImageGL getOutputMemGL(); // Returns a copy of the local _outputMem using the copy constructor
 
 private:
     /**
@@ -289,6 +310,7 @@ private:
     cl::Context _contextCL;
     cl::CommandQueue _queueCL;
     cl::Kernel _raycastKernel;
+	cl::Kernel _raycastKernelRectangle;
     cl::Kernel _genBricksKernel;
     cl::Kernel _downsamplingKernel;
 

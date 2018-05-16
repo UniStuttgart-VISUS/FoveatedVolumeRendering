@@ -83,8 +83,8 @@ public:
     QQuaternion getCamRotation() const;
     void setCamRotation(const QQuaternion &rotQuat);
 
-	enum RenderingMethod { STANDARD, MOUSE_SQUARE };
-	void setRenderingMethod(RenderingMethod rm);
+	enum RenderingMethod { STANDARD, MOUSE_SQUARE_VP, MOUSE_SQUARE_DC };
+	void setRenderingMethod(int rm);
 
 
 public slots:
@@ -139,7 +139,8 @@ private:
 
 	void renderOutput(double fps);
 	void paintGL_standard();
-	void paintGL_mouse_square();
+	void paintGL_mouse_square_vp(int swidth, int sheight);
+	void paintGL_mouse_square_dc();
 
     // -------Members--------
     //
@@ -179,4 +180,5 @@ private:
     bool _useGL;
     bool _showOverlay;
 	RenderingMethod _renderingMethod;
+	std::array<int, 2> _rect_extends;
 };

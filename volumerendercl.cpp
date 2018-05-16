@@ -135,7 +135,7 @@ void VolumeRenderCL::initKernel(const std::string fileName, const std::string bu
     try
     {
         cl::Program program = buildProgramFromSource(_contextCL, fileName, buildFlags);
-        _raycastKernel = cl::Kernel(program, "volumeRender");
+        _raycastKernel = cl::Kernel(program, "volumeRenderRectangle");
         cl_float16 view = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
         _raycastKernel.setArg(VIEW, view);
         _raycastKernel.setArg(SAMPLING_RATE, 1.5f);     // default step size 0.5*voxel size
@@ -147,7 +147,11 @@ void VolumeRenderCL::initKernel(const std::string fileName, const std::string bu
         _raycastKernel.setArg(BACKGROUND, bgColor);
         _raycastKernel.setArg(AO, 0);                   // ambient occlusion off by default
         _raycastKernel.setArg(CONTOURS, 0);             // contour lines off by default
-        _raycastKernel.setArg(AERIAL, 0);               // aerial perspective off by defualt
+        _raycastKernel.setArg(AERIAL, 0);               // aerial perspective off by default
+		cl_float2 cp = { {0.f,0.f} };
+		_raycastKernel.setArg(CURSOR_POS, cp);
+		_raycastKernel.setArg(RECTANGLE_EXTS, cp);
+		_raycastKernel.setArg(INVERT, 1);
 
         _genBricksKernel = cl::Kernel(program, "generateBricks");
         _downsamplingKernel = cl::Kernel(program, "downsampling");
@@ -294,6 +298,11 @@ const std::string VolumeRenderCL::volumeDownsampling(const int t, const int fact
     return std::string("");
 }
 
+cl::ImageGL VolumeRenderCL::getOutputMemGL()
+{
+	return cl::ImageGL(_outputMem);
+}
+
 
 /**
  * @brief VolumeRenderCL::calcScaling
@@ -425,7 +434,6 @@ void VolumeRenderCL::runRaycast(const size_t width, const size_t height, const i
         logCLerror(err);
     }
 }
-
 
 /**
  * @brief VolumeRenderCL::runRaycastNoGL
@@ -817,6 +825,23 @@ void VolumeRenderCL::setBackground(std::array<float, 4> color)
     try {
         _raycastKernel.setArg(BACKGROUND, bgColor);
     } catch (cl::Error err) { logCLerror(err); }
+}
+
+void VolumeRenderCL::setCursorPos(float xPos, float yPos)
+{
+	cl_float2 pos = { {xPos, yPos} };
+	_raycastKernel.setArg(CURSOR_POS, pos);
+}
+
+void VolumeRenderCL::setRectangleExtends(float width, float height)
+{
+	cl_float2 ext = { {width, height} };
+	_raycastKernel.setArg(RECTANGLE_EXTS, ext);
+}
+
+void VolumeRenderCL::setInvert(bool inv)
+{
+	_raycastKernel.setArg(INVERT, inv ? 1 : 0);
 }
 
 

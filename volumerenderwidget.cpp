@@ -63,21 +63,22 @@ static const char *pFsScreenQuadSource =
  * @param parent
  */
 VolumeRenderWidget::VolumeRenderWidget(QWidget *parent)
-    : QOpenGLWidget(parent)
-    , _tffRange(QPoint(0, 255))
-    , _timestep(0)
-    , _lastLocalCursorPos(QPoint(0,0))
-    , _rotQuat(QQuaternion(1, 0, 0, 0))
-    , _translation(QVector3D(0, 0, 2.0))
-    , _noUpdate(true)
-    , _loadingFinished(false)
-    , _writeImage(false)
-    , _recordVideo(false)
-    , _imgCount(0)
-    , _imgSamplingRate(1)
-    , _useGL(true)
-    , _showOverlay(true)
+	: QOpenGLWidget(parent)
+	, _tffRange(QPoint(0, 255))
+	, _timestep(0)
+	, _lastLocalCursorPos(QPoint(0, 0))
+	, _rotQuat(QQuaternion(1, 0, 0, 0))
+	, _translation(QVector3D(0, 0, 2.0))
+	, _noUpdate(true)
+	, _loadingFinished(false)
+	, _writeImage(false)
+	, _recordVideo(false)
+	, _imgCount(0)
+	, _imgSamplingRate(1)
+	, _useGL(true)
+	, _showOverlay(true)
 	, _renderingMethod(STANDARD)
+	, _rect_extends({ 50, 50 })
 {
     this->setMouseTracking(true);
 }
@@ -259,23 +260,26 @@ void VolumeRenderWidget::setImageSamplingRate(const double samplingRate)
     this->resizeGL(this->width(), this->height());
 }
 
-
-
 /**
  * @brief VolumeRenderWidget::paintGL
  */
 void VolumeRenderWidget::paintGL()
 {
-	switch (this->_renderingMethod) {
-	case MOUSE_SQUARE:
-		paintGL_mouse_square();
+	double fps = 0.0;
+	int shw = 200;
+	switch (_renderingMethod) {
+	case MOUSE_SQUARE_VP:
+		paintGL_mouse_square_vp(shw, shw);
 		break;
+	case MOUSE_SQUARE_DC:
+		paintGL_mouse_square_dc();
 	default: // case STANDARD:
 		paintGL_standard();
 		break;
 	}
+	fps = calcFPS();
+	renderOutput(fps);
 }
-
 
 /**
  * @brief VolumeRenderWidget::resizeGL
@@ -301,7 +305,6 @@ void VolumeRenderWidget::resizeGL(int w, int h)
 
     emit frameSizeChanged(this->size());
 }
-
 
 /**
  * @brief VolumeRenderWidget::generateOutputTextures
@@ -413,7 +416,7 @@ void VolumeRenderWidget::renderOutput(double fps)
 
 void VolumeRenderWidget::paintGL_standard()
 {
-	double fps = 0.0;
+	
 	if (this->_loadingFinished && _volumerender.hasData() && !_noUpdate)
 	{
 		// OpenCL raycast
@@ -442,14 +445,102 @@ void VolumeRenderWidget::paintGL_standard()
 		{
 			qCritical() << e.what();
 		}
-		fps = calcFPS();
+		
 	}
-
-	renderOutput(fps);
 }
 
-void VolumeRenderWidget::paintGL_mouse_square()
+void VolumeRenderWidget::paintGL_mouse_square_vp(int swidth, int sheight)
 {
+	if (_useGL) {
+		if (this->_loadingFinished && _volumerender.hasData() && !_noUpdate)
+		{
+			// OpenCL raycast
+			try
+			{
+				cl::ImageGL* lowRes;
+				// first render pass: render with low res full image
+				{
+					_volumerender.runRaycast(floor(this->size().width() * _imgSamplingRate),
+						floor(this->size().height()* _imgSamplingRate), _timestep);
+					lowRes = &_volumerender.getOutputMemGL();
+				}
+
+				cl::ImageGL* normRes;
+				// second render pass: render small area around the mouse with higher resolution
+				{
+					// save current view to restore it later
+					QMatrix4x4 currView = _viewMX;
+					QMatrix4x4 newView;
+
+					// std::cout << "translation.xyz: " << static_cast<float>(_translation.x()) << "," << static_cast<float>(_translation.y()) << "," << static_cast<float>(_translation.z()) << "\n";
+					// std::cout << "rotation.xyzw: " << _rotQuat.x() << ", " << _rotQuat.y() << ", " << _rotQuat.z() << std::endl;
+
+				}
+				
+			}
+			catch (std::runtime_error e)
+			{
+				qCritical() << e.what();
+			}
+
+		}
+	}
+	else {
+		qDebug() << "mouse square is only available if useGL is enabled.\n";
+	}
+}
+
+void VolumeRenderWidget::paintGL_mouse_square_dc()
+{
+	if (_useGL) {
+		if (this->_loadingFinished && _volumerender.hasData() && !_noUpdate)
+		{
+			// OpenCL raycast
+			try
+			{
+				cl::ImageGL* lowRes;
+				// first render pass: render with low res full image
+				{
+					float width_renderer = static_cast<float>(this->size().width());
+					float height_renderer = static_cast<float>(this->size().height());
+
+					if (width_renderer > 1.f && height_renderer > 1.f) {
+						float xPos_nlzd = static_cast<float>(_lastLocalCursorPos.x()) / width_renderer;
+						float yPos_nlzd = static_cast<float>(_lastLocalCursorPos.y()) / height_renderer;
+						_volumerender.setCursorPos(xPos_nlzd, yPos_nlzd);
+
+						float rect_width_nlzd = _rect_extends[0] / width_renderer;
+						float rect_height_nlzd = _rect_extends[1] / height_renderer;
+						_volumerender.setRectangleExtends(rect_width_nlzd, rect_height_nlzd);
+
+						std::cout << xPos_nlzd << ", " << yPos_nlzd << "   " << rect_width_nlzd << ", " << rect_height_nlzd << std::endl;
+					}
+					_volumerender.setInvert(false);
+
+					_volumerender.runRaycast(floor(this->size().width() * _imgSamplingRate),
+						floor(this->size().height()* _imgSamplingRate), _timestep);
+					lowRes = &_volumerender.getOutputMemGL();
+				}
+
+				cl::ImageGL* highRes;
+				// render image with four times the resolution but discard everything except a small area (discard in kernel)
+				{
+					/*_volumerender.runRaycast(floor(this->size().width() * _imgSamplingRate * 4),
+						floor(this->size().height() * _imgSamplingRate * 4), _timestep);
+					highRes = &_volumerender.getOutputMemGL();*/
+				}
+
+			}
+			catch (std::runtime_error e)
+			{
+				qCritical() << e.what();
+			}
+
+		}
+	}
+	else {
+		qDebug() << "mouse square is only available if useGL is enabled.\n";
+	}
 }
 
 void VolumeRenderWidget::setShowOverlay(bool showOverlay)
@@ -468,9 +559,9 @@ void VolumeRenderWidget::setCamRotation(const QQuaternion &rotQuat)
     _rotQuat = rotQuat;
 }
 
-void VolumeRenderWidget::setRenderingMethod(RenderingMethod rm)
+void VolumeRenderWidget::setRenderingMethod(int rm)
 {
-	this->_renderingMethod = rm;
+	this->_renderingMethod = static_cast<VolumeRenderWidget::RenderingMethod>(rm);
 }
 
 QVector3D VolumeRenderWidget::getCamTranslation() const
@@ -773,7 +864,6 @@ std::vector<unsigned char> VolumeRenderWidget::getRawTransferFunction(QGradientS
     return tff;
 }
 
-
 /**
  * @brief VolumeRenderWidget::cleanup
  */
@@ -783,8 +873,6 @@ void VolumeRenderWidget::cleanup()
 //    if (_quadVbo.isCreated())
 //        _quadVbo.destroy();
 }
-
-
 
 /**
  * @brief VolumeRenderWidget::mousePressEvent
@@ -888,6 +976,10 @@ void VolumeRenderWidget::mouseMoveEvent(QMouseEvent *event)
         updateView();
     }
 
+	if (_renderingMethod != RenderingMethod::STANDARD) {
+		update();
+	}
+
     _lastLocalCursorPos = event->pos();
     event->accept();
 }
@@ -928,11 +1020,6 @@ void VolumeRenderWidget::mouseDoubleClickEvent(QMouseEvent *event)
  */
 void VolumeRenderWidget::keyReleaseEvent(QKeyEvent *event)
 {
-	// print translation (debug)
-	if (/* TODO: check for specific key to trigger debug msg */ false) {
-		qDebug() << "translation.xyz: " << static_cast<int>(_translation.x()) << "," << static_cast<int>(_translation.y()) << "," << static_cast<int>(_translation.z()) << "\n";
-	}
-
 
     // nothing yet
     event->accept();
