@@ -273,7 +273,11 @@ void VolumeRenderWidget::paintGL()
 		break;
 	case MOUSE_SQUARE_DC:
 		paintGL_mouse_square_dc();
+		break;
 	default: // case STANDARD:
+		_volumerender.setCursorPos(0.f, 0.f);
+		_volumerender.setRectangleExtends(0.f, 0.f);
+		_volumerender.setInvert(true);
 		paintGL_standard();
 		break;
 	}
@@ -498,23 +502,33 @@ void VolumeRenderWidget::paintGL_mouse_square_dc()
 			// OpenCL raycast
 			try
 			{
+
+				float width_renderer = static_cast<float>(this->size().width());
+				float height_renderer = static_cast<float>(this->size().height());
+				float xPos_nlzd = 0.f;
+				float yPos_nlzd = 0.f;
+				float rect_width_nlzd = 0.f;
+				float rect_height_nlzd = 0.f;
+
+				if (width_renderer > 1.f && height_renderer > 1.f) {
+					xPos_nlzd = static_cast<float>(_lastLocalCursorPos.x()) / width_renderer;
+					yPos_nlzd = static_cast<float>(_lastLocalCursorPos.y()) / height_renderer;
+					
+
+					rect_width_nlzd = _rect_extends[0] / width_renderer;
+					rect_height_nlzd = _rect_extends[1] / height_renderer;
+					
+
+					std::cout << xPos_nlzd << ", " << yPos_nlzd << "   " << rect_width_nlzd << ", " << rect_height_nlzd << std::endl;
+				}
+
+				_volumerender.setCursorPos(xPos_nlzd, yPos_nlzd);
+				_volumerender.setRectangleExtends(rect_width_nlzd, rect_height_nlzd);
+
 				cl::ImageGL* lowRes;
 				// first render pass: render with low res full image
 				{
-					float width_renderer = static_cast<float>(this->size().width());
-					float height_renderer = static_cast<float>(this->size().height());
-
-					if (width_renderer > 1.f && height_renderer > 1.f) {
-						float xPos_nlzd = static_cast<float>(_lastLocalCursorPos.x()) / width_renderer;
-						float yPos_nlzd = static_cast<float>(_lastLocalCursorPos.y()) / height_renderer;
-						_volumerender.setCursorPos(xPos_nlzd, yPos_nlzd);
-
-						float rect_width_nlzd = _rect_extends[0] / width_renderer;
-						float rect_height_nlzd = _rect_extends[1] / height_renderer;
-						_volumerender.setRectangleExtends(rect_width_nlzd, rect_height_nlzd);
-
-						std::cout << xPos_nlzd << ", " << yPos_nlzd << "   " << rect_width_nlzd << ", " << rect_height_nlzd << std::endl;
-					}
+					
 					_volumerender.setInvert(false);
 
 					_volumerender.runRaycast(floor(this->size().width() * _imgSamplingRate),
@@ -525,9 +539,14 @@ void VolumeRenderWidget::paintGL_mouse_square_dc()
 				cl::ImageGL* highRes;
 				// render image with four times the resolution but discard everything except a small area (discard in kernel)
 				{
+					
+					_volumerender.setInvert(true);
+
 					/*_volumerender.runRaycast(floor(this->size().width() * _imgSamplingRate * 4),
 						floor(this->size().height() * _imgSamplingRate * 4), _timestep);
 					highRes = &_volumerender.getOutputMemGL();*/
+
+					
 				}
 
 			}
