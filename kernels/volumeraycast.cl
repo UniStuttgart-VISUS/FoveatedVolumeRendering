@@ -653,17 +653,21 @@ __kernel void volumeRenderRectangle(  __read_only image3d_t volData
     if(any(globalId >= get_image_dim(outData)))
         return;
 
-    int maxSize = max(get_global_size(0), get_global_size(1));
-    float2 imgCoords;
-    imgCoords.x = native_divide((globalId.x + 0.5f), convert_float(maxSize)) * 2.f;
-    imgCoords.y = native_divide((globalId.y + 0.5f), convert_float(maxSize)) * 2.f;
+    float2 texCoords_nlzd = (float2)(convert_float_rtp(globalId.x) / convert_float_rtp(get_global_size(0)), convert_float_rtp(globalId.y) / convert_float_rtp(get_global_size(1)));
 
     // check if imageCoord is in valid area according to cursoPos and rectangle (and invert)
-    if(checkPointInRectangle(cursorPos, rectangle, imgCoords)){
+    // shift rect that cursor is in its middle
+    
+    if(checkPointInRectangle(cursorPos - 0.5f * rectangle, rectangle, texCoords_nlzd)){
         if(invert != 0) return;
     }else{
         if(invert == 0) return;
     }
+
+    int maxSize = max(get_global_size(0), get_global_size(1));
+    float2 imgCoords;
+    imgCoords.x = native_divide((globalId.x + 0.5f), convert_float(maxSize)) * 2.f;
+    imgCoords.y = native_divide((globalId.y + 0.5f), convert_float(maxSize)) * 2.f;
 
     uint4 taus = initRNG();
     // pseudo random number [0,1] for ray offsets to avoid moire patterns
