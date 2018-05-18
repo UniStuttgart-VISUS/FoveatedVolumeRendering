@@ -900,6 +900,7 @@ __kernel void volumeRenderRectangle(  __read_only image3d_t volData
     }
 
     result.w = alpha;
+    // if(invert == 0) result.xyz += 0.5f;
     write_imagef(outData, texCoords, result);
 }
 

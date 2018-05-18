@@ -78,7 +78,7 @@ VolumeRenderWidget::VolumeRenderWidget(QWidget *parent)
 	, _useGL(true)
 	, _showOverlay(true)
 	, _renderingMethod(STANDARD)
-	, _rect_extends({ 50, 50 })
+	, _rect_extends({ 250, 250 })
 {
     this->setMouseTracking(true);
 }
@@ -279,10 +279,11 @@ void VolumeRenderWidget::paintGL()
 		_volumerender.setRectangleExtends(0.f, 0.f);
 		_volumerender.setInvert(true);
 		paintGL_standard();
+		fps = calcFPS();
+		renderOutput(fps);
 		break;
 	}
-	fps = calcFPS();
-	renderOutput(fps);
+	
 }
 
 /**
@@ -514,41 +515,155 @@ void VolumeRenderWidget::paintGL_mouse_square_dc()
 					xPos_nlzd = static_cast<float>(_lastLocalCursorPos.x()) / width_renderer;
 					yPos_nlzd = static_cast<float>(_lastLocalCursorPos.y()) / height_renderer;
 					
-
 					rect_width_nlzd = _rect_extends[0] / width_renderer;
 					rect_height_nlzd = _rect_extends[1] / height_renderer;
 					
-
 					std::cout << xPos_nlzd << ", " << yPos_nlzd << "   " << rect_width_nlzd << ", " << rect_height_nlzd << std::endl;
 				}
+
+				double fps = 0.0;
+				double firstExecTime = 0.0;
 
 				_volumerender.setCursorPos(xPos_nlzd, yPos_nlzd);
 				_volumerender.setRectangleExtends(rect_width_nlzd, rect_height_nlzd);
 
-				cl::ImageGL* lowRes;
 				// first render pass: render with low res full image
 				{
+					_volumerender.setInvert(true);
+
+					_volumerender.runRaycast(floor(this->size().width() * _imgSamplingRate),
+						floor(this->size().height()*_imgSamplingRate), _timestep);
+
+					firstExecTime = _volumerender.getLastExecTime();
+				}
+
+				QPainter p(this);
+
+				// draw first output
+				{
 					
+					p.beginNativePainting();
+					{
+						// render the ray casting output
+						// clear to white to avoid getting colored borders outside the quad
+						glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+						glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+						// draw screen quad
+						//
+						_screenQuadVao.bind();
+						_quadVbo.bind();
+						glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+						// render screen quad
+						//
+						_spScreenQuad.bind();
+						_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("projMatrix"),
+							_screenQuadProjMX);
+						_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("mvMatrix"),
+							_viewMX * _modelMX);
+
+						_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("outTex"), GL_TEXTURE0);
+						glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+						_screenQuadVao.release();
+						_quadVbo.release();
+						_spScreenQuad.release();
+
+						glDisable(GL_CULL_FACE);
+						glDisable(GL_DEPTH_TEST);
+
+					}
+					p.endNativePainting();
+
+					// recover opengl texture
+					p.beginNativePainting();
+					{
+						glActiveTexture(GL_TEXTURE0);
+						glBindTexture(GL_TEXTURE_2D, _outTexId);
+					}
+					p.endNativePainting();
+				}
+
+				// render image with four times the resolution but discard everything except a small area (discard in kernel)
+				{
+					double tmp_sampling_rate = _imgSamplingRate;
+					_volumerender.updateSamplingRate(4.0 * tmp_sampling_rate);
+
 					_volumerender.setInvert(false);
 
 					_volumerender.runRaycast(floor(this->size().width() * _imgSamplingRate),
-						floor(this->size().height()* _imgSamplingRate), _timestep);
-					lowRes = &_volumerender.getOutputMemGL();
+						floor(this->size().height() * _imgSamplingRate), _timestep);
+
+					_volumerender.updateSamplingRate(tmp_sampling_rate);
+
+					fps = calcFPS(firstExecTime);
 				}
 
-				cl::ImageGL* highRes;
-				// render image with four times the resolution but discard everything except a small area (discard in kernel)
+				// draw second output and overlays
 				{
-					
-					_volumerender.setInvert(true);
+					p.beginNativePainting();
+					{
+						// render the ray casting output
+						// clear to white to avoid getting colored borders outside the quad
+						glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+						glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-					/*_volumerender.runRaycast(floor(this->size().width() * _imgSamplingRate * 4),
-						floor(this->size().height() * _imgSamplingRate * 4), _timestep);
-					highRes = &_volumerender.getOutputMemGL();*/
+						// draw screen quad
+						//
+						_screenQuadVao.bind();
+						_quadVbo.bind();
+						glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
 
-					
+						// render screen quad
+						//
+						_spScreenQuad.bind();
+						_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("projMatrix"),
+							_screenQuadProjMX);
+						_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("mvMatrix"),
+							_viewMX * _modelMX);
+
+						_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("outTex"), GL_TEXTURE0);
+						glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+						_screenQuadVao.release();
+						_quadVbo.release();
+						_spScreenQuad.release();
+
+						glDisable(GL_CULL_FACE);
+						glDisable(GL_DEPTH_TEST);
+
+						if (_volumerender.hasData() && _writeImage)
+						{
+							QImage img = this->grabFramebuffer();
+							QString number = QString("%1").arg(_imgCount++, 6, 10, QChar('0'));
+							if (!_recordVideo)
+							{
+								QLoggingCategory category("screenshot");
+								qCInfo(category, "Writing current frame img/frame_%s.png", number.toStdString().c_str());
+								_writeImage = false;
+							}
+							if (!QDir("img").exists())
+								QDir().mkdir("img");
+							img.save("img/frame_" + number + ".png");
+						}
+					}
+					p.endNativePainting();
+
+					// render overlays
+					if (_showOverlay)
+					{
+						paintFPS(p, fps, _volumerender.getLastExecTime());
+						paintOrientationAxis(p);
+					}
+
+					// recover opengl texture
+					p.beginNativePainting();
+					{
+						glActiveTexture(GL_TEXTURE0);
+						glBindTexture(GL_TEXTURE_2D, _outTexId);
+					}
+					p.endNativePainting();
+					p.end();
 				}
-
 			}
 			catch (std::runtime_error e)
 			{
@@ -1162,9 +1277,9 @@ void VolumeRenderWidget::setBackgroundColor(const QColor col)
  * @brief VolumeRenderWidget::calcFPS
  * @return
  */
-double VolumeRenderWidget::calcFPS()
+double VolumeRenderWidget::calcFPS(double offset)
 {
-    _times.push_back(_volumerender.getLastExecTime());
+    _times.push_back(_volumerender.getLastExecTime() + offset);
     if (_times.length() > 60)
         _times.pop_front();
 

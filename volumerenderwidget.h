@@ -133,7 +133,7 @@ protected:
 private:
     void paintOrientationAxis(QPainter &p);
     void paintFPS(QPainter &p, const double fps, const double lastTime);
-    double calcFPS();
+    double calcFPS(double offset = 0.0);
 
     void generateOutputTextures(int width, int height);
 
