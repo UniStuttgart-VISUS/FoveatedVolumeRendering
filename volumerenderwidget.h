@@ -135,7 +135,7 @@ private:
     void paintFPS(QPainter &p, const double fps, const double lastTime);
     double calcFPS(double offset = 0.0);
 
-    void generateOutputTextures(int width, int height);
+    void setOutputTextures(int width, int height, GLuint texture);
 
 	void renderOutput(double fps);
 	void paintGL_standard();
@@ -160,7 +160,8 @@ private:
     QMatrix4x4 _overlayModelMX;
 
     QPoint _tffRange;
-    GLuint _outTexId;
+    GLuint _outTexId0;
+	GLuint _outTexId1;
     VolumeRenderCL _volumerender;
     QEasingCurve _tffInterpol;
     int _timestep;

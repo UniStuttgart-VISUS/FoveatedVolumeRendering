@@ -51,10 +51,25 @@ static const char *pFsScreenQuadSource =
     "#version 330\n"
     "in highp vec2 texCoord;\n"
     "out highp vec4 fragColor;\n"
-    "uniform highp sampler2D outTex;\n"
+	"layout(binding = 0) uniform highp sampler2D outTex0;\n"
+	"layout(binding = 1) uniform highp sampler2D outTex1;\n"
+	"uniform vec2 cursorPos;\n"
+	"uniform vec2 rectExt;\n"
+	"// check wheather a given point is in the rectangle\n"
+	"// rectPos is bottom left point of rect\n"
+	"bool checkPointInRectangle(vec2 rectPos, vec2 rectExtends, vec2 point) {\n"
+	"if (point.x < rectPos.x || point.y < rectPos.y) return false;    // left and bottom edge\n"
+	"if (point.x > rectPos.x + rectExtends.x || point.y > rectPos.y + rectExtends.y) return false;    // top and right edge\n"
+	"return true;\n"
+	"}\n"
     "void main() {\n"
-    "   fragColor = texture(outTex, texCoord);\n"
-    "   fragColor.a = 1.0f;\n"
+    "   vec4 fragColor0 = texture(outTex0, texCoord);\n"
+    "   vec4 fragColor1 = texture(outTex1, texCoord);\n"
+	"   if(!checkPointInRectangle(cursorPos - 0.5 * rectExt, rectExt, texCoord)){\n"
+	"       fragColor = fragColor0;\n"
+	"   }else{\n"
+	"       fragColor = fragColor1;\n"
+	"   }\n"
     "}\n";
 
 
@@ -198,6 +213,10 @@ void VolumeRenderWidget::initializeGL()
     _spScreenQuad.release();
     _screenQuadVao.release();
 
+	// create GL output Texture Object
+	glGenTextures(1, &_outTexId0);
+	glGenTextures(1, &_outTexId1);
+
     try
     {
         _volumerender.initialize(true, false);
@@ -279,8 +298,6 @@ void VolumeRenderWidget::paintGL()
 		_volumerender.setRectangleExtends(0.f, 0.f);
 		_volumerender.setInvert(true);
 		paintGL_standard();
-		fps = calcFPS();
-		renderOutput(fps);
 		break;
 	}
 	
@@ -301,7 +318,8 @@ void VolumeRenderWidget::resizeGL(int w, int h)
 
     try
     {
-        generateOutputTextures(floor(w*_imgSamplingRate), floor(h*_imgSamplingRate));
+        setOutputTextures(floor(w*_imgSamplingRate), floor(h*_imgSamplingRate), _outTexId0);
+		updateView(0, 0);
     }
     catch (std::runtime_error e)
     {
@@ -312,14 +330,13 @@ void VolumeRenderWidget::resizeGL(int w, int h)
 }
 
 /**
- * @brief VolumeRenderWidget::generateOutputTextures
+ * @brief VolumeRenderWidget::setOutputTextures
+ * works on Texture unit GL_TEXTURE0 and type GL_TEXTURE_2D
  */
-void VolumeRenderWidget::generateOutputTextures(int width, int height)
+void VolumeRenderWidget::setOutputTextures(int width, int height, GLuint texture)
 {
-    glGenTextures(1, &_outTexId);
-
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, _outTexId);
+    glBindTexture(GL_TEXTURE_2D, texture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -347,13 +364,45 @@ void VolumeRenderWidget::generateOutputTextures(int width, int height)
     glGenerateMipmap(GL_TEXTURE_2D);
 
     _volumerender.updateOutputImg(static_cast<size_t>(width), static_cast<size_t>(height),
-                                      _outTexId);
+		texture);
 
-    updateView(0, 0);
 }
 
-void VolumeRenderWidget::renderOutput(double fps)
+void VolumeRenderWidget::paintGL_standard()
 {
+	setOutputTextures(floor(this->size().width() * _imgSamplingRate),
+		floor(this->size().height()*_imgSamplingRate), _outTexId0);
+
+	if (this->_loadingFinished && _volumerender.hasData() && !_noUpdate)
+	{
+		// OpenCL raycast
+		try
+		{
+			if (_useGL)
+				_volumerender.runRaycast(floor(this->size().width() * _imgSamplingRate),
+					floor(this->size().height()* _imgSamplingRate), _timestep);
+			else
+			{
+				std::vector<float> d;
+				_volumerender.runRaycastNoGL(floor(this->size().width() * _imgSamplingRate),
+					floor(this->size().height()* _imgSamplingRate),
+					_timestep, d);
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F,
+					floor(this->size().width() * _imgSamplingRate),
+					floor(this->size().height()* _imgSamplingRate),
+					0, GL_RGBA, GL_FLOAT,
+					d.data());
+				glGenerateMipmap(GL_TEXTURE_2D);
+				_volumerender.updateOutputImg(static_cast<size_t>(width()),
+					static_cast<size_t>(height()), _outTexId0);
+			}
+		}
+		catch (std::runtime_error e)
+		{
+			qCritical() << e.what();
+		}
+		
+	}
 	QPainter p(this);
 	p.beginNativePainting();
 	{
@@ -376,7 +425,13 @@ void VolumeRenderWidget::renderOutput(double fps)
 		_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("mvMatrix"),
 			_viewMX * _modelMX);
 
-		_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("outTex"), GL_TEXTURE0);
+		QVector2D cursorPos(0, 0);
+		QVector2D rectExt(0, 0);
+
+		_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("cursorPos"), cursorPos);
+		_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("rectExt"), rectExt);
+
+		_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("outTex0"), GL_TEXTURE0);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		_screenQuadVao.release();
 		_quadVbo.release();
@@ -401,7 +456,9 @@ void VolumeRenderWidget::renderOutput(double fps)
 		}
 	}
 	p.endNativePainting();
-
+	
+	double fps = calcFPS();
+	
 	// render overlays
 	if (_showOverlay)
 	{
@@ -413,45 +470,10 @@ void VolumeRenderWidget::renderOutput(double fps)
 	p.beginNativePainting();
 	{
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, _outTexId);
+		glBindTexture(GL_TEXTURE_2D, _outTexId0);
 	}
 	p.endNativePainting();
 	p.end();
-}
-
-void VolumeRenderWidget::paintGL_standard()
-{
-	
-	if (this->_loadingFinished && _volumerender.hasData() && !_noUpdate)
-	{
-		// OpenCL raycast
-		try
-		{
-			if (_useGL)
-				_volumerender.runRaycast(floor(this->size().width() * _imgSamplingRate),
-					floor(this->size().height()* _imgSamplingRate), _timestep);
-			else
-			{
-				std::vector<float> d;
-				_volumerender.runRaycastNoGL(floor(this->size().width() * _imgSamplingRate),
-					floor(this->size().height()* _imgSamplingRate),
-					_timestep, d);
-				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F,
-					floor(this->size().width() * _imgSamplingRate),
-					floor(this->size().height()* _imgSamplingRate),
-					0, GL_RGBA, GL_FLOAT,
-					d.data());
-				glGenerateMipmap(GL_TEXTURE_2D);
-				_volumerender.updateOutputImg(static_cast<size_t>(width()),
-					static_cast<size_t>(height()), _outTexId);
-			}
-		}
-		catch (std::runtime_error e)
-		{
-			qCritical() << e.what();
-		}
-		
-	}
 }
 
 void VolumeRenderWidget::paintGL_mouse_square_vp(int swidth, int sheight)
@@ -527,8 +549,13 @@ void VolumeRenderWidget::paintGL_mouse_square_dc()
 				_volumerender.setCursorPos(xPos_nlzd, yPos_nlzd);
 				_volumerender.setRectangleExtends(rect_width_nlzd, rect_height_nlzd);
 
+
 				// first render pass: render with low res full image
 				{
+					// use _outTexId0 as texture for the first image
+					setOutputTextures(floor(this->size().width() * _imgSamplingRate),
+						floor(this->size().height()*_imgSamplingRate), _outTexId0);
+
 					_volumerender.setInvert(true);
 
 					_volumerender.runRaycast(floor(this->size().width() * _imgSamplingRate),
@@ -537,77 +564,40 @@ void VolumeRenderWidget::paintGL_mouse_square_dc()
 					firstExecTime = _volumerender.getLastExecTime();
 				}
 
-				QPainter p(this);
+				
 
-				// draw first output
-				{
-					
-					p.beginNativePainting();
-					{
-						// render the ray casting output
-						// clear to white to avoid getting colored borders outside the quad
-						glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-						glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-						// draw screen quad
-						//
-						_screenQuadVao.bind();
-						_quadVbo.bind();
-						glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
-
-						// render screen quad
-						//
-						_spScreenQuad.bind();
-						_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("projMatrix"),
-							_screenQuadProjMX);
-						_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("mvMatrix"),
-							_viewMX * _modelMX);
-
-						_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("outTex"), GL_TEXTURE0);
-						glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-						_screenQuadVao.release();
-						_quadVbo.release();
-						_spScreenQuad.release();
-
-						glDisable(GL_CULL_FACE);
-						glDisable(GL_DEPTH_TEST);
-
-					}
-					p.endNativePainting();
-
-					// recover opengl texture
-					p.beginNativePainting();
-					{
-						glActiveTexture(GL_TEXTURE0);
-						glBindTexture(GL_TEXTURE_2D, _outTexId);
-					}
-					p.endNativePainting();
-				}
-
-				// render image with four times the resolution but discard everything except a small area (discard in kernel)
+				// second render pass: render with normal res a small area
 				{
 					double tmp_sampling_rate = _imgSamplingRate;
-					_volumerender.updateSamplingRate(4.0 * tmp_sampling_rate);
+					_imgSamplingRate *= 4.0;
+
+					// use _outTexId1 as texture for the second image
+					setOutputTextures(floor(this->size().width() * _imgSamplingRate),
+						floor(this->size().height()*_imgSamplingRate), _outTexId1);
+
+					_volumerender.updateSamplingRate(_imgSamplingRate);
 
 					_volumerender.setInvert(false);
 
 					_volumerender.runRaycast(floor(this->size().width() * _imgSamplingRate),
 						floor(this->size().height() * _imgSamplingRate), _timestep);
 
-					_volumerender.updateSamplingRate(tmp_sampling_rate);
+					_imgSamplingRate = tmp_sampling_rate;
+					_volumerender.updateSamplingRate(_imgSamplingRate);
 
 					fps = calcFPS(firstExecTime);
 				}
 
-				// draw second output and overlays
+				// draw output and overlays
 				{
+					QPainter p(this);
 					p.beginNativePainting();
 					{
 						// render the ray casting output
 						// clear to white to avoid getting colored borders outside the quad
 						glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
 						glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+						
 						// draw screen quad
 						//
 						_screenQuadVao.bind();
@@ -622,15 +612,27 @@ void VolumeRenderWidget::paintGL_mouse_square_dc()
 						_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("mvMatrix"),
 							_viewMX * _modelMX);
 
-						_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("outTex"), GL_TEXTURE0);
+						QVector2D cursorPos(xPos_nlzd, yPos_nlzd);
+						QVector2D rectExt(rect_width_nlzd, rect_height_nlzd);
+						
+						_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("cursorPos"), cursorPos);
+						_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("rectExt"), rectExt);
+						glActiveTexture(GL_TEXTURE0);
+						glBindTexture(GL_TEXTURE_2D, _outTexId0);
+						// _spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("outTex0"), 2);
+						glActiveTexture(GL_TEXTURE1);
+						glBindTexture(GL_TEXTURE_2D, _outTexId1);
+						// _spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("outTex1"), 3);
+						
 						glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
 						_screenQuadVao.release();
 						_quadVbo.release();
 						_spScreenQuad.release();
 
 						glDisable(GL_CULL_FACE);
 						glDisable(GL_DEPTH_TEST);
-
+						
 						if (_volumerender.hasData() && _writeImage)
 						{
 							QImage img = this->grabFramebuffer();
@@ -659,7 +661,7 @@ void VolumeRenderWidget::paintGL_mouse_square_dc()
 					p.beginNativePainting();
 					{
 						glActiveTexture(GL_TEXTURE0);
-						glBindTexture(GL_TEXTURE_2D, _outTexId);
+						glBindTexture(GL_TEXTURE_2D, _outTexId0);
 					}
 					p.endNativePainting();
 					p.end();
@@ -696,6 +698,7 @@ void VolumeRenderWidget::setCamRotation(const QQuaternion &rotQuat)
 void VolumeRenderWidget::setRenderingMethod(int rm)
 {
 	this->_renderingMethod = static_cast<VolumeRenderWidget::RenderingMethod>(rm);
+	update();
 }
 
 QVector3D VolumeRenderWidget::getCamTranslation() const
@@ -807,8 +810,9 @@ void VolumeRenderWidget::showSelectOpenCL()
                 }
 
                 try {
-                    generateOutputTextures(floor(width()*_imgSamplingRate),
-                                           floor(height()*_imgSamplingRate));
+                    setOutputTextures(floor(width()*_imgSamplingRate),
+                                           floor(height()*_imgSamplingRate), _outTexId0);
+					updateView(0, 0);
                 } catch (std::runtime_error e) {
                     qCritical() << "An error occured while generating output texture." << e.what();
                 }

@@ -659,9 +659,15 @@ __kernel void volumeRenderRectangle(  __read_only image3d_t volData
     // shift rect that cursor is in its middle
     
     if(checkPointInRectangle(cursorPos - 0.5f * rectangle, rectangle, texCoords_nlzd)){
-        if(invert != 0) return;
+        if(invert != 0){
+            write_imagef(outData, globalId, (float4)(0.0, 0.0, 0.0, 0.0));
+            return;
+        } 
     }else{
-        if(invert == 0) return;
+        if(invert == 0){
+            write_imagef(outData, globalId, (float4)(0.0, 0.0, 0.0, 0.0));
+            return;
+        } 
     }
 
     int maxSize = max(get_global_size(0), get_global_size(1));
