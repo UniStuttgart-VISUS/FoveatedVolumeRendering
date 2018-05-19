@@ -135,9 +135,8 @@ private:
     void paintFPS(QPainter &p, const double fps, const double lastTime);
     double calcFPS(double offset = 0.0);
 
-    void setOutputTextures(int width, int height, GLuint texture);
+    void setOutputTextures(int width, int height, GLuint texture, GLuint tex_unit);
 
-	void renderOutput(double fps);
 	void paintGL_standard();
 	void paintGL_mouse_square_vp(int swidth, int sheight);
 	void paintGL_mouse_square_dc();

@@ -62,10 +62,15 @@ static const char *pFsScreenQuadSource =
 	"if (point.x > rectPos.x + rectExtends.x || point.y > rectPos.y + rectExtends.y) return false;    // top and right edge\n"
 	"return true;\n"
 	"}\n"
+	"bool ligetr(vec4 leftColor, vec4 rightColor) {\n"
+	"if (leftColor.x < rightColor.x || leftColor.y < rightColor.y || leftColor.z < rightColor.z || leftColor.w < rightColor.w) return false;\n"
+	"return true;\n"
+	"}\n"
     "void main() {\n"
     "   vec4 fragColor0 = texture(outTex0, texCoord);\n"
     "   vec4 fragColor1 = texture(outTex1, texCoord);\n"
 	"   if(!checkPointInRectangle(cursorPos - 0.5 * rectExt, rectExt, texCoord)){\n"
+	"   //if(ligetr(fragColor0, fragColor1)){\n"
 	"       fragColor = fragColor0;\n"
 	"   }else{\n"
 	"       fragColor = fragColor1;\n"
@@ -318,7 +323,7 @@ void VolumeRenderWidget::resizeGL(int w, int h)
 
     try
     {
-        setOutputTextures(floor(w*_imgSamplingRate), floor(h*_imgSamplingRate), _outTexId0);
+        setOutputTextures(floor(w*_imgSamplingRate), floor(h*_imgSamplingRate), _outTexId0, GL_TEXTURE0);
 		updateView(0, 0);
     }
     catch (std::runtime_error e)
@@ -331,11 +336,11 @@ void VolumeRenderWidget::resizeGL(int w, int h)
 
 /**
  * @brief VolumeRenderWidget::setOutputTextures
- * works on Texture unit GL_TEXTURE0 and type GL_TEXTURE_2D
+ * works on Texture tex_unit and type GL_TEXTURE_2D
  */
-void VolumeRenderWidget::setOutputTextures(int width, int height, GLuint texture)
+void VolumeRenderWidget::setOutputTextures(int width, int height, GLuint texture, GLuint tex_unit)
 {
-    glActiveTexture(GL_TEXTURE0);
+    glActiveTexture(tex_unit);
     glBindTexture(GL_TEXTURE_2D, texture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -371,7 +376,7 @@ void VolumeRenderWidget::setOutputTextures(int width, int height, GLuint texture
 void VolumeRenderWidget::paintGL_standard()
 {
 	setOutputTextures(floor(this->size().width() * _imgSamplingRate),
-		floor(this->size().height()*_imgSamplingRate), _outTexId0);
+		floor(this->size().height()*_imgSamplingRate), _outTexId0, GL_TEXTURE0);
 
 	if (this->_loadingFinished && _volumerender.hasData() && !_noUpdate)
 	{
@@ -540,26 +545,34 @@ void VolumeRenderWidget::paintGL_mouse_square_dc()
 					rect_width_nlzd = _rect_extends[0] / width_renderer;
 					rect_height_nlzd = _rect_extends[1] / height_renderer;
 					
-					std::cout << xPos_nlzd << ", " << yPos_nlzd << "   " << rect_width_nlzd << ", " << rect_height_nlzd << std::endl;
+					// std::cout << xPos_nlzd << ", " << yPos_nlzd << "   " << rect_width_nlzd << ", " << rect_height_nlzd << std::endl;
 				}
 
 				double fps = 0.0;
 				double firstExecTime = 0.0;
 
-				_volumerender.setCursorPos(xPos_nlzd, yPos_nlzd);
-				_volumerender.setRectangleExtends(rect_width_nlzd, rect_height_nlzd);
-
 
 				// first render pass: render with low res full image
 				{
+					double tmp_sampling_rate = _imgSamplingRate;
+					_imgSamplingRate *= 0.25;
 					// use _outTexId0 as texture for the first image
+					_volumerender.updateSamplingRate(_imgSamplingRate);
+
 					setOutputTextures(floor(this->size().width() * _imgSamplingRate),
-						floor(this->size().height()*_imgSamplingRate), _outTexId0);
+
+						floor(this->size().height()*_imgSamplingRate), _outTexId0, GL_TEXTURE0);
+
+					_volumerender.setCursorPos(0.0, 0.0);
+					_volumerender.setRectangleExtends(0.0, 0.0);
 
 					_volumerender.setInvert(true);
 
 					_volumerender.runRaycast(floor(this->size().width() * _imgSamplingRate),
 						floor(this->size().height()*_imgSamplingRate), _timestep);
+
+					_imgSamplingRate = tmp_sampling_rate;
+					_volumerender.updateSamplingRate(_imgSamplingRate);
 
 					firstExecTime = _volumerender.getLastExecTime();
 				}
@@ -568,22 +581,19 @@ void VolumeRenderWidget::paintGL_mouse_square_dc()
 
 				// second render pass: render with normal res a small area
 				{
-					double tmp_sampling_rate = _imgSamplingRate;
-					_imgSamplingRate *= 4.0;
 
 					// use _outTexId1 as texture for the second image
 					setOutputTextures(floor(this->size().width() * _imgSamplingRate),
-						floor(this->size().height()*_imgSamplingRate), _outTexId1);
 
-					_volumerender.updateSamplingRate(_imgSamplingRate);
+						floor(this->size().height()*_imgSamplingRate), _outTexId1, GL_TEXTURE1);
+
+					_volumerender.setCursorPos(xPos_nlzd, yPos_nlzd);
+					_volumerender.setRectangleExtends(rect_width_nlzd, rect_height_nlzd);
 
 					_volumerender.setInvert(false);
 
 					_volumerender.runRaycast(floor(this->size().width() * _imgSamplingRate),
 						floor(this->size().height() * _imgSamplingRate), _timestep);
-
-					_imgSamplingRate = tmp_sampling_rate;
-					_volumerender.updateSamplingRate(_imgSamplingRate);
 
 					fps = calcFPS(firstExecTime);
 				}
@@ -617,12 +627,15 @@ void VolumeRenderWidget::paintGL_mouse_square_dc()
 						
 						_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("cursorPos"), cursorPos);
 						_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("rectExt"), rectExt);
+
+						/*
+						* not necessary because it is binded when rendering and the shader gets it by using layout(binding = ..)
 						glActiveTexture(GL_TEXTURE0);
 						glBindTexture(GL_TEXTURE_2D, _outTexId0);
 						// _spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("outTex0"), 2);
 						glActiveTexture(GL_TEXTURE1);
 						glBindTexture(GL_TEXTURE_2D, _outTexId1);
-						// _spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("outTex1"), 3);
+						// _spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("outTex1"), 3);*/
 						
 						glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
@@ -811,7 +824,8 @@ void VolumeRenderWidget::showSelectOpenCL()
 
                 try {
                     setOutputTextures(floor(width()*_imgSamplingRate),
-                                           floor(height()*_imgSamplingRate), _outTexId0);
+
+                                           floor(height()*_imgSamplingRate), _outTexId0, GL_TEXTURE0);
 					updateView(0, 0);
                 } catch (std::runtime_error e) {
                     qCritical() << "An error occured while generating output texture." << e.what();
