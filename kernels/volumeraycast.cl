@@ -357,6 +357,7 @@ float calcAO(float3 n, uint4 *taus, image3d_t volData, float3 pos, float stepSiz
 // check wheather a given point is in the rectangle
 // rectPos is bottom left point of rect
 bool checkPointInRectangle(float2 rectPos, float2 rectExtends, float2 point){
+	if(rectExtends.x == 0.0 || rectExtends.y == 0.0) return false;
     if(point.x < rectPos.x || point.y < rectPos.y) return false;    // left and bottom edge
     if(point.x > rectPos.x + rectExtends.x || point.y > rectPos.y + rectExtends.y) return false;    // top and right edge
     return true;

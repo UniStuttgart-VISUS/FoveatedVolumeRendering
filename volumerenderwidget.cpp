@@ -62,18 +62,18 @@ static const char *pFsScreenQuadSource =
 	"if (point.x > rectPos.x + rectExtends.x || point.y > rectPos.y + rectExtends.y) return false;    // top and right edge\n"
 	"return true;\n"
 	"}\n"
-	"bool ligetr(vec4 leftColor, vec4 rightColor) {\n"
-	"if (leftColor.x < rightColor.x || leftColor.y < rightColor.y || leftColor.z < rightColor.z || leftColor.w < rightColor.w) return false;\n"
-	"return true;\n"
+	"bool rhgv(vec4 leftColor, vec4 rightColor) {\n"
+	"if (leftColor.x < rightColor.x || leftColor.y < rightColor.y || leftColor.z < rightColor.z) return true;\n"
+	"return false;\n"
 	"}\n"
     "void main() {\n"
     "   vec4 fragColor0 = texture(outTex0, texCoord);\n"
     "   vec4 fragColor1 = texture(outTex1, texCoord);\n"
-	"   if(!checkPointInRectangle(cursorPos - 0.5 * rectExt, rectExt, texCoord)){\n"
-	"   //if(ligetr(fragColor0, fragColor1)){\n"
-	"       fragColor = fragColor0;\n"
-	"   }else{\n"
+	"   if(checkPointInRectangle(cursorPos - 0.5 * rectExt, rectExt, texCoord)){\n"
+	"   //if(rhgv(vec4(0,0,0,0), fragColor1)){\n"
 	"       fragColor = fragColor1;\n"
+	"   }else{\n"
+	"       fragColor = fragColor0;\n"
 	"   }\n"
     "}\n";
 
@@ -555,9 +555,8 @@ void VolumeRenderWidget::paintGL_mouse_square_dc()
 				// first render pass: render with low res full image
 				{
 					double tmp_sampling_rate = _imgSamplingRate;
-					_imgSamplingRate *= 0.25;
+					_imgSamplingRate *= 0.5;
 					// use _outTexId0 as texture for the first image
-					_volumerender.updateSamplingRate(_imgSamplingRate);
 
 					setOutputTextures(floor(this->size().width() * _imgSamplingRate),
 
@@ -572,7 +571,6 @@ void VolumeRenderWidget::paintGL_mouse_square_dc()
 						floor(this->size().height()*_imgSamplingRate), _timestep);
 
 					_imgSamplingRate = tmp_sampling_rate;
-					_volumerender.updateSamplingRate(_imgSamplingRate);
 
 					firstExecTime = _volumerender.getLastExecTime();
 				}
@@ -583,12 +581,14 @@ void VolumeRenderWidget::paintGL_mouse_square_dc()
 				{
 
 					// use _outTexId1 as texture for the second image
-					setOutputTextures(floor(this->size().width() * _imgSamplingRate),
+					double img_width = this->size().width() * _imgSamplingRate;
+					double img_height = this->size().height()*_imgSamplingRate;
+					setOutputTextures(floor(img_width),
 
-						floor(this->size().height()*_imgSamplingRate), _outTexId1, GL_TEXTURE1);
+						floor(img_height), _outTexId1, GL_TEXTURE1);
 
 					_volumerender.setCursorPos(xPos_nlzd, yPos_nlzd);
-					_volumerender.setRectangleExtends(rect_width_nlzd, rect_height_nlzd);
+					_volumerender.setRectangleExtends(rect_width_nlzd + (16.0 / img_width), rect_height_nlzd + (16.0 / img_height));
 
 					_volumerender.setInvert(false);
 
