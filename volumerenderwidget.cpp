@@ -37,7 +37,7 @@ const static double Z_NEAR = 1.0;
 const static double Z_FAR = 500.0;
 
 static const char *pVsScreenQuadSource =
-    "#version 330\n"
+    "#version 430\n"
     "layout(location = 0) in highp vec3 vertex;\n"
     "out highp vec2 texCoord;\n"
     "uniform mat4 projMatrix;\n"
@@ -48,7 +48,7 @@ static const char *pVsScreenQuadSource =
     "}\n";
 
 static const char *pFsScreenQuadSource =
-    "#version 330\n"
+    "#version 430\n"
     "in highp vec2 texCoord;\n"
     "out highp vec4 fragColor;\n"
 	"layout(binding = 0) uniform highp sampler2D outTex0;\n"
