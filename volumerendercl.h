@@ -51,9 +51,11 @@ public:
         , MODEL_SCALE    // model scaling factor                     cl_float3
         , CONTOURS       // show contour lines                       cl_uint (bool)
         , AERIAL         // use aerial perspective                   cl_uint (bool)
-		, CURSOR_POS	 // float2 cursor pos
-		, RECTANGLE_EXTS // float2 rectangle extends
-		, INVERT		 // bool invert
+		, CURSOR_POS	 // cursor pos								 cl_float2
+		, RECTANGLE_EXTS // rectangle extends						 cl_float2
+		, INVERT		 // invert									 cl_uint (bool)
+		, RESOLUTIONFACTOR // resolution factor						 cl_float
+		, MODE			// modus									 cl_uint
 	};
 
     // mipmap down-scaling metric
@@ -213,7 +215,16 @@ public:
 	* @param color
 	*/
 	void setInvert(bool inv);
-
+	/**
+	* @brief setResolutionFactor
+	* @param factor
+	*/
+	void setResolutionFactor(float factor);
+	/**
+	* @brief setMode, 0 = Standard, 1 = dc with rect, 2 = sin res, else = standard
+	* @param mode
+	*/
+	void setMode(unsigned int mode);
     /**
      * @brief Get the execution time of the last kernel run.
      * @return The kernel runtime in seconds.
@@ -310,7 +321,6 @@ private:
     cl::Context _contextCL;
     cl::CommandQueue _queueCL;
     cl::Kernel _raycastKernel;
-	cl::Kernel _raycastKernelRectangle;
     cl::Kernel _genBricksKernel;
     cl::Kernel _downsamplingKernel;
 

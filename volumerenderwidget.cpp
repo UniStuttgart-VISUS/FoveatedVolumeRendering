@@ -293,15 +293,19 @@ void VolumeRenderWidget::paintGL()
 	int shw = 200;
 	switch (_renderingMethod) {
 	case MOUSE_SQUARE_VP:
+		_volumerender.setMode(0);
 		paintGL_mouse_square_vp(shw, shw);
 		break;
 	case MOUSE_SQUARE_DC:
+		_volumerender.setMode(1);
 		paintGL_mouse_square_dc();
 		break;
 	case SINUS_RESOLUTION:
+		_volumerender.setMode(2);
 		paintGL_SinusResolution();
 		break;
 	default: // case STANDARD:
+		_volumerender.setMode(0);
 		_volumerender.setCursorPos(0.f, 0.f);
 		_volumerender.setRectangleExtends(0.f, 0.f);
 		_volumerender.setInvert(true);

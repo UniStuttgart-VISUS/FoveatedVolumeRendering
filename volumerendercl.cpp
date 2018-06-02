@@ -135,7 +135,7 @@ void VolumeRenderCL::initKernel(const std::string fileName, const std::string bu
     try
     {
         cl::Program program = buildProgramFromSource(_contextCL, fileName, buildFlags);
-        _raycastKernel = cl::Kernel(program, "volumeRenderRectangle");
+        _raycastKernel = cl::Kernel(program, "volumeRender");
         cl_float16 view = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
         _raycastKernel.setArg(VIEW, view);
         _raycastKernel.setArg(SAMPLING_RATE, 1.5f);     // default step size 0.5*voxel size
@@ -152,6 +152,8 @@ void VolumeRenderCL::initKernel(const std::string fileName, const std::string bu
 		_raycastKernel.setArg(CURSOR_POS, cp);
 		_raycastKernel.setArg(RECTANGLE_EXTS, cp);
 		_raycastKernel.setArg(INVERT, 1);
+		_raycastKernel.setArg(RESOLUTIONFACTOR, 1);
+		_raycastKernel.setArg(MODE, 0);					// Standard
 
         _genBricksKernel = cl::Kernel(program, "generateBricks");
         _downsamplingKernel = cl::Kernel(program, "downsampling");
@@ -842,6 +844,16 @@ void VolumeRenderCL::setRectangleExtends(float width, float height)
 void VolumeRenderCL::setInvert(bool inv)
 {
 	_raycastKernel.setArg(INVERT, inv ? 1 : 0);
+}
+
+void VolumeRenderCL::setResolutionFactor(float factor)
+{
+	_raycastKernel.setArg(RESOLUTIONFACTOR, factor);
+}
+
+void VolumeRenderCL::setMode(unsigned int mode)
+{
+	_raycastKernel.setArg(MODE, mode);
 }
 
 
