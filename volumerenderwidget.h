@@ -83,7 +83,7 @@ public:
     QQuaternion getCamRotation() const;
     void setCamRotation(const QQuaternion &rotQuat);
 
-	enum RenderingMethod { STANDARD, MOUSE_SQUARE_VP, MOUSE_SQUARE_DC };
+	enum RenderingMethod { STANDARD, MOUSE_SQUARE_VP, MOUSE_SQUARE_DC, SINUS_RESOLUTION};
 	void setRenderingMethod(int rm);
 
 
@@ -140,6 +140,7 @@ private:
 	void paintGL_standard();
 	void paintGL_mouse_square_vp(int swidth, int sheight);
 	void paintGL_mouse_square_dc();
+	void paintGL_SinusResolution();
 
     // -------Members--------
     //
@@ -181,4 +182,5 @@ private:
     bool _showOverlay;
 	RenderingMethod _renderingMethod;
 	std::array<int, 2> _rect_extends;
+	float _resolutionfactor;
 };
