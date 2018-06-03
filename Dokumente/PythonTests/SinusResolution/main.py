@@ -123,7 +123,7 @@ def pow2d(tuple_element, exponent):
 
 
 def main():
-    wp = window_plotting(40, 30)
+    wp = window_plotting(90, 70)
     point = (0.7, 0.8)
     wp.modify_tuples(npos, point)
 
