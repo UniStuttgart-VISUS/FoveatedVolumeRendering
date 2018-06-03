@@ -70,20 +70,44 @@ def tp_distance(v0,v1):
     return tp_length(tp_minus(v0, v1))
 
 
-def identity(tuple_element):
+def harmonic_sinus(t, y, T, phi):
+    omega = 2.0 * np.pi / T
+    return y * np.sin(omega * t + phi)
+
+
+def assembled_sinus(x, p):
+    if x <= p:
+        t = x
+        y = p
+        T = 4 * p
+        if T == 0:
+            T = 0.0000001
+        phi = 0.0
+        y_value = harmonic_sinus(t, y, T, phi)
+    else:
+        t = x
+        y = 1 - p
+        T = 4 * (1 - p)
+        if T == 0:
+            T = 0.0000001
+        omega = 2.0 * np.pi / T
+        phi = -omega
+        y_value = harmonic_sinus(t, y, T, phi) + 1
+    return y_value
+
+
+def identity(tuple_element, width, height):
     return tuple_element
 
 
 def npos(tuple_element, width, height, point):
     # print_ftp(tuple_element, point)
-    dist = tp_distance(tuple_element, point)
-    dir = tp_minus(point, tuple_element)
+    conv_x = tuple_element[0] / width
+    conv_y = tuple_element[1] / height
+    new_x = assembled_sinus(conv_x, point[0])
+    new_y = assembled_sinus(conv_y, point[1])
 
-    # normalized_dir = float(dist) / float(tp_length((width, height)))
-
-    v2 = tp_mults(dir, np.sin(dir))
-
-    return tp_plus(tuple_element, v2)
+    return width * new_x, height * new_y
 
 
 def log2d(tuple_element):
@@ -99,12 +123,13 @@ def pow2d(tuple_element, exponent):
 
 
 def main():
-    wp = window_plotting(16, 9)
-    wp.modify_tuples(npos, (5,5))
+    wp = window_plotting(40, 30)
+    point = (0.7, 0.8)
+    wp.modify_tuples(npos, point)
 
     axes = plt.gca()
-    axes.set_xlim([-1, wp.width])
-    axes.set_ylim([-1, wp.height])
+    axes.set_xlim([-0.2, wp.width])
+    axes.set_ylim([-0.2, wp.height])
     axes.set_aspect('equal')
 
     x_v = wp.x_array()
