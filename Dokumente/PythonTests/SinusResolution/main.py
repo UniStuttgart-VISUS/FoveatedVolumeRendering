@@ -19,7 +19,7 @@ class window_plotting:
         # init window values
         for x in range(self.width):
             for y in range(self.height):
-                self.window[x, y] = (x, y)
+                self.window[x, y] = (float(x) /  width, float(y) / height)
 
     def x_array(self):
         x = []
@@ -96,6 +96,14 @@ def assembled_sinus(x, p):
     return y_value
 
 
+def mid_linear(x, p, rad=0.07):
+    if x < p-rad or x > p+rad:
+        y_value = 0.5 * x
+    else:
+        y_value = 0.8 * x
+    return y_value
+
+
 def identity(tuple_element, width, height):
     return tuple_element
 
@@ -108,6 +116,15 @@ def npos(tuple_element, width, height, point):
     new_y = assembled_sinus(conv_y, point[1])
 
     return width * new_x, height * new_y
+
+
+def npos_test(tuple_element, width, height, point, func):
+    # conv_x = tuple_element[0] / width
+    # conv_y = tuple_element[1] / height
+    new_x = func(tuple_element[0], point[0])
+    new_y = func(tuple_element[1], point[1])
+
+    return tuple_element[0], new_x
 
 
 def log2d(tuple_element):
@@ -123,13 +140,13 @@ def pow2d(tuple_element, exponent):
 
 
 def main():
-    wp = window_plotting(90, 70)
+    wp = window_plotting(160, 90)
     point = (0.7, 0.8)
-    wp.modify_tuples(npos, point)
+    wp.modify_tuples(npos_test, point, mid_linear)
 
     axes = plt.gca()
-    axes.set_xlim([-0.2, wp.width])
-    axes.set_ylim([-0.2, wp.height])
+    axes.set_xlim([-0.1, 1.1])
+    axes.set_ylim([-0.1, 1.1])
     axes.set_aspect('equal')
 
     x_v = wp.x_array()
