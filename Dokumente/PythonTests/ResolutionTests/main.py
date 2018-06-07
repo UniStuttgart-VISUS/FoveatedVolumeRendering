@@ -3,14 +3,14 @@ import matplotlib.pyplot as plt
 
 
 class window_plotting:
-    def __init__(self, width=20, height=20):
+    def __init__(self, width=20, height=20, test=0):
         self.width = width
         self.height = height
         self.resolution = (self.width, self.height)
         self.window = np.ndarray(shape=self.resolution, dtype=tuple, order='C')
-        self.reset_window(width, height)
+        self.reset_window(width, height, test)
 
-    def reset_window(self, width, height):
+    def reset_window(self, width, height, test=0):
         self.width = width
         self.height = height
         self.resolution = (self.width, self.height)
@@ -19,7 +19,7 @@ class window_plotting:
         # init window values
         for x in range(self.width):
             for y in range(self.height):
-                self.window[x, y] = (float(x) /  width, float(y) / height)
+                self.window[x, y] = (x, y) if test==0 else (x / float(self.width), y / float(self.height))
 
     def x_array(self):
         x = []
@@ -96,11 +96,59 @@ def assembled_sinus(x, p):
     return y_value
 
 
-def mid_linear(x, p, rad=0.07):
-    if x < p-rad or x > p+rad:
-        y_value = 0.5 * x
+def straight_line(m, x, d):
+    return m * x + d
+
+
+def change_density(x, p, rad=0.05, ires=0.5):
+    l = p - rad
+    md = 2.0*rad
+    r = 1.0 - md - l
+
+    pp = md
+    rp = 1.0-pp
+    lrp = l / r * rp
+    rrp = rp -lrp
+    if p-rad == 0 or x == 0:
+        return 0
+    if x < lrp:
+        print("left!")
+        m = l / float(lrp)
+        d = 0
+        y_value = straight_line(m, x, d)
+    elif x > lrp + pp:
+        print("right!")
+        m = r / rrp
+        d = - (1-r)
+        y_value = straight_line(m, x, d)
     else:
-        y_value = 0.8 * x
+        print("middle!")
+        m = 1
+        d = - (p - (l / float(lrp) * p))
+        y_value = straight_line(m, x, d)
+    # print("x: {}, y_value: {}, m: {}".format(x, y_value, m))
+    print("lrp: {}, rrp: {}, pp: {}, rp: {}, l: {}, md: {}, r: {}, x: {}, y_value: {}, m: {}, p: {}, rad: {}, ires: {}".format(lrp, rrp, pp, rp, l, md, r, x, y_value, m, p, rad, ires))
+    return y_value
+    pass
+
+
+def mid_linear(x, p, rad=0.07, ires=0.5):
+    if p-rad == 0:
+        return 0
+    if x < p-rad:
+        left_p = p - rad * ires
+        m = left_p / float(p-rad)
+        d = 0
+        y_value = straight_line(m, x, d)
+    elif x > p+rad:
+        right_p = p + rad * ires
+        m = (1-right_p) / float(1-p-rad)
+        d = - (m * (p+rad) - (p + ires * rad))
+        y_value = straight_line(m, x, d)
+    else:
+        m = ires
+        d = ires * p
+        y_value = straight_line(m, x, d)
     return y_value
 
 
@@ -108,12 +156,12 @@ def identity(tuple_element, width, height):
     return tuple_element
 
 
-def npos(tuple_element, width, height, point):
+def npos(tuple_element, width, height, point,  func):
     # print_ftp(tuple_element, point)
     conv_x = tuple_element[0] / width
     conv_y = tuple_element[1] / height
-    new_x = assembled_sinus(conv_x, point[0])
-    new_y = assembled_sinus(conv_y, point[1])
+    new_x = func(conv_x, point[0])
+    new_y = func(conv_y, point[1])
 
     return width * new_x, height * new_y
 
@@ -140,13 +188,15 @@ def pow2d(tuple_element, exponent):
 
 
 def main():
-    wp = window_plotting(160, 90)
-    point = (0.7, 0.8)
-    wp.modify_tuples(npos_test, point, mid_linear)
+    wp = window_plotting(49, 1, 1)
+    point = (0.3, 0.4)
+    wp.modify_tuples(npos_test, point, change_density)
 
     axes = plt.gca()
-    axes.set_xlim([-0.1, 1.1])
-    axes.set_ylim([-0.1, 1.1])
+    width = 1#wp.width
+    height = 1#wp.height
+    axes.set_xlim([-0.1, 1.1 * width])
+    axes.set_ylim([-0.1, 1.1 * height])
     axes.set_aspect('equal')
 
     x_v = wp.x_array()
