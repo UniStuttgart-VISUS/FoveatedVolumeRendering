@@ -105,7 +105,10 @@ p is the point where the mouse is located (one dimensional)
 rad is the radius of the area to render with different resolution
 ppf is the factor to multiply to pp when calculation the amount of points in the cursors area
 '''
-def change_density(x, p, rad=0.07, ppf=2.0):
+def change_density(x, p, rad=0.07, ppf=3.0):
+    if x == 0:
+        return 0
+
     l = p - rad
     mid = 2 * rad
     r = 1 - l - mid
@@ -130,12 +133,12 @@ def change_density(x, p, rad=0.07, ppf=2.0):
         print("pp == 0 !")
 
     lm = l / lrp
-    rm = r / rrp
     mm = mid / pp
+    rm = r / rrp
 
     ld = 0
-    md = abs(lrp * lm - lrp * mm)
-    rd = 0
+    md = lrp * lm - lrp * mm
+    rd = ((lrp + pp) * mm + md) - (lrp + pp) * rm
 
     if x < lrp:
         print("left!")
@@ -157,7 +160,10 @@ def change_density(x, p, rad=0.07, ppf=2.0):
     return y_value
     pass
 
-
+''' 
+    This has some flaws. E.g. the density of the points left and right of the
+    of the given point p is different 
+'''
 def mid_linear(x, p, rad=0.07, ires=0.5):
     if p-rad == 0:
         return 0
@@ -215,13 +221,13 @@ def npos(tuple_element, width, height, point,  func):
     return width * new_x, height * new_y
 
 
-def npos_test(tuple_element, width, height, point, func):
+def npos_test(tuple_element, width, height, point, func, *args):
     # conv_x = tuple_element[0] / width
     # conv_y = tuple_element[1] / height
-    new_x = func(tuple_element[0], point[0])
-    new_y = func(tuple_element[1], point[1])
-
-    return tuple_element[0], new_x
+    new_x = func(tuple_element[0], point[0], *args)
+    new_y = func(tuple_element[1], point[1], *args)
+    return new_x, 0.0
+    #return tuple_element[0], new_x
 
 
 def log2d(tuple_element):
@@ -237,9 +243,11 @@ def pow2d(tuple_element, exponent):
 
 
 def main():
-    wp = window_plotting(200, 1, 1)
-    point = (0.5, 0.4)
-    wp.modify_tuples(npos_test, point, change_density)
+    wp = window_plotting(20, 1, 1)
+    point = (0.3, 0.4)
+    rad = 0.07
+    inc_res_factor = 2.5
+    wp.modify_tuples(npos_test, point, change_density, rad, inc_res_factor)
 
     axes = plt.gca()
     width = 1#wp.width
