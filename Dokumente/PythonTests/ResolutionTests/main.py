@@ -99,35 +99,61 @@ def assembled_sinus(x, p):
 def straight_line(m, x, d):
     return m * x + d
 
-
-def change_density(x, p, rad=0.05, ires=0.5):
+'''
+x is the original x value which is to be changed
+p is the point where the mouse is located (one dimensional)
+rad is the radius of the area to render with different resolution
+ppf is the factor to multiply to pp when calculation the amount of points in the cursors area
+'''
+def change_density(x, p, rad=0.07, ppf=2.0):
     l = p - rad
-    md = 2.0*rad
-    r = 1.0 - md - l
+    mid = 2 * rad
+    r = 1 - l - mid
 
-    pp = md
-    rp = 1.0-pp
-    lrp = l / r * rp
-    rrp = rp -lrp
-    if p-rad == 0 or x == 0:
-        return 0
+    if r == 0:
+        print("r == 0 !")
+    elif ((l / r) + 1.0) == 0:
+        print("((l / r) + 1.0) == 0 !")
+
+    pp = 2*rad*ppf
+    one_minus_pp = 1.0 - pp
+    one_div_l_div_r_plus_1 = 1.0 / ((l / r) + 1.0)
+
+    lrp = one_minus_pp * (1.0 - one_div_l_div_r_plus_1)
+    rrp = one_minus_pp * one_div_l_div_r_plus_1
+
+    if lrp == 0:
+        print("lrp == 0 !")
+    elif rrp == 0:
+        print("rrp == 0 !")
+    elif pp == 0:
+        print("pp == 0 !")
+
+    lm = l / lrp
+    rm = r / rrp
+    mm = mid / pp
+
+    ld = 0
+    md = abs(lrp * lm - lrp * mm)
+    rd = 0
+
     if x < lrp:
         print("left!")
-        m = l / float(lrp)
-        d = 0
+        m = lm
+        d = ld
         y_value = straight_line(m, x, d)
     elif x > lrp + pp:
         print("right!")
-        m = r / rrp
-        d = - (1-r)
+        m = rm
+        d = rd
         y_value = straight_line(m, x, d)
     else:
         print("middle!")
-        m = 1
-        d = - (p - (l / float(lrp) * p))
+        m = mm
+        d = md
         y_value = straight_line(m, x, d)
     # print("x: {}, y_value: {}, m: {}".format(x, y_value, m))
-    print("lrp: {}, rrp: {}, pp: {}, rp: {}, l: {}, md: {}, r: {}, x: {}, y_value: {}, m: {}, p: {}, rad: {}, ires: {}".format(lrp, rrp, pp, rp, l, md, r, x, y_value, m, p, rad, ires))
+    # print("lrp: {}, rrp: {}, pp: {}, rp: {}, l: {}, md: {}, r: {}, x: {}, y_value: {}, m: {}, p: {}, rad: {}, ires: {}".format(lrp, rrp, pp, rp, l, md, r, x, y_value, m, p, rad, ires))
     return y_value
     pass
 
@@ -150,6 +176,29 @@ def mid_linear(x, p, rad=0.07, ires=0.5):
         d = ires * p
         y_value = straight_line(m, x, d)
     return y_value
+
+
+def test():
+    rad = 0.05
+    p = 0.2
+    l = p - rad
+    md = 2 * rad
+    r = 1 - l - md
+    ppf = 2
+
+    ges = 1
+    pp = 2*rad*ppf
+    one_minus_pp = 1.0 - pp
+    one_div_l_div_r_plus_1 = 1.0 / ((l / r) + 1.0)
+
+    lrp = one_minus_pp * (1.0 - one_div_l_div_r_plus_1)
+    rrp = one_minus_pp * one_div_l_div_r_plus_1
+
+    lm = l / lrp
+    rm = r / rrp
+    mm = md / pp
+
+    print("l: {}, r: {}, p: {}, rad: {}, ppf: {}, pp: {}, lrp: {}, rrp: {}".format(l, r, p, rad, ppf, pp, lrp, rrp))
 
 
 def identity(tuple_element, width, height):
@@ -188,15 +237,15 @@ def pow2d(tuple_element, exponent):
 
 
 def main():
-    wp = window_plotting(49, 1, 1)
-    point = (0.3, 0.4)
+    wp = window_plotting(200, 1, 1)
+    point = (0.5, 0.4)
     wp.modify_tuples(npos_test, point, change_density)
 
     axes = plt.gca()
     width = 1#wp.width
     height = 1#wp.height
     axes.set_xlim([-0.1, 1.1 * width])
-    axes.set_ylim([-0.1, 1.1 * height])
+    axes.set_ylim([-2.1, 2.1 * height])
     axes.set_aspect('equal')
 
     x_v = wp.x_array()
@@ -207,6 +256,7 @@ def main():
     plt.scatter(x_v, y_v, s=1)
 
     plt.show()
+    # test()
     return 0
 
 
