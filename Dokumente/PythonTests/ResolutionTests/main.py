@@ -211,12 +211,12 @@ def identity(tuple_element, width, height):
     return tuple_element
 
 
-def npos(tuple_element, width, height, point,  func):
+def npos(tuple_element, width, height, point, func, *args):
     # print_ftp(tuple_element, point)
     conv_x = tuple_element[0] / width
     conv_y = tuple_element[1] / height
-    new_x = func(conv_x, point[0])
-    new_y = func(conv_y, point[1])
+    new_x = func(conv_x, point[0], *args)
+    new_y = func(conv_y, point[1], *args)
 
     return width * new_x, height * new_y
 
@@ -243,17 +243,17 @@ def pow2d(tuple_element, exponent):
 
 
 def main():
-    wp = window_plotting(20, 1, 1)
-    point = (0.3, 0.4)
+    wp = window_plotting(160, 90, 0)
+    point = (0.8, 0.4)
     rad = 0.07
     inc_res_factor = 2.5
-    wp.modify_tuples(npos_test, point, change_density, rad, inc_res_factor)
+    wp.modify_tuples(npos, point, change_density, rad, inc_res_factor)
 
     axes = plt.gca()
-    width = 1#wp.width
-    height = 1#wp.height
+    width = wp.width
+    height = wp.height
     axes.set_xlim([-0.1, 1.1 * width])
-    axes.set_ylim([-2.1, 2.1 * height])
+    axes.set_ylim([-0.1, 1.1 * height])
     axes.set_aspect('equal')
 
     x_v = wp.x_array()
