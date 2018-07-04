@@ -949,6 +949,47 @@ void VolumeRenderWidget::showSelectOpenCL()
     }
 }
 
+void VolumeRenderWidget::showSelectEyetrackingDevice()
+{
+	// qDebug() << "show Select Eyetracking Device.\n";
+
+	TobiiResearchEyeTrackers* eyetrackers = NULL;
+	std::vector<std::string> eyetracker_device_names;
+
+	TobiiResearchStatus result;
+	size_t i = 0;
+	result = tobii_research_find_all_eyetrackers(&eyetrackers);
+	if (result != TOBII_RESEARCH_STATUS_OK) {
+		qCritical() << "Finding trackers failed. Error: " << result << "\n";
+		return;
+	}
+	for (i = 0; i < eyetrackers->count; i++) {
+		TobiiResearchEyeTracker* eyetracker = eyetrackers->eyetrackers[i];
+		char* device_name;
+		tobii_research_get_device_name(eyetracker, &device_name);
+		eyetracker_device_names.push_back(std::string(device_name));
+		tobii_research_free_string(device_name);
+	}
+
+	// ---- upper bound
+	QStringList platforms;
+	for (std::string &s : eyetracker_device_names)
+		platforms.append(QString::fromStdString(s));
+
+	bool ok;
+	QString platform = QInputDialog::getItem(this, tr("Select Eyetracker"),
+		tr("Select Eyetracking Device:"),
+		platforms, 0, false, &ok);
+	if (ok && !platform.isEmpty())
+	{
+		qDebug() << "selected platform: " << platform << "\nindex: " << platforms.indexOf(platform) << "\n";
+
+	}
+	// ---- lower bound
+
+	tobii_research_free_eyetrackers(eyetrackers);
+}
+
 /**
  * @brief VolumeRenderWidget::setupVertexAttribs
  */

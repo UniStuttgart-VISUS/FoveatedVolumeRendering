@@ -84,6 +84,8 @@ MainWindow::MainWindow(QWidget *parent) :
             ui->volumeRenderWidget, &VolumeRenderWidget::setShowOverlay);
     connect(ui->actionSelectOpenCL, &QAction::triggered,
             ui->volumeRenderWidget, &VolumeRenderWidget::showSelectOpenCL);
+	connect(ui->actionSelectEyetrackingDevice, &QAction::triggered,
+		ui->volumeRenderWidget, &VolumeRenderWidget::showSelectEyetrackingDevice);
     connect(ui->actionAbout, &QAction::triggered, this, &MainWindow::showAboutDialog);
 
 

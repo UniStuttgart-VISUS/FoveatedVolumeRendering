@@ -41,6 +41,9 @@
 #include <qopenglfunctions_4_3_core.h>
 #include <QPainter>
 
+#include <TOBIIRESEARCH\tobii_research.h>
+#include <TOBIIRESEARCH\tobii_research_eyetracker.h>
+
 #include "volumerendercl.h"
 
 class VolumeRenderWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_Core
@@ -119,6 +122,7 @@ public slots:
     void write(QJsonObject &json) const;
 
     void showSelectOpenCL();
+	void showSelectEyetrackingDevice();
 signals:
     void fpsChanged(double);
     void frameSizeChanged(QSize);
