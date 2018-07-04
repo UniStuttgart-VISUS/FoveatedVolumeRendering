@@ -995,6 +995,30 @@ void VolumeRenderWidget::showSelectEyetrackingDevice()
 	tobii_research_free_eyetrackers(eyetrackers);
 }
 
+void VolumeRenderWidget::calibrateEyetrackingDevice()
+{
+	qDebug() << "calibrate eyetracking device.\n";
+
+	
+	DISPLAY_DEVICE dd;
+	dd.cb = sizeof(dd);
+
+	std::vector<std::wstring> device_names;
+	std::vector<std::wstring> device_strings;
+
+	for (int deviceIndex = 0; EnumDisplayDevices(0, deviceIndex, &dd, 0); deviceIndex++) {
+		for (int monitorIndex = 0; EnumDisplayDevices(device_names[deviceIndex].c_str(), monitorIndex, &dd, 0); monitorIndex++) {
+			device_names.push_back(dd.DeviceName);
+			device_strings.push_back(dd.DeviceString);
+		}
+	}
+
+	for (int i = 0; i < device_names.size(); i++) {
+		std::wcout << "Device " << i << ": " << device_names[i] << ", " << device_strings[i] << std::endl;
+	}
+
+}
+
 /**
  * @brief VolumeRenderWidget::setupVertexAttribs
  */

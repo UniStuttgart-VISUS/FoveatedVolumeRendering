@@ -123,6 +123,7 @@ public slots:
 
     void showSelectOpenCL();
 	void showSelectEyetrackingDevice();
+	void calibrateEyetrackingDevice();
 signals:
     void fpsChanged(double);
     void frameSizeChanged(QSize);
