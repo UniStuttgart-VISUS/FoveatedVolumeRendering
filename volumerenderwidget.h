@@ -148,6 +148,9 @@ private:
 
     // -------Members--------
     //
+	// Eyetracker
+	TobiiResearchEyeTracker* _eyetracker;
+
     // OpenGL
     QOpenGLVertexArrayObject _screenQuadVao;
     QOpenGLShaderProgram _spScreenQuad;

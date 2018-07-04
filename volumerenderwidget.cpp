@@ -966,9 +966,12 @@ void VolumeRenderWidget::showSelectEyetrackingDevice()
 	for (i = 0; i < eyetrackers->count; i++) {
 		TobiiResearchEyeTracker* eyetracker = eyetrackers->eyetrackers[i];
 		char* device_name;
+		char* serial_number;
 		tobii_research_get_device_name(eyetracker, &device_name);
-		eyetracker_device_names.push_back(std::string(device_name));
+		tobii_research_get_serial_number(eyetracker, &serial_number);
+		eyetracker_device_names.push_back(std::string(device_name).append(", serial number: ").append(std::string(serial_number)));
 		tobii_research_free_string(device_name);
+		tobii_research_free_string(serial_number);
 	}
 
 	// ---- upper bound
@@ -982,8 +985,10 @@ void VolumeRenderWidget::showSelectEyetrackingDevice()
 		platforms, 0, false, &ok);
 	if (ok && !platform.isEmpty())
 	{
-		qDebug() << "selected platform: " << platform << "\nindex: " << platforms.indexOf(platform) << "\n";
+		int eyetracker_index = platforms.indexOf(platform);
 
+		// qDebug() << "selected platform: " << platform << "\nindex: " << eyetracker_index << "\n";
+		_eyetracker = eyetrackers->eyetrackers[eyetracker_index];
 	}
 	// ---- lower bound
 
