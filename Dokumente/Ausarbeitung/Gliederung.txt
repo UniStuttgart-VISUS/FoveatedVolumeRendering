@@ -1,0 +1,24 @@
+Gliederung:
+Abstrakt
+Einleitung - Motivation - Problemstellung
+Related Work - Grundlagen für Arbeit, Sehapparat, Raytracing, Volumenrendering
+Arbeitsumgebung - Projekt, Raytracer, Eyetracker
+Grundidee zur Umsetzung
+Erwartungen an die Umsetzung
+	Umsetzung
+	Probleme
+	Lösungen
+	Ergebnisse
+Abschließende Umsetzung - Implementation
+Abschließende Ergebnisse - Endergebnisse der Arbeit
+Vergleiche Ergebnisse - mit Ergebnissen aus Related Work - mit Erwartungen
+Bedeutung der Ergebnisse - Mögliche Nutzung - Kritik - Mögliche Verbesserungen
+Zusammenfassung der gesamten Arbeit
+Fazit der gesamten Arbeit
+Referenzen
+
+
+---- 
+
+
+Motivation - Einleitung mit Grundlagen vertauschen?
