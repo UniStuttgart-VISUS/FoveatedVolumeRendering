@@ -99,7 +99,9 @@ VolumeRenderWidget::VolumeRenderWidget(QWidget *parent)
 	, _showOverlay(true)
 	, _renderingMethod(STANDARD)
 	, _rect_extends({ 250, 250 })
+	, _eyetracker(nullptr)
 {
+	this->grabKeyboard();
     this->setMouseTracking(true);
 }
 
@@ -109,6 +111,7 @@ VolumeRenderWidget::VolumeRenderWidget(QWidget *parent)
  */
 VolumeRenderWidget::~VolumeRenderWidget()
 {
+	this->releaseKeyboard();
 }
 
 
@@ -999,24 +1002,39 @@ void VolumeRenderWidget::calibrateEyetrackingDevice()
 {
 	qDebug() << "calibrate eyetracking device.\n";
 
-	
-	DISPLAY_DEVICE dd;
-	dd.cb = sizeof(dd);
+	// enumerate display devices and get names
+	{
+		DISPLAY_DEVICE dd;
+		dd.cb = sizeof(dd);
 
-	std::vector<std::wstring> device_names;
-	std::vector<std::wstring> device_strings;
+		std::vector<std::wstring> device_names;
+		std::vector<std::wstring> device_strings;
 
-	for (int deviceIndex = 0; EnumDisplayDevices(0, deviceIndex, &dd, 0); deviceIndex++) {
-		device_names.push_back(dd.DeviceName);
-		for (int monitorIndex = 0; EnumDisplayDevices(device_names[deviceIndex].c_str(), monitorIndex, &dd, 0); monitorIndex++) {
-			device_strings.push_back(dd.DeviceString);
+		for (int deviceIndex = 0; EnumDisplayDevices(0, deviceIndex, &dd, 0); deviceIndex++) {
+			std::wstring dn = dd.DeviceName;
+			for (int monitorIndex = 0; EnumDisplayDevices(dn.c_str(), monitorIndex, &dd, 0); monitorIndex++) {
+				device_names.push_back(dd.DeviceName);
+				device_strings.push_back(dd.DeviceString);
+			}
 		}
+
+		std::wstring result;
+
+		for (int i = 0; i < device_names.size(); i++) {
+			result.append(L"Device ").append(std::to_wstring(i)).append(L": ").append(device_names[i]).append(L", ").append(device_strings[i]).append(L"\n");
+		}
+
+		std::wcout << result;
+	}
+	
+	// enumerate display monitors to retrive handles and information
+	{
+		
 	}
 
-	for (int i = 0; i < device_names.size(); i++) {
-		std::wcout << "Device " << i << ": " << device_names[i] << ", " << device_strings[i] << std::endl;
-	}
+	QPoint wpos = mapToGlobal(QPoint(0, 0));
 
+	qDebug() << "Volumerenderwidet position: " << wpos << "\n";
 }
 
 /**
@@ -1348,6 +1366,59 @@ void VolumeRenderWidget::mouseDoubleClickEvent(QMouseEvent *event)
 }
 
 
+void VolumeRenderWidget::gaze_data_callback(TobiiResearchGazeData * gaze_data, void * user_data)
+{
+	memcpy(user_data, gaze_data, sizeof(*gaze_data));
+}
+
+void VolumeRenderWidget::gaze_data_example(TobiiResearchEyeTracker* eyetracker) {
+	TobiiResearchGazeData gaze_data;
+	char* serial_number;
+	tobii_research_get_serial_number(eyetracker, &serial_number);
+	printf("Subscribing to gaze data for eye tracker with serial number %s.\n", serial_number);
+	tobii_research_free_string(serial_number);
+	TobiiResearchStatus status = tobii_research_subscribe_to_gaze_data(eyetracker, &VolumeRenderWidget::gaze_data_callback, &gaze_data);
+	if (status != TOBII_RESEARCH_STATUS_OK)
+		return;
+	/* Wait while some gaze data is collected. */
+	Sleep(2000);
+	/*for (int i = 0; i < 1000; i++) {
+		// printf("Last received gaze package:\n");
+		printf("System time stamp: %", gaze_data.system_time_stamp);
+		printf(", Device time stamp: %\n", gaze_data.device_time_stamp);
+		printf("Left eye 2D gaze point on display area: (%f, %f)\n",
+			gaze_data.left_eye.gaze_point.position_on_display_area.x,
+			gaze_data.left_eye.gaze_point.position_on_display_area.y);
+		printf("Right eye 3d gaze origin in user coordinates (%f, %f, %f)\n\n",
+			gaze_data.right_eye.gaze_origin.position_in_user_coordinates.x,
+			gaze_data.right_eye.gaze_origin.position_in_user_coordinates.y,
+			gaze_data.right_eye.gaze_origin.position_in_user_coordinates.z);
+		Sleep(2);
+	}*/
+	status = tobii_research_unsubscribe_from_gaze_data(eyetracker, &VolumeRenderWidget::gaze_data_callback);
+	printf("Unsubscribed from gaze data with status %i.\n", status);
+	
+	/* Wait while some gaze data is collected. */
+	// Sleep(2);
+}
+
+void VolumeRenderWidget::keyPressEvent(QKeyEvent *event) {
+	std::cout << "pressed\n";
+	char* device_name;
+	
+	if (_eyetracker == nullptr) {
+		qCritical() << "Eyetracker has not been selected yet.\n";
+	}
+	else {
+		tobii_research_get_device_name(_eyetracker, &device_name);
+
+		// qDebug() << "Using Eyetracker: " << device_name << " to collect data.\n";
+		gaze_data_example(_eyetracker);
+	}
+
+	tobii_research_free_string(device_name);
+}
+
 
 /**
  * @brief VolumeRenderWidget::keyReleaseEvent
@@ -1355,7 +1426,7 @@ void VolumeRenderWidget::mouseDoubleClickEvent(QMouseEvent *event)
  */
 void VolumeRenderWidget::keyReleaseEvent(QKeyEvent *event)
 {
-
+	std::cout << "released\n";
     // nothing yet
     event->accept();
 }

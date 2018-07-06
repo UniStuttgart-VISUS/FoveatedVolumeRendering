@@ -43,6 +43,8 @@
 
 #include <TOBIIRESEARCH\tobii_research.h>
 #include <TOBIIRESEARCH\tobii_research_eyetracker.h>
+#include <TOBIIRESEARCH\tobii_research_streams.h>
+#include <TOBIIRESEARCH\tobii_research_calibration.h>
 
 #include "volumerendercl.h"
 
@@ -73,6 +75,8 @@ public:
     void mouseDoubleClickEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
 
     void keyReleaseEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
+
+	void keyPressEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
 
     void updateView(float dx = 0, float dy = 0);
 
@@ -146,6 +150,9 @@ private:
 	void paintGL_mouse_square_vp(int swidth, int sheight);
 	void paintGL_mouse_square_dc();
 	void paintGL_SinusResolution();
+
+	static void gaze_data_callback(TobiiResearchGazeData *gaze_data, void *user_data);
+	void gaze_data_example(TobiiResearchEyeTracker* eyetracker);
 
     // -------Members--------
     //
