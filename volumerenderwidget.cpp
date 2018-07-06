@@ -1007,8 +1007,8 @@ void VolumeRenderWidget::calibrateEyetrackingDevice()
 	std::vector<std::wstring> device_strings;
 
 	for (int deviceIndex = 0; EnumDisplayDevices(0, deviceIndex, &dd, 0); deviceIndex++) {
+		device_names.push_back(dd.DeviceName);
 		for (int monitorIndex = 0; EnumDisplayDevices(device_names[deviceIndex].c_str(), monitorIndex, &dd, 0); monitorIndex++) {
-			device_names.push_back(dd.DeviceName);
 			device_strings.push_back(dd.DeviceString);
 		}
 	}
