@@ -1414,9 +1414,10 @@ void VolumeRenderWidget::keyPressEvent(QKeyEvent *event) {
 
 		// qDebug() << "Using Eyetracker: " << device_name << " to collect data.\n";
 		gaze_data_example(_eyetracker);
+		tobii_research_free_string(device_name);
 	}
 
-	tobii_research_free_string(device_name);
+	
 }
 
 
