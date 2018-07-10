@@ -158,7 +158,7 @@ private:
 
 	bool check_eyetracker_availability();
 	static void gaze_data_callback(TobiiResearchGazeData *gaze_data, void *user_data);
-
+	static std::tuple<float, float> gaze_data_to_opengl_widget(TobiiResearchGazeData gaze_data);
     // -------Members--------
     //
 	// Eyetracker

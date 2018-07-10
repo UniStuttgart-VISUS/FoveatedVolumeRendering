@@ -316,6 +316,13 @@ void VolumeRenderWidget::paintGL()
 		paintGL_standard();
 		break;
 	}
+
+	// std::cout << "paintGL got called.\n";
+
+	if (_useEyetracking) {
+		// permanently update the screen
+		update();
+	}
 	
 }
 
@@ -842,6 +849,7 @@ void VolumeRenderWidget::setEyetracking(bool eyetracking)
 		QCheckBox* eyeCB = ppW->findChild<QCheckBox*>("chbEyetracking");
 		eyeCB->setChecked(false);
 	}
+	update();
 	// std::cout << "use eyetracking: " << _useEyetracking << std::endl;
 }
 
@@ -1445,6 +1453,15 @@ bool VolumeRenderWidget::check_eyetracker_availability()
 void VolumeRenderWidget::gaze_data_callback(TobiiResearchGazeData * gaze_data, void * user_data)
 {
 	memcpy(user_data, gaze_data, sizeof(*gaze_data));
+}
+
+std::tuple<float, float> VolumeRenderWidget::gaze_data_to_opengl_widget(TobiiResearchGazeData gaze_data)
+{
+	std::tuple<float, float> opengl_widget_coordinates;
+
+	std::tuple<int, int> gaze_in_pixel;
+
+	return opengl_widget_coordinates;
 }
 
 
