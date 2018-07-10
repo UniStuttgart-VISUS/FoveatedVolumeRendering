@@ -23,6 +23,7 @@
 #pragma once
 
 #include <QObject>
+#include <qcheckbox.h>
 #include <QWidget>
 #include <QDir>
 #include <QPointer>
@@ -115,6 +116,7 @@ public slots:
     void setBackgroundColor(const QColor col);
     void setImageSamplingRate(const double samplingRate);
     void setShowOverlay(bool showOverlay);
+	void setEyetracking(bool eyetracking);
 
     void saveFrame();
     void toggleVideoRecording();
@@ -154,6 +156,7 @@ private:
 	void paintGL_mouse_square_dc();
 	void paintGL_SinusResolution();
 
+	bool check_eyetracker_availability();
 	static void gaze_data_callback(TobiiResearchGazeData *gaze_data, void *user_data);
 	void gaze_data_example(TobiiResearchEyeTracker* eyetracker);
 
@@ -189,6 +192,7 @@ private:
     QQuaternion _rotQuat;
     QVector3D _translation;
 
+	bool _useEyetracking;
     bool _noUpdate;
     bool _loadingFinished;
     bool _writeImage;

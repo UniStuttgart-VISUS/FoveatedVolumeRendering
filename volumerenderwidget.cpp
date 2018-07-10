@@ -100,6 +100,7 @@ VolumeRenderWidget::VolumeRenderWidget(QWidget *parent)
 	, _renderingMethod(STANDARD)
 	, _rect_extends({ 250, 250 })
 	, _eyetracker(nullptr)
+	, _useEyetracking(false)
 {
 	this->grabKeyboard();
     this->setMouseTracking(true);
@@ -815,6 +816,20 @@ void VolumeRenderWidget::setShowOverlay(bool showOverlay)
     updateView();
 }
 
+void VolumeRenderWidget::setEyetracking(bool eyetracking)
+{
+	if (check_eyetracker_availability()) {
+		_useEyetracking = eyetracking;
+	}
+	else {
+		_useEyetracking = false;
+		QWidget* ppW = parentWidget()->parentWidget();
+		QCheckBox* eyeCB = ppW->findChild<QCheckBox*>("chbEyetracking");
+		eyeCB->setChecked(false);
+	}
+	// std::cout << "use eyetracking: " << _useEyetracking << std::endl;
+}
+
 QQuaternion VolumeRenderWidget::getCamRotation() const
 {
     return _rotQuat;
@@ -1383,6 +1398,34 @@ void VolumeRenderWidget::mouseDoubleClickEvent(QMouseEvent *event)
 }
 
 
+bool VolumeRenderWidget::check_eyetracker_availability()
+{
+	if (_eyetracker == nullptr) {
+		return false;
+	}
+	else {
+		TobiiResearchEyeTrackers* eyetrackers = NULL;
+
+		TobiiResearchStatus result;
+		size_t i = 0;
+		result = tobii_research_find_all_eyetrackers(&eyetrackers);
+		if (result != TOBII_RESEARCH_STATUS_OK) {
+			qCritical() << "Finding trackers to check status failed. Error: " << result << "\n";
+			return false;
+		}
+
+		bool eyetracker_exists = false;
+		for (int i = 0; i < eyetrackers->count; i++) {
+			if (_eyetracker == eyetrackers->eyetrackers[i]) {
+				eyetracker_exists = true; 
+			}
+		}
+		tobii_research_free_eyetrackers(eyetrackers);
+		return eyetracker_exists;
+	}
+	
+}
+
 void VolumeRenderWidget::gaze_data_callback(TobiiResearchGazeData * gaze_data, void * user_data)
 {
 	memcpy(user_data, gaze_data, sizeof(*gaze_data));
@@ -1420,21 +1463,7 @@ void VolumeRenderWidget::gaze_data_example(TobiiResearchEyeTracker* eyetracker) 
 }
 
 void VolumeRenderWidget::keyPressEvent(QKeyEvent *event) {
-	std::cout << "pressed\n";
-	char* device_name;
-	
-	if (_eyetracker == nullptr) {
-		qCritical() << "Eyetracker has not been selected yet.\n";
-	}
-	else {
-		tobii_research_get_device_name(_eyetracker, &device_name);
-
-		// qDebug() << "Using Eyetracker: " << device_name << " to collect data.\n";
-		gaze_data_example(_eyetracker);
-		tobii_research_free_string(device_name);
-	}
-
-	
+	event->accept();
 }
 
 

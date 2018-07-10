@@ -126,6 +126,9 @@ MainWindow::MainWindow(QWidget *parent) :
             ui->volumeRenderWidget, &VolumeRenderWidget::setDrawBox);
     connect(ui->chbOrtho, &QCheckBox::toggled,
             ui->volumeRenderWidget, &VolumeRenderWidget::setCamOrtho);
+	connect(ui->chbEyetracking, &QCheckBox::toggled,
+		ui->volumeRenderWidget, &VolumeRenderWidget::setEyetracking);
+
     // connect tff editor
     connect(ui->transferFunctionEditor->getEditor(), &TransferFunctionEditor::gradientStopsChanged,
             ui->volumeRenderWidget, &VolumeRenderWidget::updateTransferFunction);
