@@ -293,7 +293,7 @@ void VolumeRenderWidget::setImageSamplingRate(const double samplingRate)
 void VolumeRenderWidget::paintGL()
 {
 	double fps = 0.0;
-	int shw = 200;
+	int shw = 200;	// square extents
 	switch (_renderingMethod) {
 	case MOUSE_SQUARE_VP:
 		_volumerender.setMode(0);
@@ -998,6 +998,23 @@ void VolumeRenderWidget::showSelectEyetrackingDevice()
 	tobii_research_free_eyetrackers(eyetrackers);
 }
 
+bool VolumeRenderWidget::MonitorEnumProc(HMONITOR monitor, HDC hdcMnitor, LPRECT rect, LPARAM param)
+{
+	MONITORINFOEX mi;
+	mi.cbSize = sizeof(MONITORINFOEX);
+
+	bool success = GetMonitorInfo(monitor, &mi);
+
+	if (success) {
+		std::wstring info;
+		info.append(L"Montitor: ").append(mi.szDevice).append(L", Left: ").append(std::to_wstring(mi.rcMonitor.left)).append(L", Right: ").append(std::to_wstring(mi.rcMonitor.right)).append(L", Top: ")
+			.append(std::to_wstring(mi.rcMonitor.top)).append(L", Bottom: ").append(std::to_wstring(mi.rcMonitor.bottom));
+		std::wcout << info << std::endl;
+	}
+
+	return success;
+}
+
 void VolumeRenderWidget::calibrateEyetrackingDevice()
 {
 	qDebug() << "calibrate eyetracking device.\n";
@@ -1029,7 +1046,7 @@ void VolumeRenderWidget::calibrateEyetrackingDevice()
 	
 	// enumerate display monitors to retrive handles and information
 	{
-		
+		EnumDisplayMonitors(NULL, NULL, reinterpret_cast<MONITORENUMPROC>(&VolumeRenderWidget::MonitorEnumProc), NULL);
 	}
 
 	QPoint wpos = mapToGlobal(QPoint(0, 0));

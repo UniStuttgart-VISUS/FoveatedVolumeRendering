@@ -41,6 +41,7 @@
 #include <qopenglfunctions_4_3_core.h>
 #include <QPainter>
 
+
 #include <TOBIIRESEARCH\tobii_research.h>
 #include <TOBIIRESEARCH\tobii_research_eyetracker.h>
 #include <TOBIIRESEARCH\tobii_research_streams.h>
@@ -127,6 +128,8 @@ public slots:
 
     void showSelectOpenCL();
 	void showSelectEyetrackingDevice();
+
+	static bool MonitorEnumProc(HMONITOR monitor, HDC hdcMnitor, LPRECT rect, LPARAM param);
 	void calibrateEyetrackingDevice();
 signals:
     void fpsChanged(double);
