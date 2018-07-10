@@ -158,12 +158,12 @@ private:
 
 	bool check_eyetracker_availability();
 	static void gaze_data_callback(TobiiResearchGazeData *gaze_data, void *user_data);
-	void gaze_data_example(TobiiResearchEyeTracker* eyetracker);
 
     // -------Members--------
     //
 	// Eyetracker
 	TobiiResearchEyeTracker* _eyetracker;
+	TobiiResearchGazeData _gaze_data;
 
     // OpenGL
     QOpenGLVertexArrayObject _screenQuadVao;

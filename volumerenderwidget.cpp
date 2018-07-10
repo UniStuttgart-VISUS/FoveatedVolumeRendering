@@ -819,6 +819,21 @@ void VolumeRenderWidget::setShowOverlay(bool showOverlay)
 void VolumeRenderWidget::setEyetracking(bool eyetracking)
 {
 	if (check_eyetracker_availability()) {
+		if (eyetracking) {
+			// start using eyetracking: subscribe to data
+			TobiiResearchStatus status = tobii_research_subscribe_to_gaze_data(_eyetracker, &VolumeRenderWidget::gaze_data_callback, &_gaze_data);
+			if (status != TOBII_RESEARCH_STATUS_OK) {
+				qCritical() << "Something went wrong when trying to subscribe to eyetracker data.\n";
+			}
+		}
+		else {
+			// stop using eyetracking: unsubscribe to data
+			TobiiResearchStatus status = tobii_research_unsubscribe_from_gaze_data(_eyetracker, &VolumeRenderWidget::gaze_data_callback);
+			if (status != TOBII_RESEARCH_STATUS_OK) {
+				qCritical() << "Something went wrong when trying to unsubscribe to eyetracker data.\n";
+			}
+				
+		}
 		_useEyetracking = eyetracking;
 	}
 	else {
@@ -1426,41 +1441,12 @@ bool VolumeRenderWidget::check_eyetracker_availability()
 	
 }
 
+
 void VolumeRenderWidget::gaze_data_callback(TobiiResearchGazeData * gaze_data, void * user_data)
 {
 	memcpy(user_data, gaze_data, sizeof(*gaze_data));
 }
 
-void VolumeRenderWidget::gaze_data_example(TobiiResearchEyeTracker* eyetracker) {
-	TobiiResearchGazeData gaze_data;
-	char* serial_number;
-	tobii_research_get_serial_number(eyetracker, &serial_number);
-	printf("Subscribing to gaze data for eye tracker with serial number %s.\n", serial_number);
-	tobii_research_free_string(serial_number);
-	TobiiResearchStatus status = tobii_research_subscribe_to_gaze_data(eyetracker, &VolumeRenderWidget::gaze_data_callback, &gaze_data);
-	if (status != TOBII_RESEARCH_STATUS_OK)
-		return;
-	/* Wait while some gaze data is collected. */
-	Sleep(2000);
-	/*for (int i = 0; i < 1000; i++) {
-		// printf("Last received gaze package:\n");
-		printf("System time stamp: %", gaze_data.system_time_stamp);
-		printf(", Device time stamp: %\n", gaze_data.device_time_stamp);
-		printf("Left eye 2D gaze point on display area: (%f, %f)\n",
-			gaze_data.left_eye.gaze_point.position_on_display_area.x,
-			gaze_data.left_eye.gaze_point.position_on_display_area.y);
-		printf("Right eye 3d gaze origin in user coordinates (%f, %f, %f)\n\n",
-			gaze_data.right_eye.gaze_origin.position_in_user_coordinates.x,
-			gaze_data.right_eye.gaze_origin.position_in_user_coordinates.y,
-			gaze_data.right_eye.gaze_origin.position_in_user_coordinates.z);
-		Sleep(2);
-	}*/
-	status = tobii_research_unsubscribe_from_gaze_data(eyetracker, &VolumeRenderWidget::gaze_data_callback);
-	printf("Unsubscribed from gaze data with status %i.\n", status);
-	
-	/* Wait while some gaze data is collected. */
-	// Sleep(2);
-}
 
 void VolumeRenderWidget::keyPressEvent(QKeyEvent *event) {
 	event->accept();
