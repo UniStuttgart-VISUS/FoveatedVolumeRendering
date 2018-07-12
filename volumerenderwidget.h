@@ -132,7 +132,7 @@ public slots:
 	void showSelectEyetrackingDevice();
 
 	static bool MonitorEnumProc(HMONITOR monitor, HDC hdcMnitor, LPRECT rect, LPARAM param);
-	void calibrateEyetrackingDevice();
+	void actionSelectMonitor();
 signals:
     void fpsChanged(double);
     void frameSizeChanged(QSize);
@@ -158,12 +158,15 @@ private:
 
 	bool check_eyetracker_availability();
 	static void gaze_data_callback(TobiiResearchGazeData *gaze_data, void *user_data);
-	static std::tuple<float, float> gaze_data_to_opengl_widget(TobiiResearchGazeData gaze_data);
+	QPoint gaze_data_to_opengl_widget();
     // -------Members--------
     //
 	// Eyetracker
 	TobiiResearchEyeTracker* _eyetracker;
 	TobiiResearchGazeData _gaze_data;
+	QPoint _monitor_offset;
+	int _curr_monitor_width;
+	int _curr_monitor_height;
 
     // OpenGL
     QOpenGLVertexArrayObject _screenQuadVao;

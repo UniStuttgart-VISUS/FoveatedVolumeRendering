@@ -1016,19 +1016,32 @@ void VolumeRenderWidget::showSelectEyetrackingDevice()
 	}
 
 	// ---- upper bound
+
+
+
 	QStringList platforms;
+	bool ok;
+	bool only_one = false;
+	QString platform;
+	int eyetracker_index;
+
 	for (std::string &s : eyetracker_device_names)
 		platforms.append(QString::fromStdString(s));
-
-	bool ok;
-	QString platform = QInputDialog::getItem(this, tr("Select Eyetracker"),
-		tr("Select Eyetracking Device:"),
-		platforms, 0, false, &ok);
-	if (ok && !platform.isEmpty())
+	
+	if (eyetracker_device_names.size() > 1) {
+		platform = QInputDialog::getItem(this, tr("Select Eyetracker"),
+			tr("Select Eyetracking Device:"),
+			platforms, 0, false, &ok);
+		eyetracker_index = platforms.indexOf(platform);
+	}
+	else {
+		only_one = true;
+		eyetracker_index = 0;
+	}
+	 
+	if (ok && !platform.isEmpty() || only_one)
 	{
-		int eyetracker_index = platforms.indexOf(platform);
-
-		// qDebug() << "selected platform: " << platform << "\nindex: " << eyetracker_index << "\n";
+		qDebug() << "selected platform: " << platform << "\nindex: " << eyetracker_index << "\n";
 		_eyetracker = eyetrackers->eyetrackers[eyetracker_index];
 	}
 	// ---- lower bound
@@ -1038,58 +1051,131 @@ void VolumeRenderWidget::showSelectEyetrackingDevice()
 
 bool VolumeRenderWidget::MonitorEnumProc(HMONITOR monitor, HDC hdcMnitor, LPRECT rect, LPARAM param)
 {
-	MONITORINFOEX mi;
-	mi.cbSize = sizeof(MONITORINFOEX);
+	struct return_data_struct {
+		bool success;
+		long left;
+		long top;
+		long right;
+		long bottom;
+		std::wstring device_name;
+	};
+	
+	return_data_struct* return_data_ptr = reinterpret_cast<return_data_struct*>(param);
 
-	bool success = GetMonitorInfo(monitor, &mi);
+	MONITORINFOEX qmi;
+	qmi.cbSize = sizeof(MONITORINFOEX);
+
+	bool success = GetMonitorInfo(monitor, &qmi);
 
 	if (success) {
-		std::wstring info;
-		info.append(L"Montitor: ").append(mi.szDevice).append(L", Left: ").append(std::to_wstring(mi.rcMonitor.left)).append(L", Right: ").append(std::to_wstring(mi.rcMonitor.right)).append(L", Top: ")
-			.append(std::to_wstring(mi.rcMonitor.top)).append(L", Bottom: ").append(std::to_wstring(mi.rcMonitor.bottom));
-		std::wcout << info << std::endl;
+		/*std::wcout << std::wstring(qmi.szDevice) << ", " << (*return_data_ptr).device_name << "." << std::endl;
+		std::wcout << return_data_ptr->success << ", " << std::endl;*/
+		if (std::wstring(qmi.szDevice).compare(return_data_ptr->device_name) == 0) {
+			return_data_ptr->success = true;
+			return_data_ptr->bottom = qmi.rcMonitor.bottom;
+			return_data_ptr->left = qmi.rcMonitor.left;
+			return_data_ptr->right = qmi.rcMonitor.right;
+			return_data_ptr->top = qmi.rcMonitor.top;
+		}
 	}
 
 	return success;
 }
 
-void VolumeRenderWidget::calibrateEyetrackingDevice()
+void VolumeRenderWidget::actionSelectMonitor()
 {
-	qDebug() << "calibrate eyetracking device.\n";
+	// qDebug() << "calibrate eyetracking device.\n";
 
 	// enumerate display devices and get names
-	{
-		DISPLAY_DEVICE dd;
-		dd.cb = sizeof(dd);
+	DISPLAY_DEVICE dd;
+	dd.cb = sizeof(dd);
+	
+	std::vector<std::wstring> device_names;
+	std::vector<std::wstring> device_strings;
 
-		std::vector<std::wstring> device_names;
-		std::vector<std::wstring> device_strings;
-
-		for (int deviceIndex = 0; EnumDisplayDevices(0, deviceIndex, &dd, 0); deviceIndex++) {
-			std::wstring dn = dd.DeviceName;
-			for (int monitorIndex = 0; EnumDisplayDevices(dn.c_str(), monitorIndex, &dd, 0); monitorIndex++) {
-				device_names.push_back(dd.DeviceName);
-				device_strings.push_back(dd.DeviceString);
-			}
+	for (int deviceIndex = 0; EnumDisplayDevices(0, deviceIndex, &dd, 0); deviceIndex++) {
+		std::wstring dn = dd.DeviceName;
+		for (int monitorIndex = 0; EnumDisplayDevices(dn.c_str(), monitorIndex, &dd, 0); monitorIndex++) {
+			device_names.push_back(dd.DeviceName);
+			device_strings.push_back(dd.DeviceString);
 		}
+	}
 
-		std::wstring result;
-
-		for (int i = 0; i < device_names.size(); i++) {
-			result.append(L"Device ").append(std::to_wstring(i)).append(L": ").append(device_names[i]).append(L", ").append(device_strings[i]).append(L"\n");
-		}
-
-		std::wcout << result;
+	std::wstring result;
+	
+	for (int i = 0; i < device_names.size(); i++) {
+		result.append(L"Device ").append(std::to_wstring(i)).append(L": ").append(device_names[i]).append(L", ").append(device_strings[i]).append(L"\n");
+		
+		// only need the substring of th device name to be able to compare it with the name returned by GetMonitorInfo
+		device_names[i] = device_names[i].substr(0, 12);
 	}
 	
-	// enumerate display monitors to retrive handles and information
-	{
-		EnumDisplayMonitors(NULL, NULL, reinterpret_cast<MONITORENUMPROC>(&VolumeRenderWidget::MonitorEnumProc), NULL);
+	std::wcout << result;
+	
+	
+	// QPoint wpos = mapToGlobal(QPoint(0, 0));
+
+	// qDebug() << "Volumerenderwidet position: " << wpos << "\n";
+
+	if (device_names.size() != device_strings.size()) {
+		qCritical() << "Something went wrong! device_names and device_strings have different sizes!\n";
+		return;
 	}
 
-	QPoint wpos = mapToGlobal(QPoint(0, 0));
+	// ---- upper bound
+	QStringList platforms;
+	for (int i = 0; i < device_names.size(); i++)
+		platforms.append(QString::fromStdWString(device_names[i]).append(QString::fromStdString(", ")).append(QString::fromStdWString(device_strings[i])));
 
-	qDebug() << "Volumerenderwidet position: " << wpos << "\n";
+	bool ok;
+	bool only_one = false;
+	QString platform;
+	int monitor_index;
+
+	if (device_names.size() > 1) {
+		platform = QInputDialog::getItem(this, tr("Select Monitor"),
+			tr("Select the Monitor the Eyetracker is calibrated to:"),
+			platforms, 0, false, &ok);
+		monitor_index = platforms.indexOf(platform);
+	}
+	else {
+		only_one = true;
+		monitor_index = 0;
+	}
+
+	if (ok && !platform.isEmpty() || only_one)
+	{
+		struct return_data_struct {
+			bool success;
+			long left;
+			long top;
+			long right;
+			long bottom;
+			std::wstring device_name;
+		} return_data;
+
+		return_data.success = false;
+		return_data.device_name = device_names[monitor_index];
+
+		// enumerate display monitors to retrive handles and information
+		EnumDisplayMonitors(NULL, NULL, reinterpret_cast<MONITORENUMPROC>(&VolumeRenderWidget::MonitorEnumProc), reinterpret_cast<LPARAM>(&return_data));
+		
+		if (return_data.success) {
+			_monitor_offset = QPoint(return_data.left, return_data.top);
+			_curr_monitor_width = return_data.right - return_data.left;
+			_curr_monitor_height = return_data.bottom - return_data.top;
+			// qDebug() << "Selected: " << QString::fromStdWString(return_data.device_name) << "\n"
+			//	<< "mon_off_x: " << _monitor_offset.x() << ", mon_off_y: " << _monitor_offset.y() << ", width: " << _curr_monitor_width << ", height: " << _curr_monitor_height << "\n";
+		}
+		else {
+			qCritical() << "Could not retrive data for selected Monitor!\n";
+		}
+
+
+		// qDebug() << "selected platform: " << platform << "\nindex: " << eyetracker_index << "\n";
+		//_eyetracker = eyetrackers->eyetrackers[eyetracker_index];
+	}
+	// ---- lower bound
 }
 
 /**
@@ -1455,13 +1541,16 @@ void VolumeRenderWidget::gaze_data_callback(TobiiResearchGazeData * gaze_data, v
 	memcpy(user_data, gaze_data, sizeof(*gaze_data));
 }
 
-std::tuple<float, float> VolumeRenderWidget::gaze_data_to_opengl_widget(TobiiResearchGazeData gaze_data)
+QPoint VolumeRenderWidget::gaze_data_to_opengl_widget()
 {
-	std::tuple<float, float> opengl_widget_coordinates;
+	float gaze_point_x = (_gaze_data.left_eye.gaze_point.position_on_display_area.x + _gaze_data.right_eye.gaze_point.position_on_display_area.x) / 2;
+	float gaze_point_y = (_gaze_data.left_eye.gaze_point.position_on_display_area.y + _gaze_data.right_eye.gaze_point.position_on_display_area.y) / 2;
 
-	std::tuple<int, int> gaze_in_pixel;
-
-	return opengl_widget_coordinates;
+	QPoint gaze_monitor_local = QPoint(gaze_point_x * _curr_monitor_width, gaze_point_y + _curr_monitor_height);
+	
+	QPoint gaze_global = _monitor_offset + gaze_monitor_local;
+	
+	return mapFromGlobal(gaze_global);
 }
 
 
