@@ -557,13 +557,19 @@ void VolumeRenderWidget::paintGL_mouse_square_dc()
 				float rect_height_nlzd = 0.f;
 
 				if (width_renderer > 1.f && height_renderer > 1.f) {
-					xPos_nlzd = static_cast<float>(_lastLocalCursorPos.x()) / width_renderer;
-					yPos_nlzd = static_cast<float>(_lastLocalCursorPos.y()) / height_renderer;
-					
+					if (_useEyetracking) {
+						std::tuple<float, float> nlzd = normalized_ogl_widget_coords();
+						xPos_nlzd = std::get<0>(nlzd);
+						yPos_nlzd = std::get<1>(nlzd);
+					}
+					else {
+						xPos_nlzd = static_cast<float>(_lastLocalCursorPos.x()) / width_renderer;
+						yPos_nlzd = static_cast<float>(_lastLocalCursorPos.y()) / height_renderer;
+					}
 					rect_width_nlzd = _rect_extends[0] / width_renderer;
 					rect_height_nlzd = _rect_extends[1] / height_renderer;
 					
-					// std::cout << xPos_nlzd << ", " << yPos_nlzd << "   " << rect_width_nlzd << ", " << rect_height_nlzd << std::endl;
+					// std::cout << "Eytracking: " << _useEyetracking << "; " << xPos_nlzd << ", " << yPos_nlzd << "   " << rect_width_nlzd << ", " << rect_height_nlzd << std::endl;
 				}
 
 				double fps = 0.0;
@@ -1041,7 +1047,7 @@ void VolumeRenderWidget::showSelectEyetrackingDevice()
 	 
 	if (ok && !platform.isEmpty() || only_one)
 	{
-		qDebug() << "selected platform: " << platform << "\nindex: " << eyetracker_index << "\n";
+		// qDebug() << "selected platform: " << platform << "\nindex: " << eyetracker_index << "\n";
 		_eyetracker = eyetrackers->eyetrackers[eyetracker_index];
 	}
 	// ---- lower bound
@@ -1546,11 +1552,19 @@ QPoint VolumeRenderWidget::gaze_data_to_opengl_widget()
 	float gaze_point_x = (_gaze_data.left_eye.gaze_point.position_on_display_area.x + _gaze_data.right_eye.gaze_point.position_on_display_area.x) / 2;
 	float gaze_point_y = (_gaze_data.left_eye.gaze_point.position_on_display_area.y + _gaze_data.right_eye.gaze_point.position_on_display_area.y) / 2;
 
-	QPoint gaze_monitor_local = QPoint(gaze_point_x * _curr_monitor_width, gaze_point_y + _curr_monitor_height);
+	std::cout << _curr_monitor_height << std::endl;
+
+	QPoint gaze_monitor_local = QPoint(gaze_point_x * _curr_monitor_width, gaze_point_y * _curr_monitor_height);
 	
 	QPoint gaze_global = _monitor_offset + gaze_monitor_local;
 	
 	return mapFromGlobal(gaze_global);
+}
+
+std::tuple<float, float> VolumeRenderWidget::normalized_ogl_widget_coords()
+{
+	QPoint ogl_w_c = gaze_data_to_opengl_widget();
+	return std::tuple<float, float>(static_cast<float>(ogl_w_c.x()) / static_cast<float>(this->size().width()), static_cast<float>(ogl_w_c.y()) / static_cast<float>(this->size().height()));
 }
 
 
