@@ -160,11 +160,15 @@ private:
 	static void gaze_data_callback(TobiiResearchGazeData *gaze_data, void *user_data);
 	QPoint gaze_data_to_opengl_widget();
 	std::tuple<float, float> normalized_ogl_widget_coords();
+	void smoothed_nmlzd_coords();
     // -------Members--------
     //
 	// Eyetracker
 	TobiiResearchEyeTracker* _eyetracker;
 	TobiiResearchGazeData _gaze_data;
+	std::vector<std::tuple<float, float>> _last_few_gaze_data;
+	std::tuple<float, float> _moving_average_gaze_data_nmlz;
+	const int _moving_average_values = 20;
 	QPoint _monitor_offset;
 	int _curr_monitor_width;
 	int _curr_monitor_height;

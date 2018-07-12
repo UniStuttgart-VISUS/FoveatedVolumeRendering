@@ -558,7 +558,8 @@ void VolumeRenderWidget::paintGL_mouse_square_dc()
 
 				if (width_renderer > 1.f && height_renderer > 1.f) {
 					if (_useEyetracking) {
-						std::tuple<float, float> nlzd = normalized_ogl_widget_coords();
+						smoothed_nmlzd_coords(); // updates moving average
+						std::tuple<float, float> nlzd = _moving_average_gaze_data_nmlz;
 						xPos_nlzd = std::get<0>(nlzd);
 						yPos_nlzd = std::get<1>(nlzd);
 					}
@@ -569,7 +570,7 @@ void VolumeRenderWidget::paintGL_mouse_square_dc()
 					rect_width_nlzd = _rect_extends[0] / width_renderer;
 					rect_height_nlzd = _rect_extends[1] / height_renderer;
 					
-					// std::cout << "Eytracking: " << _useEyetracking << "; " << xPos_nlzd << ", " << yPos_nlzd << "   " << rect_width_nlzd << ", " << rect_height_nlzd << std::endl;
+					std::cout << "Eytracking: " << _useEyetracking << "; " << xPos_nlzd << ", " << yPos_nlzd << "   " << rect_width_nlzd << ", " << rect_height_nlzd << std::endl;
 				}
 
 				double fps = 0.0;
@@ -1552,7 +1553,7 @@ QPoint VolumeRenderWidget::gaze_data_to_opengl_widget()
 	float gaze_point_x = (_gaze_data.left_eye.gaze_point.position_on_display_area.x + _gaze_data.right_eye.gaze_point.position_on_display_area.x) / 2;
 	float gaze_point_y = (_gaze_data.left_eye.gaze_point.position_on_display_area.y + _gaze_data.right_eye.gaze_point.position_on_display_area.y) / 2;
 
-	std::cout << _curr_monitor_height << std::endl;
+	// std::cout << _curr_monitor_height << std::endl;
 
 	QPoint gaze_monitor_local = QPoint(gaze_point_x * _curr_monitor_width, gaze_point_y * _curr_monitor_height);
 	
@@ -1565,6 +1566,27 @@ std::tuple<float, float> VolumeRenderWidget::normalized_ogl_widget_coords()
 {
 	QPoint ogl_w_c = gaze_data_to_opengl_widget();
 	return std::tuple<float, float>(static_cast<float>(ogl_w_c.x()) / static_cast<float>(this->size().width()), static_cast<float>(ogl_w_c.y()) / static_cast<float>(this->size().height()));
+}
+
+void VolumeRenderWidget::smoothed_nmlzd_coords()
+{
+	std::tuple<float, float> new_nmlz_data = normalized_ogl_widget_coords();
+
+	if (std::get<0>(new_nmlz_data) > 1.2f || std::get<0>(new_nmlz_data) < -1.2f ||
+		std::get<1>(new_nmlz_data) > 1.2f || std::get<1>(new_nmlz_data) < -1.2f) {
+		return;
+	}
+
+	std::get<0>(_moving_average_gaze_data_nmlz) += (1.0f / _moving_average_values) * std::get<0>(new_nmlz_data);
+	std::get<1>(_moving_average_gaze_data_nmlz) += (1.0f / _moving_average_values) * std::get<1>(new_nmlz_data);
+
+	_last_few_gaze_data.push_back(new_nmlz_data);
+	if (_last_few_gaze_data.size() > _moving_average_values) {
+		std::get<0>(_moving_average_gaze_data_nmlz) -= (1.f / _moving_average_values) * std::get<0>(_last_few_gaze_data.front());
+		std::get<1>(_moving_average_gaze_data_nmlz) -= (1.f / _moving_average_values) * std::get<1>(_last_few_gaze_data.front());
+		_last_few_gaze_data.erase(_last_few_gaze_data.begin());
+	}
+
 }
 
 
