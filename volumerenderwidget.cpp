@@ -702,6 +702,11 @@ void VolumeRenderWidget::paintGL_mouse_square_dc()
 						glBindTexture(GL_TEXTURE_2D, _outTexId0);
 					}
 					p.endNativePainting();
+
+					printQPoint(gaze_data_to_global());
+
+					// p.fillRect(QRect(-QPoint(10 + std::get<0>(_rect_extends) / 2, std::get<1>(_rect_extends) / 2 + 10 + this->size().height()) + mapFromGlobal(gaze_data_to_global()), QSize(20, 20)), Qt::red);
+
 					p.end();
 				}
 			}
@@ -1548,23 +1553,29 @@ void VolumeRenderWidget::gaze_data_callback(TobiiResearchGazeData * gaze_data, v
 	memcpy(user_data, gaze_data, sizeof(*gaze_data));
 }
 
-QPoint VolumeRenderWidget::gaze_data_to_opengl_widget()
+QPoint VolumeRenderWidget::gaze_data_to_global()
 {
 	float gaze_point_x = (_gaze_data.left_eye.gaze_point.position_on_display_area.x + _gaze_data.right_eye.gaze_point.position_on_display_area.x) / 2;
 	float gaze_point_y = (_gaze_data.left_eye.gaze_point.position_on_display_area.y + _gaze_data.right_eye.gaze_point.position_on_display_area.y) / 2;
 
-	// std::cout << _curr_monitor_height << std::endl;
-
-	QPoint gaze_monitor_local = QPoint(gaze_point_x * _curr_monitor_width, gaze_point_y * _curr_monitor_height);
+	QPoint gaze_monitor_local = QPoint(gaze_point_x * static_cast<float>(_curr_monitor_width), gaze_point_y * static_cast<float>(_curr_monitor_height));
 	
 	QPoint gaze_global = _monitor_offset + gaze_monitor_local;
+
+	std::cout << "\n\ngaze_point_x: " << gaze_point_x << ", gaze_point_y: " << gaze_point_y
+		<< ", \n_curr_monitor_width: " << _curr_monitor_width << ", _curr_monitor_height: " << _curr_monitor_height
+		<< ", \n gaze_monitor_local.x(): " << gaze_monitor_local.x() << ", gaze_monitor_local.y(): " << gaze_monitor_local.y()
+		<< ", \n _monitor_offset.x(): " << _monitor_offset.x() << ", _monitor_offset.y(): " << _monitor_offset.y()
+		<< ", \n gaze_global.x(): " << gaze_global.x() << ", gaze_global.y(): " << gaze_global.y() 
+		<< ", \n this widgets global position x: " << mapToGlobal(QPoint(0, 0)).x() << ", y: " << mapToGlobal(QPoint(0, 0)).y() 
+		<< std::endl;
 	
-	return mapFromGlobal(gaze_global);
+	return gaze_global;
 }
 
 std::tuple<float, float> VolumeRenderWidget::normalized_ogl_widget_coords()
 {
-	QPoint ogl_w_c = gaze_data_to_opengl_widget();
+	QPoint ogl_w_c = mapFromGlobal(gaze_data_to_global());
 	return std::tuple<float, float>(static_cast<float>(ogl_w_c.x()) / static_cast<float>(this->size().width()), static_cast<float>(ogl_w_c.y()) / static_cast<float>(this->size().height()));
 }
 
@@ -1587,6 +1598,16 @@ void VolumeRenderWidget::smoothed_nmlzd_coords()
 		_last_few_gaze_data.erase(_last_few_gaze_data.begin());
 	}
 
+}
+
+void VolumeRenderWidget::printFloatTuple(std::tuple<float, float> tp)
+{
+	std::cout << "(" << std::get<0>(tp) << ", " << std::get<1>(tp) << ")";
+}
+
+void VolumeRenderWidget::printQPoint(QPoint p)
+{
+	printFloatTuple(std::tuple<float, float>(p.x(), p.y()));
 }
 
 

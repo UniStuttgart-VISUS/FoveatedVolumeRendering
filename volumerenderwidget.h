@@ -158,9 +158,17 @@ private:
 
 	bool check_eyetracker_availability();
 	static void gaze_data_callback(TobiiResearchGazeData *gaze_data, void *user_data);
-	QPoint gaze_data_to_opengl_widget();
-	std::tuple<float, float> normalized_ogl_widget_coords();
-	void smoothed_nmlzd_coords();
+	QPoint gaze_data_to_global(); // returns a QPoint for the gaze_data in virtual desktop coordinates (global)
+	std::tuple<float, float> normalized_ogl_widget_coords(); // returns the gaze_data normalized to the opengl widget
+	void smoothed_nmlzd_coords();	// updates the _moving_average_gaze_data_nmlz variable
+
+
+	// Debug helper functions
+	void printFloatTuple(std::tuple<float, float> tp);
+	void printQPoint(QPoint p);
+
+
+
     // -------Members--------
     //
 	// Eyetracker
@@ -168,7 +176,7 @@ private:
 	TobiiResearchGazeData _gaze_data;
 	std::vector<std::tuple<float, float>> _last_few_gaze_data;
 	std::tuple<float, float> _moving_average_gaze_data_nmlz;
-	const int _moving_average_values = 20;
+	const int _moving_average_values = 5;
 	QPoint _monitor_offset;
 	int _curr_monitor_width;
 	int _curr_monitor_height;
