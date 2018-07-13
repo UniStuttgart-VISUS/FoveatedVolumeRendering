@@ -570,7 +570,7 @@ void VolumeRenderWidget::paintGL_mouse_square_dc()
 					rect_width_nlzd = _rect_extends[0] / width_renderer;
 					rect_height_nlzd = _rect_extends[1] / height_renderer;
 					
-					std::cout << "Eytracking: " << _useEyetracking << "; " << xPos_nlzd << ", " << yPos_nlzd << "   " << rect_width_nlzd << ", " << rect_height_nlzd << std::endl;
+					// std::cout << "Eytracking: " << _useEyetracking << "; " << xPos_nlzd << ", " << yPos_nlzd << "   " << rect_width_nlzd << ", " << rect_height_nlzd << std::endl;
 				}
 
 				double fps = 0.0;
@@ -703,7 +703,7 @@ void VolumeRenderWidget::paintGL_mouse_square_dc()
 					}
 					p.endNativePainting();
 
-					printQPoint(gaze_data_to_global());
+					// printQPoint(gaze_data_to_global());
 
 					// p.fillRect(QRect(-QPoint(10 + std::get<0>(_rect_extends) / 2, std::get<1>(_rect_extends) / 2 + 10 + this->size().height()) + mapFromGlobal(gaze_data_to_global()), QSize(20, 20)), Qt::red);
 
@@ -1562,13 +1562,13 @@ QPoint VolumeRenderWidget::gaze_data_to_global()
 	
 	QPoint gaze_global = _monitor_offset + gaze_monitor_local;
 
-	std::cout << "\n\ngaze_point_x: " << gaze_point_x << ", gaze_point_y: " << gaze_point_y
+	/*std::cout << "\n\ngaze_point_x: " << gaze_point_x << ", gaze_point_y: " << gaze_point_y
 		<< ", \n_curr_monitor_width: " << _curr_monitor_width << ", _curr_monitor_height: " << _curr_monitor_height
 		<< ", \n gaze_monitor_local.x(): " << gaze_monitor_local.x() << ", gaze_monitor_local.y(): " << gaze_monitor_local.y()
 		<< ", \n _monitor_offset.x(): " << _monitor_offset.x() << ", _monitor_offset.y(): " << _monitor_offset.y()
 		<< ", \n gaze_global.x(): " << gaze_global.x() << ", gaze_global.y(): " << gaze_global.y() 
 		<< ", \n this widgets global position x: " << mapToGlobal(QPoint(0, 0)).x() << ", y: " << mapToGlobal(QPoint(0, 0)).y() 
-		<< std::endl;
+		<< std::endl;*/
 	
 	return gaze_global;
 }
