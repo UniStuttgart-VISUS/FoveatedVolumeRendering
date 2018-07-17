@@ -98,7 +98,7 @@ VolumeRenderWidget::VolumeRenderWidget(QWidget *parent)
 	, _useGL(true)
 	, _showOverlay(true)
 	, _renderingMethod(STANDARD)
-	, _rect_extends({ 250, 250 })
+	, _rect_extends({ 350, 350 })
 	, _eyetracker(nullptr)
 	, _useEyetracking(false)
 {
@@ -333,11 +333,13 @@ void VolumeRenderWidget::paintGL()
  */
 void VolumeRenderWidget::resizeGL(int w, int h)
 {
-    _screenQuadProjMX.setToIdentity();
+	_screenQuadProjMX.setToIdentity();
     _screenQuadProjMX.perspective(53.14f, 1.0f, Z_NEAR, Z_FAR);
 
     _overlayProjMX.setToIdentity();
     _overlayProjMX.perspective(53.14f, qreal(w)/qreal(h ? h : 1), Z_NEAR, Z_FAR);
+
+	// std::cout << "resizeGL(): " << "(" << std::to_string(w) << ", " << std::to_string(h) << ")" << std::endl;
 
     try
     {
@@ -358,7 +360,15 @@ void VolumeRenderWidget::resizeGL(int w, int h)
  */
 void VolumeRenderWidget::setOutputTextures(int width, int height, GLuint texture, GLuint tex_unit)
 {
-    glActiveTexture(tex_unit);
+	// if(texture == _outTexId0)
+
+	/* std::cout << "setOutputTextures(): " << "(" << std::to_string(width) << ", " << std::to_string(height) << ")" 
+		<< ", texture: " << std::to_string(texture) << ", tex_unit: " << std::to_string(tex_unit) 
+		<< ", _volumerender.hasData(): " << _volumerender.hasData() <<  std::endl;*/
+	std::string s = std::string("Drop your volume data file here.").append(" width: ").append(std::to_string(width))
+		.append(", height: ").append(std::to_string(height));
+	
+	glActiveTexture(tex_unit);
     glBindTexture(GL_TEXTURE_2D, texture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -370,7 +380,8 @@ void VolumeRenderWidget::setOutputTextures(int width, int height, GLuint texture
         img.fill(Qt::white);
         QPainter p(&img);
         p.setFont(QFont("Helvetia", 12));
-        p.drawText(width/2 - 110, height/2, "Drop your volume data file here.");
+		std::cout << "p.drawText: " << s << std::endl;
+        p.drawText(width/2 - 110, height/2, QString::fromStdString(s));
         p.end();
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8,
                      width, height, 0,
@@ -383,7 +394,7 @@ void VolumeRenderWidget::setOutputTextures(int width, int height, GLuint texture
                      width, height, 0,
                      GL_RGBA, GL_UNSIGNED_BYTE,
                      NULL);
-    }
+	}
     glGenerateMipmap(GL_TEXTURE_2D);
 
     _volumerender.updateOutputImg(static_cast<size_t>(width), static_cast<size_t>(height),

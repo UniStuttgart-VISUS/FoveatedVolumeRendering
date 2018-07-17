@@ -1,24 +1,18 @@
 Gliederung:
 Abstrakt
-Einleitung - Motivation - Problemstellung
-Related Work - Grundlagen für Arbeit, Sehapparat, Raytracing, Volumenrendering
-Arbeitsumgebung - Projekt, Raytracer, Eyetracker
-Grundidee zur Umsetzung
-Erwartungen an die Umsetzung
-	Umsetzung
-	Probleme
-	Lösungen
-	Ergebnisse
-Abschließende Umsetzung - Implementation
-Abschließende Ergebnisse - Endergebnisse der Arbeit
-Vergleiche Ergebnisse - mit Ergebnissen aus Related Work - mit Erwartungen
-Bedeutung der Ergebnisse - Mögliche Nutzung - Kritik - Mögliche Verbesserungen
-Zusammenfassung der gesamten Arbeit
-Fazit der gesamten Arbeit
-Referenzen
+Einleitung - Motivation - Problemstellung / Aufgabenstellung - Zeitplanung
+Grundlagen für Arbeit (Related Work), Sehapparat, Raytracing, Volumenrendering, Eyetracking, GPU Architektur (Warps usw.)
+Entwurf: Projekt, Raytracer, (Auswahl des) Eyetracker, Vorüberlegungen zur Umsetzung / Integration, Grundidee zur Umsetzung
+Entwurfsziele an die Umsetzung
+Implementation: Umsetzung, Probleme, Lösungen
+Ergebnisse - Endergebnisse der Arbeit, Performance, Bilder (auf dpi achten, mind. 300), Kennkurven, Warps, weitere Leistungsmessungen bez. auf meine Arbeit
+	-> ggf. Results and Discussion seperat halten
 
+Vergleiche Ergebnisse - mit Ergebnissen aus Related Work - mit Erwartungen
+Bedeutung der Ergebnisse (im Rahmen dessen was wissenschaftlich haltbar ist)
+Fazit der Arbeit
+Ausblick: Mögliche Nutzung - Kritik - Mögliche Verbesserungen
+Referenzen
 
 ---- 
 
-
-Motivation - Einleitung mit Grundlagen vertauschen?

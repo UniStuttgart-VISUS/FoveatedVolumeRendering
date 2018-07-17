@@ -176,7 +176,7 @@ private:
 	TobiiResearchGazeData _gaze_data;
 	std::vector<std::tuple<float, float>> _last_few_gaze_data;
 	std::tuple<float, float> _moving_average_gaze_data_nmlz;
-	const int _moving_average_values = 5;
+	const int _moving_average_values = 1;
 	QPoint _monitor_offset;
 	int _curr_monitor_width;
 	int _curr_monitor_height;
@@ -197,8 +197,8 @@ private:
     QMatrix4x4 _overlayModelMX;
 
     QPoint _tffRange;
-    GLuint _outTexId0;
-	GLuint _outTexId1;
+    GLuint _outTexId0;	// bound to Texture unit 0
+	GLuint _outTexId1;	// bound to texture unit 1
     VolumeRenderCL _volumerender;
     QEasingCurve _tffInterpol;
     int _timestep;

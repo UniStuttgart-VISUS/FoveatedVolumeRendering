@@ -378,6 +378,8 @@ void VolumeRenderCL::updateSamplingRate(const double samplingRate)
  */
 void VolumeRenderCL::updateOutputImg(const size_t width, const size_t height, GLuint texId)
 {
+	// std::cout << "updateOutputImage: " << std::to_string(width) << ", " << std::to_string(height) << ", texId: " << std::to_string(texId) << std::endl;
+
     cl::ImageFormat format;
     format.image_channel_order = CL_RGBA;
     format.image_channel_data_type = CL_FLOAT;
