@@ -4,7 +4,7 @@ out highp vec4 fragColor;
 layout(binding = 0) uniform highp sampler2D outTex0;
 layout(binding = 1) uniform highp sampler2D outTex1;
 uniform vec2 cursorPos;
-uniform vec2 rectExt;
+uniform vec2 rectExt; // also used as vec2(1.0f) / vec2(width,height) when using rm1
 uniform int mode; // mode contains an integer dependent on the _renderingMethod
 // check wheather a given point is in the rectangle
 // rectPos is bottom left point of rect
@@ -20,11 +20,23 @@ bool rhgv(vec4 leftColor, vec4 rightColor) {
 
 void renderingMethod0(){ // Standard
 	fragColor = texture(outTex0, texCoord);
-	return;
 }
 
 void renderingMethod1(){ // DISTANCE_DC
-	fragColor = texture(outTex0, texCoord);
+	vec4 cur = texture(outTex0, texCoord);
+
+	if(cur.w != 0.0f){
+		fragColor = cur;
+		return;
+	}else{
+		vec4 n = texture(outTex0, texCoord + vec2(0.0f, rectExt.y));
+		vec4 s = texture(outTex0, texCoord - vec2(0.0f, rectExt.y));
+		vec4 o = texture(outTex0, texCoord + vec2(rectExt.x, 0.0f));
+		vec4 w = texture(outTex0, texCoord - vec2(rectExt.x, 0.0f));
+	
+		fragColor = (n + s + o + w) / 4.0f;
+		return;
+	}
 	return;
 }
 

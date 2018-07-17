@@ -665,10 +665,12 @@ __kernel void volumeRender(  __read_only image3d_t volData
                 break;
         case 1: // distance dependent discarding
                 // distance will be read from rectangle
-                if(globalId.x % 2== 0 && globalId.y % 2 == 1 || globalId.x % 2 == 1 && globalId.y % 2 == 0){
-                    write_imagef(outData, globalId, (float4)(0.0, 0.0, 0.0, 0.0));
-                    return;
-                }
+                //if(distance(texCoords_nlzd, cursoPos) > 0.1f){
+                    if(globalId.x % 2== 0 && globalId.y % 2 == 1 || globalId.x % 2 == 1 && globalId.y % 2 == 0){
+                        write_imagef(outData, globalId, (float4)(0.0, 0.0, 0.0, 0.0));
+                        return;
+                    }
+               // }
                 break;
         case 2: // discard with rect
                 if(checkPointInRectangle(cursorPos - 0.5f * rectangle, rectangle, texCoords_nlzd)){

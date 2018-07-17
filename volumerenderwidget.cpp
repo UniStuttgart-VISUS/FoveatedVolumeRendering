@@ -252,7 +252,7 @@ void VolumeRenderWidget::setImageSamplingRate(const double samplingRate)
 void VolumeRenderWidget::paintGL()
 {
 	double fps = 0.0;
-
+	QVector2D invSize;
 	// sets an uniform for the fragment shader to distinguish the rendering methods
 	
 	{
@@ -270,6 +270,10 @@ void VolumeRenderWidget::paintGL()
 		* The image is calculated with the full resolution but more and more invocations are discarded
 		* depending on the distance their fragment / texture-position would be to the gaze position.
 		*/
+		invSize = QVector2D(1.0f / static_cast<float>(width()), 1.0f / static_cast<float>(height()));
+		_spScreenQuad.bind();
+		_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("rectExt"), invSize);
+		_spScreenQuad.release();
 		paintGL_standard();
 		break;
 	case SQUARE_DC:
@@ -562,7 +566,7 @@ void VolumeRenderWidget::paintGL_square_dc()
 
 					_volumerender.setInvert(false);
 
-					std::cout << "xpos: " << xPos_nlzd << ", ypos: " << yPos_nlzd << std::endl;
+					// std::cout << "xpos: " << xPos_nlzd << ", ypos: " << yPos_nlzd << std::endl;
 
 					_volumerender.runRaycast(floor(this->size().width() * _imgSamplingRate),
 						floor(this->size().height() * _imgSamplingRate), _timestep);
