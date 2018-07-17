@@ -1,2 +1,1 @@
-Examiner: Prof. Dr. Thomas Ertl oder Prof. Thomas Ertl?
-supervisor: Titel der Betreuer hinzufügen!
+Latex: Detex oder so verwenden um einfach Latexbefehle zu entfernen und Word Rechtschreibung und Grammatikkorektur verwenden.
