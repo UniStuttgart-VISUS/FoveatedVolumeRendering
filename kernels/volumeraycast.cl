@@ -648,7 +648,7 @@ __kernel void volumeRender(  __read_only image3d_t volData
                            , const float2 cursorPos  // cursor Position mapped to [0,1] x [0,1]
                            , const float2 rectangle  // rectangle extends mapped to [0,1] x [0,1]
                            , const uint invert  // if true (nonzero), draws everything outside the rectangle, else everything inside
-                           , const float resolutionfactor
+                           , const float resolutionfactor // irelevant at the moment
                            , const uint mode
                            )
 {
@@ -677,6 +677,10 @@ __kernel void volumeRender(  __read_only image3d_t volData
                 }
                 break;
         case 2: // sinus resolution
+                break;
+        case 3: // distance dependent discarding
+                // distance will be read from rectangle
+                
                 break;
         default: // Standard
                 break;

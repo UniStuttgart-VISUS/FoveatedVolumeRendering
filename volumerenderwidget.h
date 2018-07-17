@@ -92,7 +92,7 @@ public:
     QQuaternion getCamRotation() const;
     void setCamRotation(const QQuaternion &rotQuat);
 
-	enum RenderingMethod { STANDARD, MOUSE_SQUARE_VP, MOUSE_SQUARE_DC, SINUS_RESOLUTION};
+	enum RenderingMethod { STANDARD, DISTANCE_DC, SQUARE_DC, SINUS_RESOLUTION};
 	void setRenderingMethod(int rm);
 
 
@@ -152,9 +152,9 @@ private:
     void setOutputTextures(int width, int height, GLuint texture, GLuint tex_unit);
 
 	void paintGL_standard();
-	void paintGL_mouse_square_vp(int swidth, int sheight);
-	void paintGL_mouse_square_dc();
-	void paintGL_SinusResolution();
+	void paintGL_distance_based_dc(); // discard invocations based on distance to gaze point with only one raycast
+	void paintGL_mouse_square_dc(); // square with discard
+	void paintGL_SinusResolution(); // not implemented
 
 	bool check_eyetracker_availability();
 	static void gaze_data_callback(TobiiResearchGazeData *gaze_data, void *user_data);

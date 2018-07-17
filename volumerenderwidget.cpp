@@ -294,13 +294,12 @@ void VolumeRenderWidget::setImageSamplingRate(const double samplingRate)
 void VolumeRenderWidget::paintGL()
 {
 	double fps = 0.0;
-	int shw = 200;	// square extents
 	switch (_renderingMethod) {
-	case MOUSE_SQUARE_VP:
-		_volumerender.setMode(0);
-		paintGL_mouse_square_vp(shw, shw);
+	case DISTANCE_DC:
+		_volumerender.setMode(3);
+		paintGL_distance_based_dc();
 		break;
-	case MOUSE_SQUARE_DC:
+	case SQUARE_DC:
 		_volumerender.setMode(1);
 		paintGL_mouse_square_dc();
 		break;
@@ -361,13 +360,18 @@ void VolumeRenderWidget::resizeGL(int w, int h)
 void VolumeRenderWidget::setOutputTextures(int width, int height, GLuint texture, GLuint tex_unit)
 {
 	// if(texture == _outTexId0)
-
+	
 	/* std::cout << "setOutputTextures(): " << "(" << std::to_string(width) << ", " << std::to_string(height) << ")" 
 		<< ", texture: " << std::to_string(texture) << ", tex_unit: " << std::to_string(tex_unit) 
 		<< ", _volumerender.hasData(): " << _volumerender.hasData() <<  std::endl;*/
 	std::string s = std::string("Drop your volume data file here.").append(" width: ").append(std::to_string(width))
 		.append(", height: ").append(std::to_string(height));
 	
+	{// recreate the texture
+		glDeleteTextures(1, &texture);
+		glGenTextures(1, &texture);
+	}
+
 	glActiveTexture(tex_unit);
     glBindTexture(GL_TEXTURE_2D, texture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -380,7 +384,7 @@ void VolumeRenderWidget::setOutputTextures(int width, int height, GLuint texture
         img.fill(Qt::white);
         QPainter p(&img);
         p.setFont(QFont("Helvetia", 12));
-		std::cout << "p.drawText: " << s << std::endl;
+		// std::cout << "p.drawText: " << s << std::endl;
         p.drawText(width/2 - 110, height/2, QString::fromStdString(s));
         p.end();
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8,
@@ -396,10 +400,8 @@ void VolumeRenderWidget::setOutputTextures(int width, int height, GLuint texture
                      NULL);
 	}
     glGenerateMipmap(GL_TEXTURE_2D);
-
-    _volumerender.updateOutputImg(static_cast<size_t>(width), static_cast<size_t>(height),
-		texture);
-
+	
+	_volumerender.updateOutputImg(static_cast<size_t>(width), static_cast<size_t>(height), texture);
 }
 
 void VolumeRenderWidget::paintGL_standard()
@@ -465,7 +467,7 @@ void VolumeRenderWidget::paintGL_standard()
 		_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("cursorPos"), cursorPos);
 		_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("rectExt"), rectExt);
 
-		_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("outTex0"), GL_TEXTURE0);
+		// _spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("outTex0"), GL_TEXTURE0); // irelevant because the shader get's its data per layout binding
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		_screenQuadVao.release();
 		_quadVbo.release();
@@ -500,7 +502,7 @@ void VolumeRenderWidget::paintGL_standard()
 		paintOrientationAxis(p);
 	}
 
-	// recover opengl texture
+	//recover opengl texture
 	p.beginNativePainting();
 	{
 		glActiveTexture(GL_TEXTURE0);
@@ -510,62 +512,34 @@ void VolumeRenderWidget::paintGL_standard()
 	p.end();
 }
 
-void VolumeRenderWidget::paintGL_mouse_square_vp(int swidth, int sheight)
+/*
+* The image is calculated with the full resolution but more and more invocations are discarded
+* depending on the distance their fragment / texture-position would be to the gaze position.
+*/
+void VolumeRenderWidget::paintGL_distance_based_dc()
 {
-	if (_useGL) {
-		if (this->_loadingFinished && _volumerender.hasData() && !_noUpdate)
-		{
-			// OpenCL raycast
-			try
-			{
-				cl::ImageGL* lowRes;
-				// first render pass: render with low res full image
-				{
-					_volumerender.runRaycast(floor(this->size().width() * _imgSamplingRate),
-						floor(this->size().height()* _imgSamplingRate), _timestep);
-					lowRes = &_volumerender.getOutputMemGL();
-				}
-
-				cl::ImageGL* normRes;
-				// second render pass: render small area around the mouse with higher resolution
-				{
-					// save current view to restore it later
-					QMatrix4x4 currView = _viewMX;
-					QMatrix4x4 newView;
-
-					// std::cout << "translation.xyz: " << static_cast<float>(_translation.x()) << "," << static_cast<float>(_translation.y()) << "," << static_cast<float>(_translation.z()) << "\n";
-					// std::cout << "rotation.xyzw: " << _rotQuat.x() << ", " << _rotQuat.y() << ", " << _rotQuat.z() << std::endl;
-
-				}
-				
-			}
-			catch (std::runtime_error e)
-			{
-				qCritical() << e.what();
-			}
-
-		}
-	}
-	else {
-		qDebug() << "mouse square is only available if useGL is enabled.\n";
-	}
+	std::cout << "paintGL_distance_based_dc()" << std::endl;
+	return;
 }
 
 void VolumeRenderWidget::paintGL_mouse_square_dc()
 {
 	if (_useGL) {
+		float width_renderer = static_cast<float>(this->size().width());
+		float height_renderer = static_cast<float>(this->size().height());
+		float xPos_nlzd = 0.f;
+		float yPos_nlzd = 0.f;
+		float rect_width_nlzd = 0.f;
+		float rect_height_nlzd = 0.f;
+		double fps = 0.0;
+		double firstExecTime = 0.0;
 		if (this->_loadingFinished && _volumerender.hasData() && !_noUpdate)
 		{
 			// OpenCL raycast
 			try
 			{
 
-				float width_renderer = static_cast<float>(this->size().width());
-				float height_renderer = static_cast<float>(this->size().height());
-				float xPos_nlzd = 0.f;
-				float yPos_nlzd = 0.f;
-				float rect_width_nlzd = 0.f;
-				float rect_height_nlzd = 0.f;
+				
 
 				if (width_renderer > 1.f && height_renderer > 1.f) {
 					if (_useEyetracking) {
@@ -583,9 +557,6 @@ void VolumeRenderWidget::paintGL_mouse_square_dc()
 					
 					// std::cout << "Eytracking: " << _useEyetracking << "; " << xPos_nlzd << ", " << yPos_nlzd << "   " << rect_width_nlzd << ", " << rect_height_nlzd << std::endl;
 				}
-
-				double fps = 0.0;
-				double firstExecTime = 0.0;
 
 
 				// first render pass: render with low res full image
@@ -620,7 +591,6 @@ void VolumeRenderWidget::paintGL_mouse_square_dc()
 					double img_width = this->size().width() * _imgSamplingRate;
 					double img_height = this->size().height()*_imgSamplingRate;
 					setOutputTextures(floor(img_width),
-
 						floor(img_height), _outTexId1, GL_TEXTURE1);
 
 					_volumerender.setCursorPos(xPos_nlzd, yPos_nlzd);
@@ -633,93 +603,6 @@ void VolumeRenderWidget::paintGL_mouse_square_dc()
 
 					fps = calcFPS(firstExecTime);
 				}
-
-				// draw output and overlays
-				{
-					QPainter p(this);
-					p.beginNativePainting();
-					{
-						// render the ray casting output
-						// clear to white to avoid getting colored borders outside the quad
-						glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-						glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-						
-						// draw screen quad
-						//
-						_screenQuadVao.bind();
-						_quadVbo.bind();
-						glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
-
-						// render screen quad
-						//
-						_spScreenQuad.bind();
-						_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("projMatrix"),
-							_screenQuadProjMX);
-						_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("mvMatrix"),
-							_viewMX * _modelMX);
-
-						QVector2D cursorPos(xPos_nlzd, yPos_nlzd);
-						QVector2D rectExt(rect_width_nlzd, rect_height_nlzd);
-						
-						_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("cursorPos"), cursorPos);
-						_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("rectExt"), rectExt);
-
-						/*
-						* not necessary because it is binded when rendering and the shader gets it by using layout(binding = ..)
-						glActiveTexture(GL_TEXTURE0);
-						glBindTexture(GL_TEXTURE_2D, _outTexId0);
-						// _spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("outTex0"), 2);
-						glActiveTexture(GL_TEXTURE1);
-						glBindTexture(GL_TEXTURE_2D, _outTexId1);
-						// _spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("outTex1"), 3);*/
-						
-						glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-						_screenQuadVao.release();
-						_quadVbo.release();
-						_spScreenQuad.release();
-
-						glDisable(GL_CULL_FACE);
-						glDisable(GL_DEPTH_TEST);
-						
-						if (_volumerender.hasData() && _writeImage)
-						{
-							QImage img = this->grabFramebuffer();
-							QString number = QString("%1").arg(_imgCount++, 6, 10, QChar('0'));
-							if (!_recordVideo)
-							{
-								QLoggingCategory category("screenshot");
-								qCInfo(category, "Writing current frame img/frame_%s.png", number.toStdString().c_str());
-								_writeImage = false;
-							}
-							if (!QDir("img").exists())
-								QDir().mkdir("img");
-							img.save("img/frame_" + number + ".png");
-						}
-					}
-					p.endNativePainting();
-
-					// render overlays
-					if (_showOverlay)
-					{
-						paintFPS(p, fps, _volumerender.getLastExecTime());
-						paintOrientationAxis(p);
-					}
-
-					// recover opengl texture
-					p.beginNativePainting();
-					{
-						glActiveTexture(GL_TEXTURE0);
-						glBindTexture(GL_TEXTURE_2D, _outTexId0);
-					}
-					p.endNativePainting();
-
-					// printQPoint(gaze_data_to_global());
-
-					// p.fillRect(QRect(-QPoint(10 + std::get<0>(_rect_extends) / 2, std::get<1>(_rect_extends) / 2 + 10 + this->size().height()) + mapFromGlobal(gaze_data_to_global()), QSize(20, 20)), Qt::red);
-
-					p.end();
-				}
 			}
 			catch (std::runtime_error e)
 			{
@@ -727,6 +610,93 @@ void VolumeRenderWidget::paintGL_mouse_square_dc()
 			}
 
 		}
+		// draw output and overlays
+		{
+			QPainter p(this);
+			p.beginNativePainting();
+			{
+				// render the ray casting output
+				// clear to white to avoid getting colored borders outside the quad
+				glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+				// draw screen quad
+				//
+				_screenQuadVao.bind();
+				_quadVbo.bind();
+				glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+				// render screen quad
+				//
+				_spScreenQuad.bind();
+				_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("projMatrix"),
+					_screenQuadProjMX);
+				_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("mvMatrix"),
+					_viewMX * _modelMX);
+
+				QVector2D cursorPos(xPos_nlzd, yPos_nlzd);
+				QVector2D rectExt(rect_width_nlzd, rect_height_nlzd);
+
+				_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("cursorPos"), cursorPos);
+				_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("rectExt"), rectExt);
+
+				/*
+				* not necessary because it is binded when rendering and the shader gets it by using layout(binding = ..)
+				glActiveTexture(GL_TEXTURE0);
+				glBindTexture(GL_TEXTURE_2D, _outTexId0);
+				// _spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("outTex0"), 2);
+				glActiveTexture(GL_TEXTURE1);
+				glBindTexture(GL_TEXTURE_2D, _outTexId1);
+				// _spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("outTex1"), 3);*/
+
+				glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+				_screenQuadVao.release();
+				_quadVbo.release();
+				_spScreenQuad.release();
+
+				glDisable(GL_CULL_FACE);
+				glDisable(GL_DEPTH_TEST);
+
+				if (_volumerender.hasData() && _writeImage)
+				{
+					QImage img = this->grabFramebuffer();
+					QString number = QString("%1").arg(_imgCount++, 6, 10, QChar('0'));
+					if (!_recordVideo)
+					{
+						QLoggingCategory category("screenshot");
+						qCInfo(category, "Writing current frame img/frame_%s.png", number.toStdString().c_str());
+						_writeImage = false;
+					}
+					if (!QDir("img").exists())
+						QDir().mkdir("img");
+					img.save("img/frame_" + number + ".png");
+				}
+			}
+			p.endNativePainting();
+
+			// render overlays
+			if (_showOverlay)
+			{
+				paintFPS(p, fps, _volumerender.getLastExecTime());
+				paintOrientationAxis(p);
+			}
+
+			// recover opengl texture
+			p.beginNativePainting();
+			{
+				glActiveTexture(GL_TEXTURE0);
+				glBindTexture(GL_TEXTURE_2D, _outTexId0);
+			}
+			p.endNativePainting();
+
+			// printQPoint(gaze_data_to_global());
+
+			// p.fillRect(QRect(-QPoint(10 + std::get<0>(_rect_extends) / 2, std::get<1>(_rect_extends) / 2 + 10 + this->size().height()) + mapFromGlobal(gaze_data_to_global()), QSize(20, 20)), Qt::red);
+
+			p.end();
+		}
+
 	}
 	else {
 		qDebug() << "mouse square is only available if useGL is enabled.\n";
@@ -1493,8 +1463,12 @@ void VolumeRenderWidget::mouseMoveEvent(QMouseEvent *event)
         updateView();
     }
 
-	if (_renderingMethod != RenderingMethod::STANDARD) {
+	switch (_renderingMethod) {
+	case RenderingMethod::SQUARE_DC:
 		update();
+		break;
+	default:
+		break;
 	}
 
     _lastLocalCursorPos = event->pos();

@@ -1,1 +1,2 @@
 Latex: Detex oder so verwenden um einfach Latexbefehle zu entfernen und Word Rechtschreibung und Grammatikkorektur verwenden.
+Visus bzw. Vis zu vollständigen Namen Ändern.
