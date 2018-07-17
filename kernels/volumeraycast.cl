@@ -663,7 +663,14 @@ __kernel void volumeRender(  __read_only image3d_t volData
     switch(mode){
         case 0: // Standard
                 break;
-        case 1: // discard with rect
+        case 1: // distance dependent discarding
+                // distance will be read from rectangle
+                if(globalId.x % 2== 0 && globalId.y % 2 == 1 || globalId.x % 2 == 1 && globalId.y % 2 == 0){
+                    write_imagef(outData, globalId, (float4)(0.0, 0.0, 0.0, 0.0));
+                    return;
+                }
+                break;
+        case 2: // discard with rect
                 if(checkPointInRectangle(cursorPos - 0.5f * rectangle, rectangle, texCoords_nlzd)){
                     if(invert != 0){
                         write_imagef(outData, globalId, (float4)(0.0, 0.0, 0.0, 0.0));
@@ -676,12 +683,9 @@ __kernel void volumeRender(  __read_only image3d_t volData
                     }
                 }
                 break;
-        case 2: // sinus resolution
+        case 3: // sinus resolution
                 break;
-        case 3: // distance dependent discarding
-                // distance will be read from rectangle
-                
-                break;
+        
         default: // Standard
                 break;
     }

@@ -36,48 +36,6 @@
 const static double Z_NEAR = 1.0;
 const static double Z_FAR = 500.0;
 
-static const char *pVsScreenQuadSource =
-    "#version 430\n"
-    "layout(location = 0) in highp vec3 vertex;\n"
-    "out highp vec2 texCoord;\n"
-    "uniform mat4 projMatrix;\n"
-    "uniform mat4 mvMatrix;\n"
-    "void main() {\n"
-    "   texCoord = vec2(0.5f) + 0.5f * vertex.xy;\n"
-    "   gl_Position = projMatrix * mvMatrix * vec4(vertex.xy, 1.0f, 1.0f);\n"
-    "}\n";
-
-static const char *pFsScreenQuadSource =
-    "#version 430\n"
-    "in highp vec2 texCoord;\n"
-    "out highp vec4 fragColor;\n"
-	"layout(binding = 0) uniform highp sampler2D outTex0;\n"
-	"layout(binding = 1) uniform highp sampler2D outTex1;\n"
-	"uniform vec2 cursorPos;\n"
-	"uniform vec2 rectExt;\n"
-	"// check wheather a given point is in the rectangle\n"
-	"// rectPos is bottom left point of rect\n"
-	"bool checkPointInRectangle(vec2 rectPos, vec2 rectExtends, vec2 point) {\n"
-	"if (point.x < rectPos.x || point.y < rectPos.y) return false;    // left and bottom edge\n"
-	"if (point.x > rectPos.x + rectExtends.x || point.y > rectPos.y + rectExtends.y) return false;    // top and right edge\n"
-	"return true;\n"
-	"}\n"
-	"bool rhgv(vec4 leftColor, vec4 rightColor) {\n"
-	"if (leftColor.x < rightColor.x || leftColor.y < rightColor.y || leftColor.z < rightColor.z) return true;\n"
-	"return false;\n"
-	"}\n"
-    "void main() {\n"
-    "   vec4 fragColor0 = texture(outTex0, texCoord);\n"
-    "   vec4 fragColor1 = texture(outTex1, texCoord);\n"
-	"   if(checkPointInRectangle(cursorPos - 0.5 * rectExt, rectExt, texCoord)){\n"
-	"   //if(rhgv(vec4(0,0,0,0), fragColor1)){\n"
-	"       fragColor = fragColor1;\n"
-	"   }else{\n"
-	"       fragColor = fragColor0;\n"
-	"   }\n"
-    "}\n";
-
-
 /**
  * @brief VolumeRenderWidget::VolumeRenderWidget
  * @param parent
@@ -189,8 +147,8 @@ void VolumeRenderWidget::initializeGL()
     glDisable(GL_CULL_FACE);
     glDisable(GL_DEPTH_TEST);
 
-    _spScreenQuad.addShaderFromSourceCode(QOpenGLShader::Vertex, pVsScreenQuadSource);
-    _spScreenQuad.addShaderFromSourceCode(QOpenGLShader::Fragment, pFsScreenQuadSource);
+    _spScreenQuad.addShaderFromSourceCode(QOpenGLShader::Vertex, VolumeRenderWidget::ReadFile("shaders/vertex_shader.glsl").c_str());
+    _spScreenQuad.addShaderFromSourceCode(QOpenGLShader::Fragment, VolumeRenderWidget::ReadFile("shaders/fragment_shader.glsl").c_str());
     _spScreenQuad.bindAttributeLocation("vertex", 0);
     _spScreenQuad.link();
 
@@ -294,21 +252,33 @@ void VolumeRenderWidget::setImageSamplingRate(const double samplingRate)
 void VolumeRenderWidget::paintGL()
 {
 	double fps = 0.0;
+
+	// sets an uniform for the fragment shader to distinguish the rendering methods
+	
+	{
+		_spScreenQuad.bind();
+		_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("mode"), static_cast<GLint>(_renderingMethod));
+		_spScreenQuad.release();
+	}
+		_volumerender.setMode(static_cast<unsigned int>(_renderingMethod));
+	// std::cout << "paintGL(): " << "_renderingMethod: " << static_cast<GLint>(_renderingMethod) << std::endl;
+
 	switch (_renderingMethod) {
 	case DISTANCE_DC:
-		_volumerender.setMode(3);
-		paintGL_distance_based_dc();
+		/*
+		// discard invocations based on distance to gaze point with only one raycast
+		* The image is calculated with the full resolution but more and more invocations are discarded
+		* depending on the distance their fragment / texture-position would be to the gaze position.
+		*/
+		paintGL_standard();
 		break;
 	case SQUARE_DC:
-		_volumerender.setMode(1);
-		paintGL_mouse_square_dc();
+		paintGL_square_dc();
 		break;
 	case SINUS_RESOLUTION:
-		_volumerender.setMode(2);
 		paintGL_SinusResolution();
 		break;
 	default: // case STANDARD:
-		_volumerender.setMode(0);
 		_volumerender.setCursorPos(0.f, 0.f);
 		_volumerender.setRectangleExtends(0.f, 0.f);
 		_volumerender.setInvert(true);
@@ -466,6 +436,7 @@ void VolumeRenderWidget::paintGL_standard()
 
 		_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("cursorPos"), cursorPos);
 		_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("rectExt"), rectExt);
+		
 
 		// _spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("outTex0"), GL_TEXTURE0); // irelevant because the shader get's its data per layout binding
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -512,17 +483,10 @@ void VolumeRenderWidget::paintGL_standard()
 	p.end();
 }
 
-/*
-* The image is calculated with the full resolution but more and more invocations are discarded
-* depending on the distance their fragment / texture-position would be to the gaze position.
+/* The image is created in two render calls. The first one is a low resolution render call, the second is a high resolution
+	render call. Each render calls result is stored in a seperate opengl texture. the fragment shader does merge them to the final image.
 */
-void VolumeRenderWidget::paintGL_distance_based_dc()
-{
-	std::cout << "paintGL_distance_based_dc()" << std::endl;
-	return;
-}
-
-void VolumeRenderWidget::paintGL_mouse_square_dc()
+void VolumeRenderWidget::paintGL_square_dc()
 {
 	if (_useGL) {
 		float width_renderer = static_cast<float>(this->size().width());
@@ -597,6 +561,8 @@ void VolumeRenderWidget::paintGL_mouse_square_dc()
 					_volumerender.setRectangleExtends(rect_width_nlzd + (16.0 / img_width), rect_height_nlzd + (16.0 / img_height));
 
 					_volumerender.setInvert(false);
+
+					std::cout << "xpos: " << xPos_nlzd << ", ypos: " << yPos_nlzd << std::endl;
 
 					_volumerender.runRaycast(floor(this->size().width() * _imgSamplingRate),
 						floor(this->size().height() * _imgSamplingRate), _timestep);
@@ -1593,6 +1559,15 @@ void VolumeRenderWidget::printFloatTuple(std::tuple<float, float> tp)
 void VolumeRenderWidget::printQPoint(QPoint p)
 {
 	printFloatTuple(std::tuple<float, float>(p.x(), p.y()));
+}
+
+std::string VolumeRenderWidget::ReadFile(const char * path)
+{
+	std::ifstream file_stream(path);
+	if (!file_stream.is_open()) {
+		throw std::runtime_error(std::string("Failed to open") + path);
+	}
+	return std::string(std::istreambuf_iterator<char>(file_stream), std::istreambuf_iterator<char>());
 }
 
 

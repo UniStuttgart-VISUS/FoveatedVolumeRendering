@@ -152,8 +152,7 @@ private:
     void setOutputTextures(int width, int height, GLuint texture, GLuint tex_unit);
 
 	void paintGL_standard();
-	void paintGL_distance_based_dc(); // discard invocations based on distance to gaze point with only one raycast
-	void paintGL_mouse_square_dc(); // square with discard
+	void paintGL_square_dc(); // square with discard
 	void paintGL_SinusResolution(); // not implemented
 
 	bool check_eyetracker_availability();
@@ -167,6 +166,8 @@ private:
 	void printFloatTuple(std::tuple<float, float> tp);
 	void printQPoint(QPoint p);
 
+	// file loading helper function
+	static std::string ReadFile(const char *path); // returns the content of a file
 
 
     // -------Members--------
