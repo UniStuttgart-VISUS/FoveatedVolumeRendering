@@ -253,6 +253,7 @@ void VolumeRenderWidget::paintGL()
 {
 	double fps = 0.0;
 	QVector2D invSize;
+	QVector2D tex0_size;
 	// sets an uniform for the fragment shader to distinguish the rendering methods
 	
 	{
@@ -263,6 +264,11 @@ void VolumeRenderWidget::paintGL()
 		_volumerender.setMode(static_cast<unsigned int>(_renderingMethod));
 	// std::cout << "paintGL(): " << "_renderingMethod: " << static_cast<GLint>(_renderingMethod) << std::endl;
 
+	float width_renderer = static_cast<float>(this->size().width());
+	float height_renderer = static_cast<float>(this->size().height());
+	float xPos_nlzd = 0.f;
+	float yPos_nlzd = 0.f;
+
 	switch (_renderingMethod) {
 	case DISTANCE_DC:
 		/*
@@ -270,10 +276,19 @@ void VolumeRenderWidget::paintGL()
 		* The image is calculated with the full resolution but more and more invocations are discarded
 		* depending on the distance their fragment / texture-position would be to the gaze position.
 		*/
-		invSize = QVector2D(1.0f / static_cast<float>(width()), 1.0f / static_cast<float>(height()));
+		invSize = QVector2D(1.0f / static_cast<float>(this->size().width() * _imgSamplingRate), 1.0f / static_cast<float>(this->size().height() * _imgSamplingRate));
+		tex0_size = QVector2D(static_cast<float>(this->size().width() * _imgSamplingRate), static_cast<float>(this->size().height() * _imgSamplingRate));
 		_spScreenQuad.bind();
 		_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("rectExt"), invSize);
+		_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("tex0_size"), tex0_size);
 		_spScreenQuad.release();
+		
+		{
+			xPos_nlzd = static_cast<float>(_lastLocalCursorPos.x()) / width_renderer;
+			yPos_nlzd = static_cast<float>(_lastLocalCursorPos.y()) / height_renderer;
+			_volumerender.setCursorPos(xPos_nlzd, yPos_nlzd);
+		}
+
 		paintGL_standard();
 		break;
 	case SQUARE_DC:
@@ -506,9 +521,6 @@ void VolumeRenderWidget::paintGL_square_dc()
 			// OpenCL raycast
 			try
 			{
-
-				
-
 				if (width_renderer > 1.f && height_renderer > 1.f) {
 					if (_useEyetracking) {
 						smoothed_nmlzd_coords(); // updates moving average
@@ -967,6 +979,14 @@ void VolumeRenderWidget::showSelectEyetrackingDevice()
 		qCritical() << "Finding trackers failed. Error: " << result << "\n";
 		return;
 	}
+	else {
+		if (eyetrackers->count == 0) {
+			qDebug() << "No Eyetrackers found!\n";
+		}
+	}
+
+	
+
 	for (i = 0; i < eyetrackers->count; i++) {
 		TobiiResearchEyeTracker* eyetracker = eyetrackers->eyetrackers[i];
 		char* device_name;
@@ -1001,14 +1021,12 @@ void VolumeRenderWidget::showSelectEyetrackingDevice()
 		only_one = true;
 		eyetracker_index = 0;
 	}
-	 
-	if (ok && !platform.isEmpty() || only_one)
+	if (ok && !platform.isEmpty() || only_one && eyetrackers->count > 0)
 	{
 		// qDebug() << "selected platform: " << platform << "\nindex: " << eyetracker_index << "\n";
 		_eyetracker = eyetrackers->eyetrackers[eyetracker_index];
 	}
 	// ---- lower bound
-
 	tobii_research_free_eyetrackers(eyetrackers);
 }
 
@@ -1435,6 +1453,9 @@ void VolumeRenderWidget::mouseMoveEvent(QMouseEvent *event)
 
 	switch (_renderingMethod) {
 	case RenderingMethod::SQUARE_DC:
+		update();
+		break;
+	case RenderingMethod::DISTANCE_DC:
 		update();
 		break;
 	default:

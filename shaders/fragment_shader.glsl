@@ -5,6 +5,7 @@ layout(binding = 0) uniform highp sampler2D outTex0;
 layout(binding = 1) uniform highp sampler2D outTex1;
 uniform vec2 cursorPos;
 uniform vec2 rectExt; // also used as vec2(1.0f) / vec2(width,height) when using rm1
+uniform vec2 tex0_size;
 uniform int mode; // mode contains an integer dependent on the _renderingMethod
 // check wheather a given point is in the rectangle
 // rectPos is bottom left point of rect
@@ -24,18 +25,37 @@ void renderingMethod0(){ // Standard
 
 void renderingMethod1(){ // DISTANCE_DC
 	vec4 cur = texture(outTex0, texCoord);
+	vec2 windows_coord = tex0_size * texCoord;
+    
+	int x = int(windows_coord.x);
+	int y = int(windows_coord.y);
 
-	if(cur.w != 0.0f){
-		fragColor = cur;
-		return;
-	}else{
-		vec4 n = texture(outTex0, texCoord + vec2(0.0f, rectExt.y));
-		vec4 s = texture(outTex0, texCoord - vec2(0.0f, rectExt.y));
-		vec4 o = texture(outTex0, texCoord + vec2(rectExt.x, 0.0f));
-		vec4 w = texture(outTex0, texCoord - vec2(rectExt.x, 0.0f));
-	
-		fragColor = (n + s + o + w) / 4.0f;
-		return;
+	vec4 red = vec4(1.0f, 0.0f, 0.0f, 1.0f);
+	vec4 green = vec4(0.0f, 1.0f, 0.0f, 1.0f);
+	vec4 blue = vec4(0.0f, 0.0f, 1.0f, 1.0f);
+
+	if(x % 2== 1 || y % 2 == 1){ // blacked out, take another texel
+        // determine which texel to take
+		if(x % 2== 1 && y % 2 == 1){
+			// take top left
+			//fragColor = texture(outTex0, texCoord - rectExt);
+			fragColor = red;
+		}else{
+			if(x % 2== 0 && y % 2 == 1){
+				// top
+				//fragColor = texture(outTex0, texCoord - vec2(0, rectExt.y));
+				fragColor = green;
+			}else{
+				if(x % 2== 1 && y % 2 == 0){
+					// left
+					//fragColor = texture(outTex0, texCoord - vec2(rectExt.x, 0));
+					fragColor = blue;
+				}
+			}
+		}
+    }else{
+		fragColor = texture(outTex0, texCoord);
+		// same texel
 	}
 	return;
 }

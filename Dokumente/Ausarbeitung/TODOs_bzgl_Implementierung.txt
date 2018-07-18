@@ -1,1 +1,2 @@
 Implementierung auf eine Textur umbasteln!
+cl: distance von rect_extends auslesen

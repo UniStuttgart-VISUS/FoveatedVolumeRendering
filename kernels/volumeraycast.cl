@@ -660,17 +660,17 @@ __kernel void volumeRender(  __read_only image3d_t volData
 
     // check if imageCoord is in valid area according to cursoPos and rectangle (and invert)
     // shift rect that cursor is in its middle
-    switch(mode){
+    switch(mode){ // early discard here
         case 0: // Standard
                 break;
         case 1: // distance dependent discarding
                 // distance will be read from rectangle
-                //if(distance(texCoords_nlzd, cursoPos) > 0.1f){
-                    if(globalId.x % 2== 0 && globalId.y % 2 == 1 || globalId.x % 2 == 1 && globalId.y % 2 == 0){
-                        write_imagef(outData, globalId, (float4)(0.0, 0.0, 0.0, 0.0));
+                if(distance(texCoords_nlzd, cursorPos) > 0.1f){ // outside the range: discard every second ray
+                    if(globalId.x % 2== 1 || globalId.y % 2 == 1){ // blacked out
+                        write_imagef(outData, globalId, (float4)(0.0f, 0.0f, 0.0f, 0.0f));
                         return;
                     }
-               // }
+                }
                 break;
         case 2: // discard with rect
                 if(checkPointInRectangle(cursorPos - 0.5f * rectangle, rectangle, texCoords_nlzd)){
