@@ -24,7 +24,7 @@ void renderingMethod0(){ // Standard
 }
 
 void renderingMethod1(){ // DISTANCE_DC
-	vec4 cur = texture(outTex0, texCoord);
+	/*vec4 cur = texture(outTex0, texCoord);
 	vec2 windows_coord = tex0_size * texCoord;
     
 	int x = int(windows_coord.x);
@@ -53,10 +53,10 @@ void renderingMethod1(){ // DISTANCE_DC
 				}
 			}
 		}
-    }else{
+    }else{*/
 		fragColor = texture(outTex0, texCoord);
 		// same texel
-	}
+	//}
 	return;
 }
 

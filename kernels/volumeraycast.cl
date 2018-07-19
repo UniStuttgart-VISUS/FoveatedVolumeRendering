@@ -667,7 +667,6 @@ __kernel void volumeRender(  __read_only image3d_t volData
                 // distance will be read from rectangle
                 if(distance(texCoords_nlzd, cursorPos) > 0.1f){ // outside the range: discard every second ray
                     if(globalId.x % 2== 1 || globalId.y % 2 == 1){ // blacked out
-                        write_imagef(outData, globalId, (float4)(0.0f, 0.0f, 0.0f, 0.0f));
                         return;
                     }
                 }
@@ -747,7 +746,34 @@ __kernel void volumeRender(  __read_only image3d_t volData
     hit = intersectBox(camPos, rayDir, &tnear, &tfar);
     if (!hit || tfar < 0)
     {
-        write_imagef(outData, texCoords, background);
+        switch(mode){ // no hit, set background
+        case 0: // Standard
+                write_imagef(outData, texCoords, background);
+                break;
+        case 1: // distance dependent
+                if(distance(texCoords_nlzd, cursorPos) > 0.1f){ // outside the range: discard every second ray
+                    if(globalId.x % 2== 0 || globalId.y % 2 == 0){ // not blacked out, also write the other three texel
+
+                        write_imagef(outData, (int2)(texCoords.x, texCoords.y + 1) , background); // bottom
+                        write_imagef(outData, texCoords + (int2)(1,1), background); // bottom right
+                        write_imagef(outData, (int2)(texCoords.x + 1, texCoords.y), background); // right
+                    }
+                }else{
+                    // inside the range, behave normally
+                    write_imagef(outData, texCoords, background);
+                }
+                break;
+        case 2: // discard with rect
+                write_imagef(outData, texCoords, background);
+                break;
+        case 3: // sinus resolution
+                write_imagef(outData, texCoords, background);
+                break;
+        
+        default: // Standard
+                write_imagef(outData, texCoords, background);
+                break;
+        }
         return;
     }
 
@@ -929,7 +955,33 @@ __kernel void volumeRender(  __read_only image3d_t volData
 
     result.w = alpha;
     // if(invert == 0) result.xyz += 0.5f;
-    write_imagef(outData, texCoords, result);
+    switch(mode){ // result
+        case 0: // Standard
+                write_imagef(outData, texCoords, result);
+                break;
+        case 1: // distance dependent
+                if(distance(texCoords_nlzd, cursorPos) > 0.1f){ // outside the range: discard every second ray
+                    if(globalId.x % 2== 0 || globalId.y % 2 == 0){ // not blacked out, also write the other three texel
+                        write_imagef(outData, (int2)(texCoords.x, texCoords.y + 11) , background); // bottom
+                        write_imagef(outData, texCoords + (int2)(1,1), background); // bottom right
+                        write_imagef(outData, (int2)(texCoords.x + 1, texCoords.y), background); // right
+                    }
+                }else{
+                    // inside the range, behave normally
+                    write_imagef(outData, texCoords, background);
+                }
+                break;
+        case 2: // discard with rect
+                write_imagef(outData, texCoords, result);
+                break;
+        case 3: // sinus resolution
+                write_imagef(outData, texCoords, result);
+                break;
+        
+        default: // Standard
+                write_imagef(outData, texCoords, result);
+                break;
+        }
 }
 
 #pragma OPENCL EXTENSION cl_khr_3d_image_writes : enable
