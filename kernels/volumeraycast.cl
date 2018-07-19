@@ -675,7 +675,7 @@ __kernel void volumeRender(  __read_only image3d_t volData
                 break;
         case 1: // distance dependent discarding
                 // distance will be read from rectangle
-                if(distance(texCoords_nlzd, cursorPos) > 0.1f){ // outside the range: discard every second ray
+                if(distance(texCoords_nlzd, cursorPos) > 0.11f){ // outside the range: discard every second ray
                     if(globalId.x % 2 == 1 || globalId.y % 2 == 1){ // blacked out
                         return;
                     }
@@ -761,11 +761,9 @@ __kernel void volumeRender(  __read_only image3d_t volData
                 write_imagef(outData, texCoords, background);
                 break;
         case 1: // distance dependent
-                if(distance(texCoords_nlzd, cursorPos) > 0.12f){ // outside the range: discard every second ray
+                if(distance(texCoords_nlzd, cursorPos) > 0.1f){ // outside the range: discard every second ray
                     if(globalId.x % 2 == 0 && globalId.y % 2 == 0){ // not blacked out, also write the other three texel
-						
-
-                        write_imagef_with_bounds_check(img_bounds, outData, (int2)(texCoords.x, texCoords.y - 1) , background); // bottom
+						write_imagef_with_bounds_check(img_bounds, outData, (int2)(texCoords.x, texCoords.y - 1) , background); // bottom
                         write_imagef_with_bounds_check(img_bounds, outData, texCoords - (int2)(1,1), background); // bottom right
                         write_imagef_with_bounds_check(img_bounds, outData, (int2)(texCoords.x - 1, texCoords.y), background); // right
                     }
@@ -972,7 +970,7 @@ __kernel void volumeRender(  __read_only image3d_t volData
                 write_imagef(outData, texCoords, result);
                 break;
         case 1: // distance dependent
-                if(distance(texCoords_nlzd, cursorPos) > 0.12f){ // outside the range: discard every second ray
+                if(distance(texCoords_nlzd, cursorPos) > 0.1f){ // outside the range: discard every second ray
                     if(globalId.x % 2== 0 && globalId.y % 2 == 0){ // not blacked out, also write the other three texel
                         write_imagef_with_bounds_check(img_bounds, outData, (int2)(texCoords.x, texCoords.y - 1) , result); // bottom
                         write_imagef_with_bounds_check(img_bounds, outData, texCoords - (int2)(1,1), result); // bottom right
@@ -980,7 +978,16 @@ __kernel void volumeRender(  __read_only image3d_t volData
                     }
                 }else{
                     // inside the range, behave normally
-                    
+                    // check if still needed to write to lower, lower right and right because those are discards
+                    if(texCoords.x % 2== 1 || texCoords.y - 1 % 2 == 1){ // also write the other texel
+                        write_imagef_with_bounds_check(img_bounds, outData, (int2)(texCoords.x, texCoords.y - 1) , result); // bottom
+                    }
+                    if(texCoords.x -1 % 2== 1 || texCoords.y -1 % 2 == 1){ // also write the other texel
+                        write_imagef_with_bounds_check(img_bounds, outData, texCoords - (int2)(1,1), result); // bottom right
+                    }
+                    if(texCoords.x - 1 % 2 == 1 || texCoords.y % 2 == 1){ // also write the other texel
+                        write_imagef_with_bounds_check(img_bounds, outData, (int2)(texCoords.x - 1, texCoords.y), result); // right
+                    }
                 }
 				write_imagef(outData, texCoords, result);
                 break;

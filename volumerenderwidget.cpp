@@ -622,15 +622,6 @@ void VolumeRenderWidget::paintGL_square_dc()
 				_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("cursorPos"), cursorPos);
 				_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("rectExt"), rectExt);
 
-				/*
-				* not necessary because it is binded when rendering and the shader gets it by using layout(binding = ..)
-				glActiveTexture(GL_TEXTURE0);
-				glBindTexture(GL_TEXTURE_2D, _outTexId0);
-				// _spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("outTex0"), 2);
-				glActiveTexture(GL_TEXTURE1);
-				glBindTexture(GL_TEXTURE_2D, _outTexId1);
-				// _spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("outTex1"), 3);*/
-
 				glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
 				_screenQuadVao.release();
