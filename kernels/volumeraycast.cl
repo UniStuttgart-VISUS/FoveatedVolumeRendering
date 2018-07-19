@@ -364,7 +364,7 @@ bool checkPointInRectangle(float2 rectPos, float2 rectExtends, float2 point){
 }
 
 // wirtes image data but checks whether it is in bounds: bounds starting from 0
-void write_imagef_with_bounds_check(int2 bounds, image2d_t outData, int2 img_coord, float4 color){
+void write_imagef_with_bounds_check(int2 bounds, __write_only image2d_t outData, int2 img_coord, float4 color){
     if(img_coord.x <= bounds.x && img_coord.y <= bounds.y && img_coord.x >= 0 && img_coord.y >= 0){
         write_imagef(outData, img_coord, color);
     }

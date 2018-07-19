@@ -67,7 +67,7 @@ void renderingMethod2(){ // SQUARE_DC
 		//if(rhgv(vec4(0,0,0,0), fragColor1)){
 			fragColor = fragColor1;
 	}else{
-			//fragColor = fragColor0;
+			fragColor = fragColor0;
 	}
 	return;
 }
