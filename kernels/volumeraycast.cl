@@ -363,6 +363,33 @@ bool checkPointInRectangle(float2 rectPos, float2 rectExtends, float2 point){
     return true;
 }
 
+// returns the 1d index for a 2d point in an grid with width m
+int index_from_2d(int2 coord, int m){
+    return coord.y * m + coord.x;
+}
+
+// returns the 2d coord for a point given as 1d index in a grid with width m
+int2 coord_from_1d(int index, int m){
+    return (int2)(index % m, index / m);
+}
+
+// returns the mapped 1d index with a gap_size of g - 1 and a grid width of m
+int mapped_index(int old_index, int m, int g){
+    return index_from_2d((int2)(i * g % m, ((i * g) / m) * g));
+}
+
+// returns the mapped 2d index with a gap size of g - 1 and a grid width of m
+int2 mapped_2d_index_from_1d(int old_index, int m, int g){
+    return (int2)(i * g % m, ((i * g) / m) * g);
+}
+
+/*
+checks whether a point is inside the disk bounded by an ellipse
+*/
+bool checkPointInEllipse(float2 ellipse_center, float rx, float ry, float2 point){
+    return native_divide(pown(point.x - ellipse_center.x, 2), pown(rx, 2)) + native_divide(pown(point.y - ellipse_center.y, 2), pown(ry, 2)) <= 1.0;
+}
+
 // wirtes image data but checks whether it is in bounds: bounds starting from 0
 void write_imagef_with_bounds_check(int2 bounds, __write_only image2d_t outData, int2 img_coord, float4 color){
     if(img_coord.x <= bounds.x && img_coord.y <= bounds.y && img_coord.x >= 0 && img_coord.y >= 0){
@@ -653,9 +680,10 @@ __kernel void volumeRender(  __read_only image3d_t volData
                            , const float3 modelScale
                            , const uint contours
                            , const uint aerial
-                           , const float2 cursorPos  // cursor Position mapped to [0,1] x [0,1]
-                           , const float2 rectangle  // rectangle extends mapped to [0,1] x [0,1]
-                           , const uint invert  // if true (nonzero), draws everything outside the rectangle, else everything inside
+                           , const float2 cursorPos  // cursor Position mapped to [0,1] x [0,1], is also center of ellipse 1 and ellipse 2 but then it is not normalized
+                           , const float2 rectangle  // rectangle extends mapped to [0,1] x [0,1], also used for ellipse 1, contains rx and ry, not normalized
+                           , const float2 ell1 // vector used for ellipse 2, contains rx and ry, not normalized
+                           , const uint invert  // if true (nonzero), draws everything outside the rectangle, else everything inside, tells in mode=1 which area is being drawn (A, B or C ad 0, 1 or 2)
                            , const float resolutionfactor // irelevant at the moment
                            , const uint mode
                            )
@@ -674,12 +702,9 @@ __kernel void volumeRender(  __read_only image3d_t volData
         case 0: // Standard
                 break;
         case 1: // distance dependent discarding
-                // distance will be read from rectangle
-                if(distance(texCoords_nlzd, cursorPos) > 0.11f){ // outside the range: discard every second ray
-                    if(globalId.x % 2 == 1 || globalId.y % 2 == 1){ // blacked out
-                        return;
-                    }
-                }
+                // distance will be read from rectangle or ell1
+
+                
                 break;
         case 2: // discard with rect
                 if(checkPointInRectangle(cursorPos - 0.5f * rectangle, rectangle, texCoords_nlzd)){

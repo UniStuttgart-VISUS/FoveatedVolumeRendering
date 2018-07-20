@@ -52,7 +52,8 @@ public:
         , CONTOURS       // show contour lines                       cl_uint (bool)
         , AERIAL         // use aerial perspective                   cl_uint (bool)
 		, CURSOR_POS	 // cursor pos								 cl_float2
-		, RECTANGLE_EXTS // rectangle extends						 cl_float2
+		, RECTANGLE_EXTS // rectangle extends, also used for ell1	 cl_float2
+		, ELLIPSE_2		 // ellipse 2								 cl_float2
 		, INVERT		 // invert									 cl_uint (bool)
 		, RESOLUTIONFACTOR // resolution factor						 cl_float
 		, MODE			// modus									 cl_uint
@@ -210,6 +211,11 @@ public:
 	* @param color
 	*/
 	void setRectangleExtends(float width, float height);
+	/**
+	* @brief set ellipse 2
+	* @param color
+	*/
+	void setEllipse2(float width, float height);
 	/**
 	* @brief setInvert
 	* @param color

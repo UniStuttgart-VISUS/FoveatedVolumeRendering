@@ -151,6 +151,7 @@ void VolumeRenderCL::initKernel(const std::string fileName, const std::string bu
 		cl_float2 cp = { {0.f,0.f} };
 		_raycastKernel.setArg(CURSOR_POS, cp);
 		_raycastKernel.setArg(RECTANGLE_EXTS, cp);
+		_raycastKernel.setArg(ELLIPSE_2, cp);
 		_raycastKernel.setArg(INVERT, 1);
 		_raycastKernel.setArg(RESOLUTIONFACTOR, 1);
 		_raycastKernel.setArg(MODE, 0);					// Standard
@@ -841,6 +842,12 @@ void VolumeRenderCL::setRectangleExtends(float width, float height)
 {
 	cl_float2 ext = { {width, height} };
 	_raycastKernel.setArg(RECTANGLE_EXTS, ext);
+}
+
+void VolumeRenderCL::setEllipse2(float width, float height)
+{
+	cl_float2 rx_ry = { { width, height } };
+	_raycastKernel.setArg(ELLIPSE_2, rx_ry);
 }
 
 void VolumeRenderCL::setInvert(bool inv)

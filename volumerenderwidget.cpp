@@ -485,32 +485,35 @@ void VolumeRenderWidget::paintGL_standard()
 */
 void VolumeRenderWidget::paintGL_distance_dc()
 {
-	QVector2D invSize;
-	QVector2D tex0_size;
 
 	float width_renderer = static_cast<float>(this->size().width());
 	float height_renderer = static_cast<float>(this->size().height());
-	float xPos_nlzd = 0.f;
-	float yPos_nlzd = 0.f;
 
-	invSize = QVector2D(1.0f / static_cast<float>(this->size().width() * _imgSamplingRate), 1.0f / static_cast<float>(this->size().height() * _imgSamplingRate));
-	tex0_size = QVector2D(static_cast<float>(this->size().width() * _imgSamplingRate), static_cast<float>(this->size().height() * _imgSamplingRate));
-	_spScreenQuad.bind();
-	_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("rectExt"), invSize);
-	_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("tex0_size"), tex0_size);
-	_spScreenQuad.release();
+	{	// only set once for all opencl kernel calls in this rendering case:
 
-	{
-		xPos_nlzd = static_cast<float>(_lastLocalCursorPos.x()) / width_renderer;
-		yPos_nlzd = static_cast<float>(_lastLocalCursorPos.y()) / height_renderer;
-		_volumerender.setCursorPos(xPos_nlzd, yPos_nlzd);
+		// cursor position or eyetracking position is not normalized in this rendering case! cursor pos is center of ellipse 1 and ellipse 2.
+		if (_useEyetracking) {
+			smoothed_nmlzd_coords(); // updates moving average
+			std::tuple<float, float> nlzd = _moving_average_gaze_data_nmlz;
+			_volumerender.setCursorPos(std::get<0>(nlzd) * width_renderer, std::get<1>(nlzd) * height_renderer); // sets eyetracking data as not normalized data!
+		}
+		else {
+			_volumerender.setCursorPos(static_cast<float>(_lastLocalCursorPos.x()), static_cast<float>(_lastLocalCursorPos.y()));
+		}
+
+		// rx and ry for ellipse 1. Here not normalized (in pixel)!
+		_volumerender.setRectangleExtends(100, 80);
+
+		// rx and ry for ellipse 2. Here not normalized (in pixel)!
+		_volumerender.setEllipse2(200, 160);
+	
+		setOutputTextures(floor(this->size().width() * _imgSamplingRate),
+			floor(this->size().height()*_imgSamplingRate), _outTexId0, GL_TEXTURE0);
 	}
 
-	// -- begin standard
 
-	setOutputTextures(floor(this->size().width() * _imgSamplingRate),
-		floor(this->size().height()*_imgSamplingRate), _outTexId0, GL_TEXTURE0);
-
+	// -- begin
+	
 	if (this->_loadingFinished && _volumerender.hasData() && !_noUpdate)
 	{
 		// OpenCL raycast
@@ -521,18 +524,7 @@ void VolumeRenderWidget::paintGL_distance_dc()
 					floor(this->size().height()* _imgSamplingRate), _timestep);
 			else
 			{
-				std::vector<float> d;
-				_volumerender.runRaycastNoGL(floor(this->size().width() * _imgSamplingRate),
-					floor(this->size().height()* _imgSamplingRate),
-					_timestep, d);
-				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F,
-					floor(this->size().width() * _imgSamplingRate),
-					floor(this->size().height()* _imgSamplingRate),
-					0, GL_RGBA, GL_FLOAT,
-					d.data());
-				glGenerateMipmap(GL_TEXTURE_2D);
-				_volumerender.updateOutputImg(static_cast<size_t>(width()),
-					static_cast<size_t>(height()), _outTexId0);
+				qCritical() << "Distance dependent discarding only available if _useGL == true!\n";
 			}
 		}
 		catch (std::runtime_error e)
@@ -570,7 +562,6 @@ void VolumeRenderWidget::paintGL_distance_dc()
 		_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("rectExt"), rectExt);
 
 
-		// _spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("outTex0"), GL_TEXTURE0); // irelevant because the shader get's its data per layout binding
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		_screenQuadVao.release();
 		_quadVbo.release();
@@ -614,7 +605,7 @@ void VolumeRenderWidget::paintGL_distance_dc()
 	p.endNativePainting();
 	p.end();
 
-	// -- end standard
+	// -- end
 
 
 }
