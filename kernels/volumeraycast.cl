@@ -375,12 +375,12 @@ int2 coord_from_1d(int index, int m){
 
 // returns the mapped 1d index with a gap_size of g - 1 and a grid width of m
 int mapped_index(int old_index, int m, int g){
-    return index_from_2d((int2)(i * g % m, ((i * g) / m) * g));
+    return index_from_2d((int2)(old_index * g % m, ((old_index * g) / m) * g), m);
 }
 
 // returns the mapped 2d index with a gap size of g - 1 and a grid width of m
 int2 mapped_2d_index_from_1d(int old_index, int m, int g){
-    return (int2)(i * g % m, ((i * g) / m) * g);
+    return (int2)(old_index * g % m, ((old_index * g) / m) * g);
 }
 
 /*

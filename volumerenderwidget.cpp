@@ -519,9 +519,12 @@ void VolumeRenderWidget::paintGL_distance_dc()
 		// OpenCL raycast
 		try
 		{
-			if (_useGL)
+			if (_useGL) {
+
+				// TODO: stopped here at 20.07.18 17:44, now do the 3 rendering calls for three areas plus one to interpolate!
 				_volumerender.runRaycast(floor(this->size().width() * _imgSamplingRate),
 					floor(this->size().height()* _imgSamplingRate), _timestep);
+			}
 			else
 			{
 				qCritical() << "Distance dependent discarding only available if _useGL == true!\n";
