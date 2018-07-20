@@ -488,6 +488,11 @@ void VolumeRenderWidget::paintGL_distance_dc()
 
 	float width_renderer = static_cast<float>(this->size().width());
 	float height_renderer = static_cast<float>(this->size().height());
+	double texture_width = floor(this->size().width() * _imgSamplingRate);
+	double texture_height = floor(this->size().height * _imgSamplingRate);
+
+	std::tuple<int, int> ell1(100, 80);
+	std::tuple<int, int> ell2(200, 160);
 
 	{	// only set once for all opencl kernel calls in this rendering case:
 
@@ -502,15 +507,14 @@ void VolumeRenderWidget::paintGL_distance_dc()
 		}
 
 		// rx and ry for ellipse 1. Here not normalized (in pixel)!
-		_volumerender.setRectangleExtends(100, 80);
+		_volumerender.setRectangleExtends(std::get<0>(ell1), std::get<1>(ell1));
 
 		// rx and ry for ellipse 2. Here not normalized (in pixel)!
-		_volumerender.setEllipse2(200, 160);
+		_volumerender.setEllipse2(std::get<0>(ell2), std::get<1>(ell2));
 	
-		setOutputTextures(floor(this->size().width() * _imgSamplingRate),
-			floor(this->size().height()*_imgSamplingRate), _outTexId0, GL_TEXTURE0);
+		setOutputTextures(texture_width,
+			texture_height, _outTexId0, GL_TEXTURE0);
 	}
-
 
 	// -- begin
 	
@@ -521,9 +525,26 @@ void VolumeRenderWidget::paintGL_distance_dc()
 		{
 			if (_useGL) {
 
-				// TODO: stopped here at 20.07.18 17:44, now do the 3 rendering calls for three areas plus one to interpolate!
-				_volumerender.runRaycast(floor(this->size().width() * _imgSamplingRate),
-					floor(this->size().height()* _imgSamplingRate), _timestep);
+				// first call: render area C (everything outside of ellipse 2) with gap size 2 -> g = 3
+				{
+					int g = 3;
+					int x_y_dimension = std::ceil(std::sqrt(texture_width * texture_height * 0.25)) + 1;  // +1 as offset alpha for safety, maybe not needed
+					_volumerender.runRaycast(x_y_dimension, x_y_dimension);
+				}
+
+				// second call: render area B (everything inside of ellipse 2 and outside of ellipse 1) with gap size 1 -> g = 2
+				{
+					int g = 2;
+					int x_y_dimension = std::ceil(std::sqrt(texture_width * texture_height * 0.0625)) + 1;
+					_volumerender.runRaycast(x_y_dimension, x_y_dimension);
+				}
+
+				// third call: render area A (everything inside of ellipse 1) with gap size 0 -> g = 1
+				{
+					int g = 1;
+					int x_y_dimension = std::ceil(2 * std::sqrt(std::get<0>(ell1) * std::get<1>(ell2))) + 1; // approximate amount of pixels in ellipse 1
+					_volumerender.runRaycast(x_y_dimension, x_y_dimension);
+				}
 			}
 			else
 			{

@@ -2,4 +2,5 @@ Implementierung auf eine Textur umbasteln!
 cl: distance von rect_extends auslesen
 sqdc: der offset kommt glaube ich daher,dass die strahlrichtung durch die veränderte auflösung nicht mit der strahldichte des texels der anderen auflösung übereinstimmt.
 Bei ddc: nicht nur jeden zweiten pixel discarden sondern gegen außen auch mehrere. INTERPOLIEREN! Indizierung so ändern, dass ganze Blöcke discarded werden können. Profiler Werte der Warps messen!
-ddc: eyetracking enablen.
+ddc: compute optimum for kernel call dimension in x and y according to the gap size.
+ddc: make gap size variable
