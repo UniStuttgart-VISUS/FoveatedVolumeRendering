@@ -152,6 +152,7 @@ private:
     void setOutputTextures(int width, int height, GLuint texture, GLuint tex_unit);
 
 	void paintGL_standard();
+	void paintGL_distance_dc(); // elliptical discards in multiple rendering calls
 	void paintGL_square_dc(); // square with discard
 	void paintGL_SinusResolution(); // not implemented
 

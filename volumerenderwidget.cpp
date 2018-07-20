@@ -252,8 +252,7 @@ void VolumeRenderWidget::setImageSamplingRate(const double samplingRate)
 void VolumeRenderWidget::paintGL()
 {
 	double fps = 0.0;
-	QVector2D invSize;
-	QVector2D tex0_size;
+
 	// sets an uniform for the fragment shader to distinguish the rendering methods
 	
 	{
@@ -264,32 +263,9 @@ void VolumeRenderWidget::paintGL()
 		_volumerender.setMode(static_cast<unsigned int>(_renderingMethod));
 	// std::cout << "paintGL(): " << "_renderingMethod: " << static_cast<GLint>(_renderingMethod) << std::endl;
 
-	float width_renderer = static_cast<float>(this->size().width());
-	float height_renderer = static_cast<float>(this->size().height());
-	float xPos_nlzd = 0.f;
-	float yPos_nlzd = 0.f;
-
 	switch (_renderingMethod) {
 	case DISTANCE_DC:
-		/*
-		// discard invocations based on distance to gaze point with only one raycast
-		* The image is calculated with the full resolution but more and more invocations are discarded
-		* depending on the distance their fragment / texture-position would be to the gaze position.
-		*/
-		invSize = QVector2D(1.0f / static_cast<float>(this->size().width() * _imgSamplingRate), 1.0f / static_cast<float>(this->size().height() * _imgSamplingRate));
-		tex0_size = QVector2D(static_cast<float>(this->size().width() * _imgSamplingRate), static_cast<float>(this->size().height() * _imgSamplingRate));
-		_spScreenQuad.bind();
-		_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("rectExt"), invSize);
-		_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("tex0_size"), tex0_size);
-		_spScreenQuad.release();
-		
-		{
-			xPos_nlzd = static_cast<float>(_lastLocalCursorPos.x()) / width_renderer;
-			yPos_nlzd = static_cast<float>(_lastLocalCursorPos.y()) / height_renderer;
-			_volumerender.setCursorPos(xPos_nlzd, yPos_nlzd);
-		}
-
-		paintGL_standard();
+		paintGL_distance_dc();
 		break;
 	case SQUARE_DC:
 		paintGL_square_dc();
@@ -500,6 +476,147 @@ void VolumeRenderWidget::paintGL_standard()
 	}
 	p.endNativePainting();
 	p.end();
+}
+
+/*
+// discard invocations based on distance to gaze point with only one raycast
+* The image is calculated with the full resolution but more and more invocations are discarded
+* depending on the distance their fragment / texture-position would be to the gaze position.
+*/
+void VolumeRenderWidget::paintGL_distance_dc()
+{
+	QVector2D invSize;
+	QVector2D tex0_size;
+
+	float width_renderer = static_cast<float>(this->size().width());
+	float height_renderer = static_cast<float>(this->size().height());
+	float xPos_nlzd = 0.f;
+	float yPos_nlzd = 0.f;
+
+	invSize = QVector2D(1.0f / static_cast<float>(this->size().width() * _imgSamplingRate), 1.0f / static_cast<float>(this->size().height() * _imgSamplingRate));
+	tex0_size = QVector2D(static_cast<float>(this->size().width() * _imgSamplingRate), static_cast<float>(this->size().height() * _imgSamplingRate));
+	_spScreenQuad.bind();
+	_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("rectExt"), invSize);
+	_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("tex0_size"), tex0_size);
+	_spScreenQuad.release();
+
+	{
+		xPos_nlzd = static_cast<float>(_lastLocalCursorPos.x()) / width_renderer;
+		yPos_nlzd = static_cast<float>(_lastLocalCursorPos.y()) / height_renderer;
+		_volumerender.setCursorPos(xPos_nlzd, yPos_nlzd);
+	}
+
+	// -- begin standard
+
+	setOutputTextures(floor(this->size().width() * _imgSamplingRate),
+		floor(this->size().height()*_imgSamplingRate), _outTexId0, GL_TEXTURE0);
+
+	if (this->_loadingFinished && _volumerender.hasData() && !_noUpdate)
+	{
+		// OpenCL raycast
+		try
+		{
+			if (_useGL)
+				_volumerender.runRaycast(floor(this->size().width() * _imgSamplingRate),
+					floor(this->size().height()* _imgSamplingRate), _timestep);
+			else
+			{
+				std::vector<float> d;
+				_volumerender.runRaycastNoGL(floor(this->size().width() * _imgSamplingRate),
+					floor(this->size().height()* _imgSamplingRate),
+					_timestep, d);
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F,
+					floor(this->size().width() * _imgSamplingRate),
+					floor(this->size().height()* _imgSamplingRate),
+					0, GL_RGBA, GL_FLOAT,
+					d.data());
+				glGenerateMipmap(GL_TEXTURE_2D);
+				_volumerender.updateOutputImg(static_cast<size_t>(width()),
+					static_cast<size_t>(height()), _outTexId0);
+			}
+		}
+		catch (std::runtime_error e)
+		{
+			qCritical() << e.what();
+		}
+
+	}
+	QPainter p(this);
+	p.beginNativePainting();
+	{
+		// render the ray casting output
+		// clear to white to avoid getting colored borders outside the quad
+		glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		// draw screen quad
+		//
+		_screenQuadVao.bind();
+		_quadVbo.bind();
+		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, 0);
+
+		// render screen quad
+		//
+		_spScreenQuad.bind();
+		_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("projMatrix"),
+			_screenQuadProjMX);
+		_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("mvMatrix"),
+			_viewMX * _modelMX);
+
+		QVector2D cursorPos(0, 0);
+		QVector2D rectExt(0, 0);
+
+		_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("cursorPos"), cursorPos);
+		_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("rectExt"), rectExt);
+
+
+		// _spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("outTex0"), GL_TEXTURE0); // irelevant because the shader get's its data per layout binding
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+		_screenQuadVao.release();
+		_quadVbo.release();
+		_spScreenQuad.release();
+
+		glDisable(GL_CULL_FACE);
+		glDisable(GL_DEPTH_TEST);
+
+		if (_volumerender.hasData() && _writeImage)
+		{
+			QImage img = this->grabFramebuffer();
+			QString number = QString("%1").arg(_imgCount++, 6, 10, QChar('0'));
+			if (!_recordVideo)
+			{
+				QLoggingCategory category("screenshot");
+				qCInfo(category, "Writing current frame img/frame_%s.png", number.toStdString().c_str());
+				_writeImage = false;
+			}
+			if (!QDir("img").exists())
+				QDir().mkdir("img");
+			img.save("img/frame_" + number + ".png");
+		}
+	}
+	p.endNativePainting();
+
+	double fps = calcFPS();
+
+	// render overlays
+	if (_showOverlay)
+	{
+		paintFPS(p, fps, _volumerender.getLastExecTime());
+		paintOrientationAxis(p);
+	}
+
+	//recover opengl texture
+	p.beginNativePainting();
+	{
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, _outTexId0);
+	}
+	p.endNativePainting();
+	p.end();
+
+	// -- end standard
+
+
 }
 
 /* The image is created in two render calls. The first one is a low resolution render call, the second is a high resolution
