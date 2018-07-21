@@ -875,6 +875,10 @@ double VolumeRenderCL::getLastExecTime()
     return _lastExecTime;
 }
 
+void VolumeRenderCL::runInterpolation()
+{
+}
+
 
 /**
  * @brief VolumeRenderCL::getPlatformNames

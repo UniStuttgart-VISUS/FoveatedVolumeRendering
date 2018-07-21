@@ -236,6 +236,10 @@ public:
      * @return The kernel runtime in seconds.
      */
     double getLastExecTime();
+	/**
+	*  Run the kernel to interpolate the values from distance_dc
+	*/
+	void runInterpolation();
 
     /**
      * @brief getPlatformNames

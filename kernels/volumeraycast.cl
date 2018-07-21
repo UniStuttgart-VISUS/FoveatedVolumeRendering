@@ -684,7 +684,7 @@ __kernel void volumeRender(  __read_only image3d_t volData
                            , const float2 rectangle  // rectangle extends mapped to [0,1] x [0,1], also used for ellipse 1, contains rx and ry, not normalized
                            , const float2 ell1 // vector used for ellipse 2, contains rx and ry, not normalized
                            , const uint invert  // if true (nonzero), draws everything outside the rectangle, else everything inside, tells in mode=1 which area is being drawn (A, B or C ad 0, 1 or 2)
-                           , const float resolutionfactor // irelevant at the moment
+                           , const float resolutionfactor // is used as g for mode: discard_dc, m is derived from the mode and from the texture width, ell1 and ell2 rx.
                            , const uint mode
                            )
 {
