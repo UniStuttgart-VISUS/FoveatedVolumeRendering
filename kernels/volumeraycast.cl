@@ -378,9 +378,14 @@ int mapped_index(int old_index, int m, int g){
     return index_from_2d((int2)(old_index * g % m, ((old_index * g) / m) * g), m);
 }
 
-// returns the mapped 2d index with a gap size of g - 1 and a grid width of m
+// returns the mapped 2d cord with a gap size of g - 1 and a grid width of m
 int2 mapped_2d_index_from_1d(int old_index, int m, int g){
     return (int2)(old_index * g % m, ((old_index * g) / m) * g);
+}
+
+// returns the mapped 2d coord from old coord, where m is the new width of the grid and old_m is the old m of the grid
+int2 old_2d_to_new_2d_coord(int2 old_coord, int m, int g, int old_m){
+    return mapped_2d_index_from_1d(index_from_2d(old_coord, old_m), m, g);
 }
 
 /*
@@ -691,7 +696,7 @@ __kernel void volumeRender(  __read_only image3d_t volData
     int2 globalId = (int2)(get_global_id(0), get_global_id(1));
     if(any(globalId >= get_image_dim(outData)))
         return;
-
+    int maxSize = max(get_global_size(0), get_global_size(1));
     float2 texCoords_nlzd = (float2)(convert_float_rtp(globalId.x) / convert_float_rtp(get_global_size(0)), convert_float_rtp(globalId.y) / convert_float_rtp(get_global_size(1)));
 
     int2 img_bounds = (int2)(get_global_size(0), get_global_size(1));
@@ -703,7 +708,19 @@ __kernel void volumeRender(  __read_only image3d_t volData
                 break;
         case 1: // distance dependent discarding
                 // distance will be read from rectangle or ell1
-
+                switch(invert){
+                    case 0:
+                        globalId = old_2d_to_new_2d_coord(globalId, get_global_size(0), round(resolutionfactor), get_global_size(0));
+                        img_bounds = (int2)(get_global_size(0) * round(resolutionfactor), get_global_size(1) * round(resolutionfactor));
+                        maxSize = max(img_bounds.x, img_bounds.y);
+                        break;
+                    case 1:
+                        break;
+                    case 3:
+                        break;
+                    default:
+                        break;
+                }
                 
                 break;
         case 2: // discard with rect
@@ -726,7 +743,7 @@ __kernel void volumeRender(  __read_only image3d_t volData
                 break;
     }
 
-    int maxSize = max(get_global_size(0), get_global_size(1));
+    
     float2 imgCoords;
     imgCoords.x = native_divide((globalId.x + 0.5f), convert_float(maxSize)) * 2.f;
     imgCoords.y = native_divide((globalId.y + 0.5f), convert_float(maxSize)) * 2.f;
@@ -786,7 +803,7 @@ __kernel void volumeRender(  __read_only image3d_t volData
                 write_imagef(outData, texCoords, background);
                 break;
         case 1: // distance dependent
-                if(distance(texCoords_nlzd, cursorPos) > 0.1f){ // outside the range: discard every second ray
+                /*if(distance(texCoords_nlzd, cursorPos) > 0.1f){ // outside the range: discard every second ray
                     if(globalId.x % 2 == 0 && globalId.y % 2 == 0){ // not blacked out, also write the other three texel
 						write_imagef_with_bounds_check(img_bounds, outData, (int2)(texCoords.x, texCoords.y - 1) , background); // bottom
                         write_imagef_with_bounds_check(img_bounds, outData, texCoords - (int2)(1,1), background); // bottom right
@@ -795,7 +812,7 @@ __kernel void volumeRender(  __read_only image3d_t volData
                 }else{
                     // inside the range, behave normally
                     
-                }
+                }*/
 				write_imagef(outData, texCoords, background);
                 break;
         case 2: // discard with rect
@@ -995,7 +1012,7 @@ __kernel void volumeRender(  __read_only image3d_t volData
                 write_imagef(outData, texCoords, result);
                 break;
         case 1: // distance dependent
-                if(distance(texCoords_nlzd, cursorPos) > 0.1f){ // outside the range: discard every second ray
+                /*if(distance(texCoords_nlzd, cursorPos) > 0.1f){ // outside the range: discard every second ray
                     if(globalId.x % 2== 0 && globalId.y % 2 == 0){ // not blacked out, also write the other three texel
                         write_imagef_with_bounds_check(img_bounds, outData, (int2)(texCoords.x, texCoords.y - 1) , result); // bottom
                         write_imagef_with_bounds_check(img_bounds, outData, texCoords - (int2)(1,1), result); // bottom right
@@ -1013,7 +1030,7 @@ __kernel void volumeRender(  __read_only image3d_t volData
                     if(texCoords.x - 1 % 2 == 1 || texCoords.y % 2 == 1){ // also write the other texel
                         write_imagef_with_bounds_check(img_bounds, outData, (int2)(texCoords.x - 1, texCoords.y), result); // right
                     }
-                }
+                }*/
 				write_imagef(outData, texCoords, result);
                 break;
         case 2: // discard with rect
