@@ -699,7 +699,7 @@ __kernel void volumeRender(  __read_only image3d_t volData
     int maxSize = max(get_global_size(0), get_global_size(1));
     float2 texCoords_nlzd = (float2)(convert_float_rtp(globalId.x) / convert_float_rtp(get_global_size(0)), convert_float_rtp(globalId.y) / convert_float_rtp(get_global_size(1)));
 
-    int2 img_bounds = (int2)(get_global_size(0), get_global_size(1));
+    int2 img_bounds = get_image_dim(outData); //(int2)(get_global_size(0), get_global_size(1));
 
     // check if imageCoord is in valid area according to cursoPos and rectangle (and invert)
     // shift rect that cursor is in its middle
@@ -710,11 +710,13 @@ __kernel void volumeRender(  __read_only image3d_t volData
                 // distance will be read from rectangle or ell1
                 switch(invert){
                     case 0:
-                        globalId = old_2d_to_new_2d_coord(globalId, get_global_size(0), round(resolutionfactor), get_global_size(0));
-                        img_bounds = (int2)(get_global_size(0) * round(resolutionfactor), get_global_size(1) * round(resolutionfactor));
+                        // img_bounds = get_image_dim(outData);
                         maxSize = max(img_bounds.x, img_bounds.y);
+                        globalId = old_2d_to_new_2d_coord(globalId, img_bounds.x, round(resolutionfactor), get_global_size(0));
                         break;
                     case 1:
+                        maxSize = max(img_bounds.x, img_bounds.y);
+                        globalId = old_2d_to_new_2d_coord(globalId, img_bounds.x, round(resolutionfactor), get_global_size(0));
                         break;
                     case 3:
                         break;
@@ -757,11 +759,11 @@ __kernel void volumeRender(  __read_only image3d_t volData
     float maxRes = (float)max(get_image_dim(volData).x, get_image_dim(volData).z);
 
     int2 texCoords = globalId;
-    float aspectRatio = native_divide((float)get_global_size(1), (float)(get_global_size(0)));
-    aspectRatio = min(aspectRatio, native_divide((float)get_global_size(0), (float)(get_global_size(1))));
+    float aspectRatio = native_divide((float)(img_bounds.x), (float)(img_bounds.y));
+    aspectRatio = min(aspectRatio, native_divide((float)(img_bounds.x), (float)(img_bounds.y)));
     
     // calculate correct offset based on aspect ratio
-    imgCoords -= get_global_size(0) > get_global_size(1) ?
+    imgCoords -= img_bounds.x > img_bounds.y ?
                         (float2)(1.0f, aspectRatio) : (float2)(aspectRatio, 1.0);
     imgCoords.y *= -1.f;   // flip y coord
 
