@@ -492,8 +492,8 @@ void VolumeRenderWidget::paintGL_distance_dc()
 	double texture_height = floor(this->size().height() * _imgSamplingRate);
 	double execution_time = 0.0;
 
-	std::tuple<int, int> ell1(500, 400); // Area A
-	std::tuple<int, int> ell2(1000, 800);	// Area B
+	std::tuple<int, int> ell1(500 * _imgSamplingRate, 400 * _imgSamplingRate); // Area A
+	std::tuple<int, int> ell2(1000 * _imgSamplingRate, 800 * _imgSamplingRate);	// Area B
 
 	{	// only set once for all opencl kernel calls in this rendering case:
 
@@ -501,10 +501,10 @@ void VolumeRenderWidget::paintGL_distance_dc()
 		if (_useEyetracking) {
 			smoothed_nmlzd_coords(); // updates moving average
 			std::tuple<float, float> nlzd = _moving_average_gaze_data_nmlz;
-			_volumerender.setCursorPos(std::get<0>(nlzd) * width_renderer, std::get<1>(nlzd) * height_renderer); // sets eyetracking data as not normalized data!
+			_volumerender.setCursorPos(std::get<0>(nlzd) * texture_width, std::get<1>(nlzd) * texture_height); // sets eyetracking data as not normalized data!
 		}
 		else {
-			_volumerender.setCursorPos(static_cast<float>(_lastLocalCursorPos.x()), static_cast<float>(_lastLocalCursorPos.y()));
+			_volumerender.setCursorPos(static_cast<float>(_lastLocalCursorPos.x() * _imgSamplingRate), static_cast<float>(_lastLocalCursorPos.y() * _imgSamplingRate));
 		}
 
 		// rx and ry for ellipse 1. Here not normalized (in pixel)!

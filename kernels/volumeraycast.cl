@@ -1069,6 +1069,19 @@ __kernel void volumeRender(  __read_only image3d_t volData
         }
 }
 
+//************************** Interpolate Pixels ***************************
+__kernel void interpolateTexelsFromDDC(   __read_only image2d_t inData  // data to interpolate
+                                        , __write_only image2d_t outData    // interpolatet data
+                                        , const uint2 g_values  // x is g for ell1, y is g for ell2
+                                        , const float2 cursorPos // cursor position
+                                        , const float2 ell1 // rx, ry for ell1
+                                        , const float2 ell2 // rx, ry for ell2
+                                        )
+{
+    // TODO: interpolate data. Note: to interpolate correctly: need to know the area one is in.
+    return;
+}
+
 #pragma OPENCL EXTENSION cl_khr_3d_image_writes : enable
 
 //************************** Generate brick volume ***************************
