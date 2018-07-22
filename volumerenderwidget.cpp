@@ -526,18 +526,18 @@ void VolumeRenderWidget::paintGL_distance_dc()
 		{
 			if (_useGL) {
 
-				// first call: render area C (everything outside of ellipse 2) with gap size 2 -> g = 3
+				// first call: render area C (everything outside of ellipse 2) g = gap_size + 1
 				{
-					int g = 3;
+					int g = 6;
 					_volumerender.setInvert(+0);
 					_volumerender.setResolutionFactor(g);
 					_volumerender.runRaycast(texture_width / g, texture_height / g);
 					execution_time += _volumerender.getLastExecTime();
 				}
 
-				// second call: render area B (everything inside of ellipse 2 and outside of ellipse 1) with gap size 1 -> g = 2
+				// second call: render area B (everything inside of ellipse 2 and outside of ellipse 1)
 				{
-					int g = 2;
+					int g = 3;
 					_volumerender.setInvert(+1);
 					_volumerender.setResolutionFactor(g);
 					_volumerender.runRaycast(std::get<0>(ell2) / g, std::get<1>(ell2) / g);

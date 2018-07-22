@@ -411,22 +411,22 @@ float4 itp_imagef_with_bound_check(image2d_t image, int2 coord, int g, int d, in
     int2 c_pos = (int2)(coord.x -e, coord.y - d);
     int2 d_pos = (int2)(coord.x + (g-e), coord.y - d);
 
-    float4 a = read_imagef(image, nearestIntSmp, a_pos);
-    float4 b = read_imagef(image, nearestIntSmp, b_pos);
-    float4 c = read_imagef(image, nearestIntSmp, c_pos);
-    float4 d = read_imagef(image, nearestIntSmp, d_pos);
+    float4 a_color = read_imagef(image, nearestIntSmp, a_pos);
+    float4 b_color = read_imagef(image, nearestIntSmp, b_pos);
+    float4 c_color = read_imagef(image, nearestIntSmp, c_pos);
+    float4 d_color = read_imagef(image, nearestIntSmp, d_pos);
 
     if(any(b_pos > get_image_dim(image))){
         // out of bounds
-        return c;
+        return c_color;
     }
 
     float a_koeff = native_divide(convert_float(d * (g - e)), convert_float(g));
     float b_koeff = native_divide(convert_float(d * e), convert_float(g));
     float c_koeff = native_divide(convert_float((g-e) * (g-d)), convert_float(g));
-    float d_koeff = native_divide(convert_float(e * (g-d), convert_float(g));
+    float d_koeff = native_divide(convert_float(e * (g-d)), convert_float(g));
 
-    return a_koeff * a + b_koeff * b + c_koeff * c + d_koeff * d;
+    return a_koeff * a_color + b_koeff * b_color + c_koeff * c_color + d_koeff * d_color;
 }
 
 /**
@@ -1105,30 +1105,28 @@ __kernel void interpolateTexelsFromDDC(   __read_only image2d_t inData  // data 
                                         )
 {
     // interpolate data. Note: to interpolate correctly: need to know the area one is in.
-    if(get_image_dim(inData) != get_image_dim(outData)) return;
+    if(any(get_image_dim(inData) != get_image_dim(outData))) return;
     int2 globalId = (int2)(get_global_id(0), get_global_id(1));
     if(any(globalId > get_image_dim(outData))) return;
 
-    if(checkPointInEllipse()){
+    if(checkPointInEllipse(cursorPos, ell1.x, ell1.y, convert_float2_rtz(globalId))){
         // Area A: discard because all texels are set anyway
         return;
     }
 
-    float4 a = read_imagef(inData, nearestIntSmp, (int2)(globalId
-
-    if(checkPointInEllipse()){
+    if(checkPointInEllipse(cursorPos, ell2.x, ell2.y, convert_float2_rtz(globalId))){
         // Area B: interpolate. Maybe need to check at borders
-        int d = cursorPos.y % g.x;
-        int e = cursorPos.x % g.x;
+        int d = globalId.y % g_values.x;
+        int e = globalId.x % g_values.x;
 
-        write_imagef(outData, globalId, itp_imagef_with_bound_check(inData, globalId, g.x, d, e));
+        write_imagef(outData, globalId, itp_imagef_with_bound_check(inData, globalId, g_values.x, d, e));
 
     }else{
         // Area C: interpolate. Maybe need to check at borders too.
-        int d = cursorPos.y % g.y;
-        int e = cursorPos.x % g.y;
+        int d = globalId.y % g_values.y;
+        int e = globalId.x % g_values.y;
 
-        write_imagef(outData, globalId, itp_imagef_with_bound_check(inData, globalId, g.y, d, e));
+        write_imagef(outData, globalId, itp_imagef_with_bound_check(inData, globalId, g_values.y, d, e));
     }
 
     return;
