@@ -850,9 +850,10 @@ void VolumeRenderCL::setEllipse2(float width, float height)
 	_raycastKernel.setArg(ELLIPSE_2, rx_ry);
 }
 
-void VolumeRenderCL::setInvert(bool inv)
+// False := 0, True := !False
+void VolumeRenderCL::setInvert(unsigned int inv)
 {
-	_raycastKernel.setArg(INVERT, inv ? 1 : 0);
+	_raycastKernel.setArg(INVERT, inv);
 }
 
 void VolumeRenderCL::setResolutionFactor(float factor)

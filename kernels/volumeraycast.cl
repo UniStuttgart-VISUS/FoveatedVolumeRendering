@@ -688,7 +688,7 @@ __kernel void volumeRender(  __read_only image3d_t volData
                            , const float2 cursorPos  // cursor Position mapped to [0,1] x [0,1], is also center of ellipse 1 and ellipse 2 but then it is not normalized
                            , const float2 rectangle  // rectangle extends mapped to [0,1] x [0,1], also used for ellipse 1, contains rx and ry, not normalized
                            , const float2 ell2 // vector used for ellipse 2, contains rx and ry, not normalized
-                           , const uint invert  // if true (nonzero), draws everything outside the rectangle, else everything inside, tells in mode=1 which area is being drawn (A, B or C ad 0, 1 or 2)
+                           , const uint invert  // if true (nonzero), draws everything outside the rectangle, else everything inside, tells in mode=1 which area is being drawn (A, B or C ad 2, 1 or 0)
                            , const float resolutionfactor // is used as g for mode: discard_dc, m is derived from the mode and from the texture width, ell1 and ell2 rx.
                            , const uint mode
                            )
@@ -709,21 +709,33 @@ __kernel void volumeRender(  __read_only image3d_t volData
         case 1: // distance dependent discarding
                 // distance will be read from rectangle or ell1
                 switch(invert){
-                    case 0:
+                    case 0: // Area C
                         // img_bounds = get_image_dim(outData);
                         maxSize = max(img_bounds.x, img_bounds.y);
                         globalId = old_2d_to_new_2d_coord(globalId, img_bounds.x, round(resolutionfactor), get_global_size(0));
-
-                        // todo: discard if inside ell2
                         
+
+                        // discard if inside ell2
+                        if(checkPointInEllipse(cursorPos, ell2.x / 2, ell2.y / 2, convert_float2_rtz(globalId))) return;
                         break;
-                    case 1:
+                    case 1: // Area B
                         maxSize = max(img_bounds.x, img_bounds.y);
                         globalId = old_2d_to_new_2d_coord(globalId, round(ell2.x), round(resolutionfactor), get_global_size(0));
+                        globalId += convert_int2_rtz(cursorPos) - (int2)(0.5 * ell2.x, 0.5 * ell2.y);
+
+                        // discard if in ell1
+                        if(checkPointInEllipse(cursorPos, rectangle.x / 2, rectangle.y / 2, convert_float2_rtz(globalId))) return;
+
+                        // discard outside ell2
+                        if(!checkPointInEllipse(cursorPos, ell2.x / 2, ell2.y / 2, convert_float2_rtz(globalId))) return;
                         break;
-                    case 2:
+                    case 2: // Area A
                         maxSize = max(img_bounds.x, img_bounds.y);
                         globalId = old_2d_to_new_2d_coord(globalId, round(rectangle.x), round(resolutionfactor), get_global_size(0));
+                        globalId += convert_int2_rtz(cursorPos) - (int2)(0.5 * rectangle.x, 0.5 * rectangle.y);
+
+                        // discard outside ell1
+                        if(!checkPointInEllipse(cursorPos, rectangle.x / 2, rectangle.y / 2, convert_float2_rtz(globalId))) return;
                         break;
                     default:
                         break;

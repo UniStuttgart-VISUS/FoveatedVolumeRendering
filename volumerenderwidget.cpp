@@ -492,8 +492,8 @@ void VolumeRenderWidget::paintGL_distance_dc()
 	double texture_height = floor(this->size().height() * _imgSamplingRate);
 	double execution_time = 0.0;
 
-	std::tuple<int, int> ell1(300, 200);
-	std::tuple<int, int> ell2(600, 400);
+	std::tuple<int, int> ell1(500, 400); // Area A
+	std::tuple<int, int> ell2(1000, 800);	// Area B
 
 	{	// only set once for all opencl kernel calls in this rendering case:
 
@@ -508,10 +508,10 @@ void VolumeRenderWidget::paintGL_distance_dc()
 		}
 
 		// rx and ry for ellipse 1. Here not normalized (in pixel)!
-		_volumerender.setRectangleExtends(std::get<0>(ell1), std::get<1>(ell1));
+		_volumerender.setRectangleExtends(std::get<0>(ell1), std::get<1>(ell1)); // Area A
 
 		// rx and ry for ellipse 2. Here not normalized (in pixel)!
-		_volumerender.setEllipse2(std::get<0>(ell2), std::get<1>(ell2));
+		_volumerender.setEllipse2(std::get<0>(ell2), std::get<1>(ell2));	// Area B
 	
 		setOutputTextures(texture_width,
 			texture_height, _outTexId0, GL_TEXTURE0);
@@ -529,7 +529,7 @@ void VolumeRenderWidget::paintGL_distance_dc()
 				// first call: render area C (everything outside of ellipse 2) with gap size 2 -> g = 3
 				{
 					int g = 3;
-					_volumerender.setInvert(0);
+					_volumerender.setInvert(+0);
 					_volumerender.setResolutionFactor(g);
 					_volumerender.runRaycast(texture_width / g, texture_height / g);
 					execution_time += _volumerender.getLastExecTime();
@@ -538,7 +538,7 @@ void VolumeRenderWidget::paintGL_distance_dc()
 				// second call: render area B (everything inside of ellipse 2 and outside of ellipse 1) with gap size 1 -> g = 2
 				{
 					int g = 2;
-					_volumerender.setInvert(1);
+					_volumerender.setInvert(+1);
 					_volumerender.setResolutionFactor(g);
 					_volumerender.runRaycast(std::get<0>(ell2) / g, std::get<1>(ell2) / g);
 					execution_time += _volumerender.getLastExecTime();
@@ -547,7 +547,7 @@ void VolumeRenderWidget::paintGL_distance_dc()
 				// third call: render area A (everything inside of ellipse 1) with gap size 0 -> g = 1
 				{
 					int g = 1;
-					_volumerender.setInvert(2);
+					_volumerender.setInvert(+2);
 					_volumerender.setResolutionFactor(g);
 					_volumerender.runRaycast(std::get<0>(ell1) / g, std::get<1>(ell1) / g);
 					execution_time += _volumerender.getLastExecTime();

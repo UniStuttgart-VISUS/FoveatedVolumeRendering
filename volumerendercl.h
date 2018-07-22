@@ -220,7 +220,7 @@ public:
 	* @brief setInvert
 	* @param color
 	*/
-	void setInvert(bool inv);
+	void setInvert(unsigned int inv);
 	/**
 	* @brief setResolutionFactor
 	* @param factor
