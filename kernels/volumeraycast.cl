@@ -713,6 +713,9 @@ __kernel void volumeRender(  __read_only image3d_t volData
                         // img_bounds = get_image_dim(outData);
                         maxSize = max(img_bounds.x, img_bounds.y);
                         globalId = old_2d_to_new_2d_coord(globalId, img_bounds.x, round(resolutionfactor), get_global_size(0));
+
+                        // discard if inside ell2
+                        
                         break;
                     case 1:
                         maxSize = max(img_bounds.x, img_bounds.y);
@@ -723,6 +726,10 @@ __kernel void volumeRender(  __read_only image3d_t volData
                     default:
                         break;
                 }
+
+                // discard if out of range
+                if(any(globalId >= get_image_dim(outData)))
+                    return;
                 
                 break;
         case 2: // discard with rect
@@ -759,7 +766,7 @@ __kernel void volumeRender(  __read_only image3d_t volData
     float maxRes = (float)max(get_image_dim(volData).x, get_image_dim(volData).z);
 
     int2 texCoords = globalId;
-    float aspectRatio = native_divide((float)(img_bounds.x), (float)(img_bounds.y));
+    float aspectRatio = native_divide((float)(img_bounds.y), (float)(img_bounds.x));
     aspectRatio = min(aspectRatio, native_divide((float)(img_bounds.x), (float)(img_bounds.y)));
     
     // calculate correct offset based on aspect ratio

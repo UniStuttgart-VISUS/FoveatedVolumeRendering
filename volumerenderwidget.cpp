@@ -528,10 +528,10 @@ void VolumeRenderWidget::paintGL_distance_dc()
 				// first call: render area C (everything outside of ellipse 2) with gap size 2 -> g = 3
 				{
 					int g = 3;
-					int x_y_dimension = std::ceil(std::sqrt(texture_width * texture_height * 0.25)) + 1;  // +1 as offset alpha for safety, maybe not needed
+					// int x_y_dimension = std::ceil(std::sqrt(texture_width * texture_height * (1.0 / (g*g -1)))) + 1;  // +1 as offset alpha for safety, maybe not needed
 					_volumerender.setInvert(0);
 					_volumerender.setResolutionFactor(g);
-					_volumerender.runRaycast(x_y_dimension, x_y_dimension);
+					_volumerender.runRaycast(texture_width / g, texture_height / g);
 				}
 
 				// second call: render area B (everything inside of ellipse 2 and outside of ellipse 1) with gap size 1 -> g = 2
@@ -548,12 +548,12 @@ void VolumeRenderWidget::paintGL_distance_dc()
 					int x_y_dimension = std::ceil(2 * std::sqrt(std::get<0>(ell1) * std::get<1>(ell2))) + 1; // approximate amount of pixels in ellipse 1
 					_volumerender.setResolutionFactor(g);
 					_volumerender.runRaycast(x_y_dimension, x_y_dimension);
-				}*/
+				}
 
 				// forth call: interpolate and combine them
 				{
 					_volumerender.runInterpolation();
-				}
+				}*/
 			}
 			else
 			{
@@ -1860,6 +1860,7 @@ void VolumeRenderWidget::setBackgroundColor(const QColor col)
 
 /**
  * @brief VolumeRenderWidget::calcFPS
+ * calculates FPS based on the last ExecTime. If using two ore more executíon calls to OpenCL, all except the last one have to be given as offset.
  * @return
  */
 double VolumeRenderWidget::calcFPS(double offset)
