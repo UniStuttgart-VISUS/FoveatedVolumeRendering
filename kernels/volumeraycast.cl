@@ -403,6 +403,32 @@ void write_imagef_with_bounds_check(int2 bounds, __write_only image2d_t outData,
     return;
 }
 
+// bipolar interpolates the coord and does a bound check for each value that is read. returns the final color value for some coord.
+float4 itp_imagef_with_bound_check(image2d_t image, int2 coord, int g, int d, int e){
+    // if out of bounds use no interpolation and just use the bottom left value
+    int2 a_pos = (int2)(coord.x - e, coord.y + (g -d));
+    int2 b_pos = (int2)(coord.x + (g-e), coord.y + (g-d));
+    int2 c_pos = (int2)(coord.x -e, coord.y - d);
+    int2 d_pos = (int2)(coord.x + (g-e), coord.y - d);
+
+    float4 a = read_imagef(image, nearestIntSmp, a_pos);
+    float4 b = read_imagef(image, nearestIntSmp, b_pos);
+    float4 c = read_imagef(image, nearestIntSmp, c_pos);
+    float4 d = read_imagef(image, nearestIntSmp, d_pos);
+
+    if(any(b_pos > get_image_dim(image))){
+        // out of bounds
+        return c;
+    }
+
+    float a_koeff = native_divide(convert_float(d * (g - e)), convert_float(g));
+    float b_koeff = native_divide(convert_float(d * e), convert_float(g));
+    float c_koeff = native_divide(convert_float((g-e) * (g-d)), convert_float(g));
+    float d_koeff = native_divide(convert_float(e * (g-d), convert_float(g));
+
+    return a_koeff * a + b_koeff * b + c_koeff * c + d_koeff * d;
+}
+
 /**
  * direct volume raycasting kernel
  */
@@ -701,7 +727,7 @@ __kernel void volumeRender(  __read_only image3d_t volData
 
     int2 img_bounds = get_image_dim(outData); //(int2)(get_global_size(0), get_global_size(1));
 
-    // check if imageCoord is in valid area according to cursoPos and rectangle (and invert)
+    // check if imageCoord is in valid area according to cursorPos and rectangle (and invert)
     // shift rect that cursor is in its middle
     switch(mode){ // early discard here
         case 0: // Standard
@@ -1073,12 +1099,38 @@ __kernel void volumeRender(  __read_only image3d_t volData
 __kernel void interpolateTexelsFromDDC(   __read_only image2d_t inData  // data to interpolate
                                         , __write_only image2d_t outData    // interpolatet data
                                         , const uint2 g_values  // x is g for ell1, y is g for ell2
-                                        , const float2 cursorPos // cursor position
-                                        , const float2 ell1 // rx, ry for ell1
-                                        , const float2 ell2 // rx, ry for ell2
+                                        , const float2 cursorPos // cursor position in texels
+                                        , const float2 ell1 // rx, ry for ell1 in texels
+                                        , const float2 ell2 // rx, ry for ell2 in texels
                                         )
 {
-    // TODO: interpolate data. Note: to interpolate correctly: need to know the area one is in.
+    // interpolate data. Note: to interpolate correctly: need to know the area one is in.
+    if(get_image_dim(inData) != get_image_dim(outData)) return;
+    int2 globalId = (int2)(get_global_id(0), get_global_id(1));
+    if(any(globalId > get_image_dim(outData))) return;
+
+    if(checkPointInEllipse()){
+        // Area A: discard because all texels are set anyway
+        return;
+    }
+
+    float4 a = read_imagef(inData, nearestIntSmp, (int2)(globalId
+
+    if(checkPointInEllipse()){
+        // Area B: interpolate. Maybe need to check at borders
+        int d = cursorPos.y % g.x;
+        int e = cursorPos.x % g.x;
+
+        write_imagef(outData, globalId, itp_imagef_with_bound_check(inData, globalId, g.x, d, e));
+
+    }else{
+        // Area C: interpolate. Maybe need to check at borders too.
+        int d = cursorPos.y % g.y;
+        int e = cursorPos.x % g.y;
+
+        write_imagef(outData, globalId, itp_imagef_with_bound_check(inData, globalId, g.y, d, e));
+    }
+
     return;
 }
 
