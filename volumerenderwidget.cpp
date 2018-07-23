@@ -492,11 +492,11 @@ void VolumeRenderWidget::paintGL_distance_dc()
 	double texture_height = floor(this->size().height() * _imgSamplingRate);
 	double execution_time = 0.0;
 
-	std::tuple<int, int> ell1(0.3 * texture_width, 0.2 * texture_height); // Area A
-	std::tuple<int, int> ell2(0.5 * texture_width, 0.3 * texture_height);	// Area B
+	std::tuple<float, float> ell1(0.3 * texture_width, 0.2 * texture_height); // Area A
+	std::tuple<float, float> ell2(0.5 * texture_width, 0.3 * texture_height);	// Area B
 
-	std::tuple<int, int> g_values(6, 3);
-	std::tuple<int, int> cursorPos;
+	std::tuple<float, float> g_values(6, 3);
+	std::tuple<float, float> cursorPos;
 
 	{	// only set once for all opencl kernel calls in this rendering case:
 
@@ -504,10 +504,10 @@ void VolumeRenderWidget::paintGL_distance_dc()
 		if (_useEyetracking) {
 			smoothed_nmlzd_coords(); // updates moving average
 			std::tuple<float, float> nlzd = _moving_average_gaze_data_nmlz;
-			cursorPos = std::tuple<int, int>(std::get<0>(nlzd) * texture_width, std::get<1>(nlzd) * texture_height);
+			cursorPos = std::tuple<float, float>(std::get<0>(nlzd) * texture_width, std::get<1>(nlzd) * texture_height);
 		}
 		else {
-			cursorPos = std::tuple<int, int>(_lastLocalCursorPos.x() * _imgSamplingRate, _lastLocalCursorPos.y() * _imgSamplingRate);
+			cursorPos = std::tuple<float, float>(_lastLocalCursorPos.x() * _imgSamplingRate, _lastLocalCursorPos.y() * _imgSamplingRate);
 		}
 
 		_volumerender.setCursorPos(std::get<0>(cursorPos), std::get<1>(cursorPos));
@@ -533,7 +533,7 @@ void VolumeRenderWidget::paintGL_distance_dc()
 
 				// first call: render area C (everything outside of ellipse 2) g = gap_size + 1
 				{
-					int g = std::get<0>(g_values);
+					float g = std::get<0>(g_values);
 					_volumerender.setInvert(+0);
 					_volumerender.setResolutionFactor(g);
 					_volumerender.runRaycast(texture_width / g, texture_height / g);
@@ -542,7 +542,7 @@ void VolumeRenderWidget::paintGL_distance_dc()
 
 				// second call: render area B (everything inside of ellipse 2 and outside of ellipse 1)
 				{
-					int g = std::get<1>(g_values);
+					float g = std::get<1>(g_values);
 					_volumerender.setInvert(+1);
 					_volumerender.setResolutionFactor(g);
 					_volumerender.runRaycast(std::get<0>(ell2) / g, std::get<1>(ell2) / g);
@@ -551,7 +551,7 @@ void VolumeRenderWidget::paintGL_distance_dc()
 
 				// third call: render area A (everything inside of ellipse 1) with gap size 0 -> g = 1
 				{
-					int g = 1;
+					float g = 1;
 					_volumerender.setInvert(+2);
 					_volumerender.setResolutionFactor(g);
 					_volumerender.runRaycast(std::get<0>(ell1) / g, std::get<1>(ell1) / g);
@@ -561,8 +561,8 @@ void VolumeRenderWidget::paintGL_distance_dc()
 				// forth call: interpolate and combine them
 				{
 					_volumerender.updateOutputImg(texture_width, texture_height, _outTexId0, CL_MEM_READ_WRITE);
-					_volumerender.setInterpolationParameters(cl_float2{ std::get<0>(g_values),std::get<1>(g_values) }, cl_float2{ std::get<0>(g_values),std::get<1>(g_values) }, cl_float2{ std::get<0>(g_values),std::get<1>(g_values) }, cl_float2{ std::get<0>(g_values),std::get<1>(g_values) });
-					_volumerender.runInterpolation();
+					_volumerender.setInterpolationParameters(cl_float2{ std::get<0>(g_values),std::get<1>(g_values) }, cl_float2{ std::get<0>(cursorPos),std::get<1>(cursorPos) }, cl_float2{ std::get<0>(ell1),std::get<1>(ell1) }, cl_float2{ std::get<0>(ell2),std::get<1>(ell2) });
+					_volumerender.runInterpolation(texture_width, texture_height);
 					// don't need to add last exec time because of the construction of calcFPS()
 				}
 			}

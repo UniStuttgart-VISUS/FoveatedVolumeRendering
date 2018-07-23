@@ -1096,7 +1096,8 @@ __kernel void volumeRender(  __read_only image3d_t volData
 }
 
 //************************** Interpolate Pixels ***************************
-__kernel void interpolateTexelsFromDDC(   __read_write image2d_t inoutData  // data to interpolate
+__kernel void interpolateTexelsFromDDC(   __read_only image2d_t inData  // data to interpolate
+                                        , __write_only image2d_t outData // outData
                                         , const uint2 g_values  // x is g for ell1, y is g for ell2
                                         , const float2 cursorPos // cursor position in texels
                                         , const float2 ell1 // rx, ry for ell1 in texels
@@ -1104,11 +1105,13 @@ __kernel void interpolateTexelsFromDDC(   __read_write image2d_t inoutData  // d
                                         )
 {
     // interpolate data. Note: to interpolate correctly: need to know the area one is in.
+    if(any(get_image_dim(inData) != get_image_dim(outData))) return;
     int2 globalId = (int2)(get_global_id(0), get_global_id(1));
-    if(any(globalId > get_image_dim(inoutData))) return;
+    if(any(globalId > get_image_dim(outData))) return;
 
     if(checkPointInEllipse(cursorPos, ell1.x, ell1.y, convert_float2_rtz(globalId))){
         // Area A: discard because all texels are set anyway
+        //write_imagef(outData, globalId, (float4)(1.0f, 4.0f, 7.0f, 1.0f));
         return;
     }
 
@@ -1117,14 +1120,14 @@ __kernel void interpolateTexelsFromDDC(   __read_write image2d_t inoutData  // d
         int d = globalId.y % g_values.x;
         int e = globalId.x % g_values.x;
 
-        write_imagef(inoutData, globalId, itp_imagef_with_bound_check(inoutData, globalId, g_values.x, d, e));
+        //write_imagef(outData, globalId, itp_imagef_with_bound_check(inData, globalId, g_values.x, d, e));
 
     }else{
         // Area C: interpolate. Maybe need to check at borders too.
         int d = globalId.y % g_values.y;
         int e = globalId.x % g_values.y;
 
-        write_imagef(inoutData, globalId, itp_imagef_with_bound_check(inoutData, globalId, g_values.y, d, e));
+        // write_imagef(outData, globalId, itp_imagef_with_bound_check(inData, globalId, g_values.y, d, e));
     }
 
     return;

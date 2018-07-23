@@ -158,6 +158,7 @@ void VolumeRenderCL::initKernel(const std::string fileName, const std::string bu
 
         _genBricksKernel = cl::Kernel(program, "generateBricks");
         _downsamplingKernel = cl::Kernel(program, "downsampling");
+		_interpolationKernel = cl::Kernel(program, "interpolateTexelsFromDDC");
     }
     catch (cl::Error err)
     {
@@ -197,7 +198,8 @@ void VolumeRenderCL::setMemObjectsBrickGen(const int t)
 
 void VolumeRenderCL::setMemObjectsInterpolation()
 {
-	_interpolationKernel.setArg(0, _outputMem);
+	_interpolationKernel.setArg(0, _outputMem); // in Data
+	_interpolationKernel.setArg(1, _outputMem);	// out Data
 }
 
 
@@ -871,6 +873,14 @@ void VolumeRenderCL::setMode(unsigned int mode)
 	_raycastKernel.setArg(MODE, mode);
 }
 
+void VolumeRenderCL::setInterpolationParameters(cl_float2 g_values, cl_float2 cursorPos, cl_float2 ell1, cl_float2 ell2)
+{
+	_interpolationKernel.setArg(2, g_values);
+	_interpolationKernel.setArg(3, cursorPos);
+	_interpolationKernel.setArg(4, ell1);
+	_interpolationKernel.setArg(5, ell2);
+}
+
 
 /**
  * @brief VolumeRenderCL::getLastExecTime
@@ -881,8 +891,39 @@ double VolumeRenderCL::getLastExecTime()
     return _lastExecTime;
 }
 
-void VolumeRenderCL::runInterpolation()
+void VolumeRenderCL::runInterpolation(const size_t width, const size_t height)
 {
+	if (!this->_volLoaded)
+		return;
+	try // opencl scope
+	{
+		setMemObjectsInterpolation();
+		size_t lDim = 8;    // local work group dimension
+		cl::NDRange globalThreads(width + (lDim - width % lDim), height + (lDim - height % lDim));
+		cl::NDRange localThreads(lDim, lDim);
+		cl::Event ndrEvt;
+
+		std::vector<cl::Memory> memObj;
+		memObj.push_back(_outputMem);
+		_queueCL.enqueueAcquireGLObjects(&memObj);
+		_queueCL.enqueueNDRangeKernel(
+			_interpolationKernel, cl::NullRange, globalThreads, localThreads, NULL, &ndrEvt);
+		_queueCL.enqueueReleaseGLObjects(&memObj);
+		_queueCL.finish();    // global sync
+
+#ifdef CL_QUEUE_PROFILING_ENABLE
+		cl_ulong start = 0;
+		cl_ulong end = 0;
+		ndrEvt.getProfilingInfo(CL_PROFILING_COMMAND_START, &start);
+		ndrEvt.getProfilingInfo(CL_PROFILING_COMMAND_END, &end);
+		_lastExecTime = static_cast<double>(end - start)*1e-9;
+		//        std::cout << "Kernel time: " << _lastExecTime << std::endl << std::endl;
+#endif
+	}
+	catch (cl::Error err)
+	{
+		logCLerror(err);
+	}
 }
 
 

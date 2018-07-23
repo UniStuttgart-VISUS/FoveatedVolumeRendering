@@ -231,6 +231,12 @@ public:
 	* @param mode
 	*/
 	void setMode(unsigned int mode);
+
+	/*
+	* Sets interpolation parameters for mode 1.
+	*/
+	void setInterpolationParameters(cl_float2 g_values, cl_float2 cursorPos, cl_float2 ell1, cl_float2 ell2);
+
     /**
      * @brief Get the execution time of the last kernel run.
      * @return The kernel runtime in seconds.
@@ -239,7 +245,7 @@ public:
 	/**
 	*  Run the kernel to interpolate the values from distance_dc
 	*/
-	void runInterpolation();
+	void runInterpolation(const size_t width, const size_t height);
 
     /**
      * @brief getPlatformNames
