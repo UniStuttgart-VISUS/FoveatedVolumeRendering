@@ -427,8 +427,8 @@ float4 itp_imagef_with_bound_check(__read_only image2d_t image, int2 coord, int 
     float c_koeff = native_divide(convert_float((g-e) * (g-d)), convert_float(g));
     float d_koeff = native_divide(convert_float(e * (g-d)), convert_float(g));
 
-    // return a_color;
-    return a_koeff * a_color + b_koeff * b_color + c_koeff * c_color + d_koeff * d_color;
+    return c_color;
+    // return a_koeff * a_color + b_koeff * b_color + c_koeff * c_color + d_koeff * d_color;
 }
 
 
@@ -849,10 +849,48 @@ __kernel void interpolateTexelsFromDDC(   __read_only image2d_t inData  // data 
     int2 globalId = (int2)(get_global_id(0), get_global_id(1));
     if(any(globalId > get_image_dim(outData))) return;
 
-    if(globalId.x == 0 && globalId.y == 0){
+    /*if(globalId.x == 0 && globalId.y == 0){
         write_imagef(outData, globalId, (float4)(0.0f, 1.0f, 0.0f, 1.0f));
         return;
     }
+
+    if(globalId.x == 2 && globalId.y == 2){
+        write_imagef(outData, globalId, (float4)(0.0f, 1.0f, 0.0f, 1.0f));
+        return;
+    }
+
+    if(globalId.x == 0 && globalId.y == 2){
+        write_imagef(outData, globalId, (float4)(0.0f, 1.0f, 0.0f, 1.0f));
+        return;
+    }
+
+    if(globalId.x == 2 && globalId.y == 0){
+        write_imagef(outData, globalId, (float4)(0.0f, 1.0f, 0.0f, 1.0f));
+        return;
+    }
+
+    if(globalId.x == 1 && globalId.y == 1){
+        write_imagef(outData, globalId, (float4)(1.0f, 1.0f, 0.0f, 1.0f));
+        return;
+    }
+
+    if(globalId.x == 1 && globalId.y == 2){
+        write_imagef(outData, globalId, (float4)(1.0f, 1.0f, 0.0f, 1.0f));
+        return;
+    }
+
+    if(globalId.x == 2 && globalId.y == 1){
+        write_imagef(outData, globalId, (float4)(1.0f, 1.0f, 0.0f, 1.0f));
+        return;
+    }
+    if(globalId.x == 0 && globalId.y == 1){
+        write_imagef(outData, globalId, (float4)(1.0f, 1.0f, 0.0f, 1.0f));
+        return;
+    }
+    if(globalId.x == 1 && globalId.y == 0){
+        write_imagef(outData, globalId, (float4)(1.0f, 1.0f, 0.0f, 1.0f));
+        return;
+    }*/
 
     if(checkPointInEllipse(cursorPos, ell1.x / 2, ell1.y / 2, convert_float2_rtz(globalId))){
         // Area A: discard because all texels are set anyway
