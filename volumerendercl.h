@@ -94,7 +94,7 @@ public:
      * @param width The image width in pixels.
      * @param height The image height in pixels.
      */
-    void updateOutputImg(const size_t width, const size_t height, cl_GLuint texId);
+    void updateOutputImg(const size_t width, const size_t height, cl_GLuint texId, cl_mem_flags flags = CL_MEM_WRITE_ONLY);
 
     /**
      * @brief Run the actual OpenCL volume raycasting kernel.
@@ -323,6 +323,7 @@ private:
 
     void setMemObjectsRaycast(const int t);
     void setMemObjectsBrickGen(const int t);
+	void setMemObjectsInterpolation();
 
     void initKernel(const std::string fileName, const std::string buildFlags = "");
 
@@ -333,6 +334,7 @@ private:
     cl::Kernel _raycastKernel;
     cl::Kernel _genBricksKernel;
     cl::Kernel _downsamplingKernel;
+	cl::Kernel _interpolationKernel;
 
     std::vector<cl::Image3D> _volumesMem;
     std::vector<cl::Image3D> _bricksMem;

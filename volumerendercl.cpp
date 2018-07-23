@@ -195,6 +195,11 @@ void VolumeRenderCL::setMemObjectsBrickGen(const int t)
     _genBricksKernel.setArg(BRICKS, _bricksMem.at(t));
 }
 
+void VolumeRenderCL::setMemObjectsInterpolation()
+{
+	_interpolationKernel.setArg(0, _outputMem);
+}
+
 
 /**
  * @brief VolumeRenderCL::setMemObjectsDownsampling
@@ -377,7 +382,7 @@ void VolumeRenderCL::updateSamplingRate(const double samplingRate)
  * @param width
  * @param height
  */
-void VolumeRenderCL::updateOutputImg(const size_t width, const size_t height, GLuint texId)
+void VolumeRenderCL::updateOutputImg(const size_t width, const size_t height, GLuint texId, cl_mem_flags flags)
 {
 	// std::cout << "updateOutputImage: " << std::to_string(width) << ", " << std::to_string(height) << ", texId: " << std::to_string(texId) << std::endl;
 
@@ -387,10 +392,10 @@ void VolumeRenderCL::updateOutputImg(const size_t width, const size_t height, GL
     try
     {
         if (_useGL)
-            _outputMem = cl::ImageGL(_contextCL, CL_MEM_WRITE_ONLY, GL_TEXTURE_2D, 0, texId);
+            _outputMem = cl::ImageGL(_contextCL, flags, GL_TEXTURE_2D, 0, texId);
         else
         {
-            _outputMemNoGL = cl::Image2D(_contextCL, CL_MEM_WRITE_ONLY, format, width, height);
+            _outputMemNoGL = cl::Image2D(_contextCL, flags, format, width, height);
             _raycastKernel.setArg(OUTPUT, _outputMemNoGL);
         }
     }
