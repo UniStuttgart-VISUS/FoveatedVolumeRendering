@@ -245,7 +245,7 @@ public:
 	/**
 	*  Run the kernel to interpolate the values from distance_dc
 	*/
-	void runInterpolation(const size_t width, const size_t height);
+	void runInterpolation(const size_t width, const size_t height, GLuint inTexId, GLuint outTexId);
 
     /**
      * @brief getPlatformNames
@@ -329,7 +329,7 @@ private:
 
     void setMemObjectsRaycast(const int t);
     void setMemObjectsBrickGen(const int t);
-	void setMemObjectsInterpolation();
+	void setMemObjectsInterpolation(GLuint inTexId, GLuint outTexId);
 
     void initKernel(const std::string fileName, const std::string buildFlags = "");
 
@@ -345,6 +345,7 @@ private:
     std::vector<cl::Image3D> _volumesMem;
     std::vector<cl::Image3D> _bricksMem;
     cl::ImageGL _outputMem;
+	cl::ImageGL _inputMem; // used for mode 1.
     cl::ImageGL _overlayMem;
     cl::Image1D _tffMem;
     cl::Image1D _tffPrefixMem;

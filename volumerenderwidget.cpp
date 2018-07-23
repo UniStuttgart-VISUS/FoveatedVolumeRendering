@@ -519,7 +519,7 @@ void VolumeRenderWidget::paintGL_distance_dc()
 		_volumerender.setEllipse2(std::get<0>(ell2), std::get<1>(ell2));	// Area B
 	
 		setOutputTextures(texture_width,
-			texture_height, _outTexId0, GL_TEXTURE0);
+			texture_height, _outTexId1, GL_TEXTURE0);
 	}
 
 	// -- begin
@@ -560,9 +560,10 @@ void VolumeRenderWidget::paintGL_distance_dc()
 
 				// forth call: interpolate and combine them
 				{
-					_volumerender.updateOutputImg(texture_width, texture_height, _outTexId0, CL_MEM_READ_WRITE);
+					setOutputTextures(texture_width,
+						texture_height, _outTexId0, GL_TEXTURE0);
 					_volumerender.setInterpolationParameters(cl_float2{ std::get<0>(g_values),std::get<1>(g_values) }, cl_float2{ std::get<0>(cursorPos),std::get<1>(cursorPos) }, cl_float2{ std::get<0>(ell1),std::get<1>(ell1) }, cl_float2{ std::get<0>(ell2),std::get<1>(ell2) });
-					_volumerender.runInterpolation(texture_width, texture_height);
+					_volumerender.runInterpolation(texture_width, texture_height, _outTexId1, _outTexId0);
 					// don't need to add last exec time because of the construction of calcFPS()
 				}
 			}

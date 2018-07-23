@@ -196,9 +196,12 @@ void VolumeRenderCL::setMemObjectsBrickGen(const int t)
     _genBricksKernel.setArg(BRICKS, _bricksMem.at(t));
 }
 
-void VolumeRenderCL::setMemObjectsInterpolation()
+void VolumeRenderCL::setMemObjectsInterpolation(GLuint inTexId, GLuint outTexId)
 {
-	_interpolationKernel.setArg(0, _outputMem); // in Data
+	_inputMem = cl::ImageGL(_contextCL, CL_MEM_READ_ONLY, GL_TEXTURE_2D, 0, inTexId);
+	_outputMem = cl::ImageGL(_contextCL, CL_MEM_WRITE_ONLY, GL_TEXTURE_2D, 0, outTexId);
+
+	_interpolationKernel.setArg(0, _inputMem); // in Data
 	_interpolationKernel.setArg(1, _outputMem);	// out Data
 }
 
@@ -891,13 +894,13 @@ double VolumeRenderCL::getLastExecTime()
     return _lastExecTime;
 }
 
-void VolumeRenderCL::runInterpolation(const size_t width, const size_t height)
+void VolumeRenderCL::runInterpolation(const size_t width, const size_t height, GLuint inTexId, GLuint outTexId)
 {
 	if (!this->_volLoaded)
 		return;
 	try // opencl scope
 	{
-		setMemObjectsInterpolation();
+		setMemObjectsInterpolation(inTexId, outTexId);
 		size_t lDim = 8;    // local work group dimension
 		cl::NDRange globalThreads(width + (lDim - width % lDim), height + (lDim - height % lDim));
 		cl::NDRange localThreads(lDim, lDim);
@@ -905,6 +908,7 @@ void VolumeRenderCL::runInterpolation(const size_t width, const size_t height)
 
 		std::vector<cl::Memory> memObj;
 		memObj.push_back(_outputMem);
+		memObj.push_back(_inputMem);
 		_queueCL.enqueueAcquireGLObjects(&memObj);
 		_queueCL.enqueueNDRangeKernel(
 			_interpolationKernel, cl::NullRange, globalThreads, localThreads, NULL, &ndrEvt);
