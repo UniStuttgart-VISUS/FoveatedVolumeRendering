@@ -492,8 +492,8 @@ void VolumeRenderWidget::paintGL_distance_dc()
 	double texture_height = floor(this->size().height() * _imgSamplingRate);
 	double execution_time = 0.0;
 
-	std::tuple<int, int> ell1(500 * _imgSamplingRate, 400 * _imgSamplingRate); // Area A
-	std::tuple<int, int> ell2(1000 * _imgSamplingRate, 800 * _imgSamplingRate);	// Area B
+	std::tuple<int, int> ell1(0.3 * texture_width, 0.2 * texture_height); // Area A
+	std::tuple<int, int> ell2(0.5 * texture_width, 0.3 * texture_height);	// Area B
 
 	{	// only set once for all opencl kernel calls in this rendering case:
 
