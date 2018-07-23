@@ -406,31 +406,29 @@ void write_imagef_with_bounds_check(int2 bounds, __write_only image2d_t outData,
 // bipolar interpolates the coord and does a bound check for each value that is read. returns the final color value for some coord.
 float4 itp_imagef_with_bound_check(__read_only image2d_t image, int2 coord, int g, int d, int e){
     // if out of bounds use no interpolation and just use the bottom left value
-    // int2 a_pos = (int2)(coord.x - e, coord.y + (g -d));
-    int2 a_pos = (int2)(coord.x + g, coord.y + g);
+    int2 a_pos = (int2)(coord.x - e, coord.y + (g -d));
     int2 b_pos = (int2)(coord.x + (g-e), coord.y + (g-d));
     int2 c_pos = (int2)(coord.x -e , coord.y - d);
     int2 d_pos = (int2)(coord.x + (g-e), coord.y - d);
-
-    if(any(b_pos > get_image_dim(image))){
-        // out of bounds
-        // return read_imagef(image, nearestIntSmp, coord);
-        return (float4)(1.0f,0.0f,0.0f,1.0f);
-        // return a_color;
-    }
 
     float4 a_color = read_imagef(image, nearestIntSmp, a_pos);
     float4 b_color = read_imagef(image, nearestIntSmp, b_pos);
     float4 c_color = read_imagef(image, nearestIntSmp, c_pos);
     float4 d_color = read_imagef(image, nearestIntSmp, d_pos);
-
+    
+    if(any(a_pos > get_image_dim(image))){
+        // out of bounds
+        // return read_imagef(image, nearestIntSmp, coord);
+        // return (float4)(1.0f,0.0f,0.0f,1.0f);
+        return c_color;
+    }
     float a_koeff = native_divide(convert_float(d * (g - e)), convert_float(g));
     float b_koeff = native_divide(convert_float(d * e), convert_float(g));
     float c_koeff = native_divide(convert_float((g-e) * (g-d)), convert_float(g));
     float d_koeff = native_divide(convert_float(e * (g-d)), convert_float(g));
 
-    return c_color;
-    // return a_koeff * a_color + b_koeff * b_color + c_koeff * c_color + d_koeff * d_color;
+    // return a_color;
+    return a_koeff * a_color + b_koeff * b_color + c_koeff * c_color + d_koeff * d_color;
 }
 
 
@@ -851,6 +849,11 @@ __kernel void interpolateTexelsFromDDC(   __read_only image2d_t inData  // data 
     int2 globalId = (int2)(get_global_id(0), get_global_id(1));
     if(any(globalId > get_image_dim(outData))) return;
 
+    if(globalId.x == 0 && globalId.y == 0){
+        write_imagef(outData, globalId, (float4)(0.0f, 1.0f, 0.0f, 1.0f));
+        return;
+    }
+
     if(checkPointInEllipse(cursorPos, ell1.x / 2, ell1.y / 2, convert_float2_rtz(globalId))){
         // Area A: discard because all texels are set anyway
         write_imagef(outData, globalId, read_imagef(inData, nearestIntSmp, globalId));
@@ -859,21 +862,16 @@ __kernel void interpolateTexelsFromDDC(   __read_only image2d_t inData  // data 
 
     if(checkPointInEllipse(cursorPos, ell2.x / 2, ell2.y / 2, convert_float2_rtz(globalId))){
         // Area B: interpolate. Maybe need to check at borders
-        int d = globalId.y % g_values.x;
-        int e = globalId.x % g_values.x;
-
         // write_imagef(outData, globalId, read_imagef(inData, nearestIntSmp, globalId));
-        // write_imagef(outData, globalId, itp_imagef_with_bound_check(inData, globalId, g_values.x, d, e));
-        write_imagef(outData, globalId, (float4)(0.0f, 1.0f, 0.0f, 1.0f));
+        write_imagef(outData, globalId, itp_imagef_with_bound_check(inData, globalId, g_values.x, globalId.y % g_values.x, globalId.x % g_values.x));
+        // write_imagef(outData, globalId, (float4)(0.0f, 1.0f, 0.0f, 1.0f));
     }else{
         // Area C: interpolate. Maybe need to check at borders too.
-        int d = globalId.y % g_values.y;
-        int e = globalId.x % g_values.y;
-
-        //write_imagef(outData, globalId, (float4)(0.0f, 0.0f, 1.0f, 1.0f));
-        write_imagef(outData, globalId, itp_imagef_with_bound_check(inData, globalId, g_values.y, d, e));
+        // write_imagef(outData, globalId, read_imagef(inData, nearestIntSmp, globalId));
+        // write_imagef(outData, globalId, (float4)(0.0f, 0.0f, 1.0f, 1.0f));
+        write_imagef(outData, globalId, itp_imagef_with_bound_check(inData, globalId, g_values.y, globalId.y % g_values.y, globalId.x % g_values.y));
     }
-
+    // write_imagef(outData, globalId, read_imagef(inData, nearestIntSmp, globalId));
     return;
 }
 
