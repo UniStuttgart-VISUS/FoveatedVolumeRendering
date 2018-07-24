@@ -510,6 +510,11 @@ __kernel void volumeRender(  __read_only image3d_t volData
                 // discard if out of range
                 if(any(globalId >= get_image_dim(outData)))
                     return;
+
+				if(globalId.x % 2 == 0 && globalId.y % 2 == 0){ 
+					write_imagef(outData, globalId, (float4)(1.0f, 0.0f, 0.0f, 1.0f));
+					return;
+				}
                 
                 break;
         case 2: // discard with rect
@@ -892,11 +897,11 @@ __kernel void interpolateTexelsFromDDC(   __read_only image2d_t inData  // data 
         return;
     }*/
 
-    if(checkPointInEllipse(cursorPos, ell1.x / 2, ell1.y / 2, convert_float2_rtz(globalId))){
+    //if(checkPointInEllipse(cursorPos, ell1.x / 2, ell1.y / 2, convert_float2_rtz(globalId))){
         // Area A: discard because all texels are set anyway
         write_imagef(outData, globalId, read_imagef(inData, nearestIntSmp, globalId));
         return;
-    }
+    //}
 
     if(checkPointInEllipse(cursorPos, ell2.x / 2, ell2.y / 2, convert_float2_rtz(globalId))){
         // Area B: interpolate. Maybe need to check at borders
