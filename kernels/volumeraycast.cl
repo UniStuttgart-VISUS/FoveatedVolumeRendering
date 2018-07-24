@@ -509,12 +509,7 @@ __kernel void volumeRender(  __read_only image3d_t volData
 
                 // discard if out of range
                 if(any(globalId >= get_image_dim(outData)))
-                    return;
-
-				if(globalId.x % 2 == 0 && globalId.y % 2 == 0){ 
-					write_imagef(outData, globalId, (float4)(1.0f, 0.0f, 0.0f, 1.0f));
-					return;
-				}
+                    return;s
                 
                 break;
         case 2: // discard with rect
