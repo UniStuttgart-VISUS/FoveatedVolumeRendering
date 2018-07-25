@@ -403,34 +403,6 @@ void write_imagef_with_bounds_check(int2 bounds, __write_only image2d_t outData,
     return;
 }
 
-// bipolar interpolates the coord and does a bound check for each value that is read. returns the final color value for some coord.
-float4 itp_imagef_with_bound_check(__read_only image2d_t image, int2 coord, int g, int d, int e){
-    // if out of bounds use no interpolation and just use the bottom left value
-    int2 a_pos = (int2)(coord.x - e, coord.y + (g -d));
-    int2 b_pos = (int2)(coord.x + (g-e), coord.y + (g-d));
-    int2 c_pos = (int2)(coord.x -e , coord.y - d);
-    int2 d_pos = (int2)(coord.x + (g-e), coord.y - d);
-
-    float4 a_color = read_imagef(image, nearestIntSmp, a_pos);
-    float4 b_color = read_imagef(image, nearestIntSmp, b_pos);
-    float4 c_color = read_imagef(image, nearestIntSmp, c_pos);
-    float4 d_color = read_imagef(image, nearestIntSmp, d_pos);
-    
-    if(any(a_pos > get_image_dim(image))){
-        // out of bounds
-        // return read_imagef(image, nearestIntSmp, coord);
-        // return (float4)(1.0f,0.0f,0.0f,1.0f);
-        return c_color;
-    }
-    float a_koeff = native_divide(convert_float(d * (g - e)), convert_float(g * g));
-    float b_koeff = native_divide(convert_float(d * e), convert_float(g * g));
-    float c_koeff = native_divide(convert_float((g-e) * (g-d)), convert_float(g * g));
-    float d_koeff = native_divide(convert_float(e * (g-d)), convert_float(g * g));
-
-    // return c_color;
-    return a_koeff * a_color + b_koeff * b_color + c_koeff * c_color + d_koeff * d_color;
-}
-
 
 /**
 * direct volume raycasting kernel which draws everything inside or except a specified Rectangle around the cursor position
@@ -822,71 +794,122 @@ __kernel void interpolateTexelsFromDDC(   __read_only image2d_t inData  // data 
                                         )
 {
     // interpolate data. Note: to interpolate correctly: need to know the area one is in.
-    if(any(get_image_dim(inData) != get_image_dim(outData))) return;
+	int2 in_img_dim = get_image_dim(inData);
+
+    if(any(in_img_dim != get_image_dim(outData))) return;
     int2 globalId = (int2)(get_global_id(0), get_global_id(1));
-    if(any(globalId > get_image_dim(outData))) return;
+    if(any(globalId > in_img_dim)) return;
 
-    /*if(globalId.x == 0 && globalId.y == 0){
-        write_imagef(outData, globalId, (float4)(0.0f, 1.0f, 0.0f, 1.0f));
-        return;
-    }
+	// new begin
 
-    if(globalId.x == 2 && globalId.y == 2){
-        write_imagef(outData, globalId, (float4)(0.0f, 1.0f, 0.0f, 1.0f));
-        return;
-    }
+	float2 ell2_div_2 = ell2 * 0.5f;
+	float2 ell1_div_2 = ell1 * 0.5f;
 
-    if(globalId.x == 0 && globalId.y == 2){
-        write_imagef(outData, globalId, (float4)(0.0f, 1.0f, 0.0f, 1.0f));
-        return;
-    }
+	float2 globalId_f = convert_float2_rtz(globalId);
 
-    if(globalId.x == 2 && globalId.y == 0){
-        write_imagef(outData, globalId, (float4)(0.0f, 1.0f, 0.0f, 1.0f));
-        return;
-    }
+	if(checkPointInEllipse(cursorPos, ell1_div_2.x, ell1_div_2.y, globalId_f)){	// Area A
+		write_imagef(outData, globalId, read_imagef(inData, nearestIntSmp, globalId));
+	}else{
+		int d = 0;
+		int e = 0;
+		int g = 0;
 
-    if(globalId.x == 1 && globalId.y == 1){
-        write_imagef(outData, globalId, (float4)(1.0f, 1.0f, 0.0f, 1.0f));
-        return;
-    }
+		bool in_ell2 = checkPointInEllipse(cursorPos, ell2_div_2.x, ell2_div_2.y, globalId_f);
 
-    if(globalId.x == 1 && globalId.y == 2){
-        write_imagef(outData, globalId, (float4)(1.0f, 1.0f, 0.0f, 1.0f));
-        return;
-    }
+		if(in_ell2){	// Area B
+			g = g_values.x;
+			d = globalId.y % g_values.x;
+			e = globalId.x % g_values.x;		
+		}else{	// Area C
+			g = g_values.y;
+			d = globalId.y % g_values.y;
+			e = globalId.x % g_values.y;
+		}
 
-    if(globalId.x == 2 && globalId.y == 1){
-        write_imagef(outData, globalId, (float4)(1.0f, 1.0f, 0.0f, 1.0f));
-        return;
-    }
-    if(globalId.x == 0 && globalId.y == 1){
-        write_imagef(outData, globalId, (float4)(1.0f, 1.0f, 0.0f, 1.0f));
-        return;
-    }
-    if(globalId.x == 1 && globalId.y == 0){
-        write_imagef(outData, globalId, (float4)(1.0f, 1.0f, 0.0f, 1.0f));
-        return;
-    }*/
+		float g_square = convert_float(g * g);
+		int g_minus_e = g - e;
+		int g_minus_d = g - d;
+		
+		int2 c_pos_1 = (int2)(globalId.x - globalId.x % g_values.x, globalId.y - globalId.y % g_values.x);	// Area B
+		int2 c_pos_2 = (int2)(globalId.x - globalId.x % g_values.y, globalId.y - globalId.y % g_values.y);	// Area C
+		int2 c_pos = in_ell2 ? c_pos_1 : c_pos_2;
 
-    if(checkPointInEllipse(cursorPos, ell1.x / 2, ell1.y / 2, convert_float2_rtz(globalId))){
-        // Area A: discard because all texels are set anyway
-        write_imagef(outData, globalId, read_imagef(inData, nearestIntSmp, globalId));
-        return;
-    }
+		int2 a_pos_1 = (int2)(globalId.x - globalId.x % g_values.x, globalId.y + g_values.x - globalId.y % g_values.x);
+		int2 a_pos_2 = (int2)(globalId.x - globalId.x % g_values.y, globalId.y + g_values.y - globalId.y % g_values.y);
+		int2 a_pos = in_ell2 ? a_pos_1 : a_pos_2;
 
-    if(checkPointInEllipse(cursorPos, ell2.x / 2, ell2.y / 2, convert_float2_rtz(globalId))){
-        // Area B: interpolate. Maybe need to check at borders
-        // write_imagef(outData, globalId, read_imagef(inData, nearestIntSmp, globalId));
-        write_imagef(outData, globalId, itp_imagef_with_bound_check(inData, globalId, g_values.x, globalId.y % g_values.x, globalId.x % g_values.x));
-        // write_imagef(outData, globalId, (float4)(0.0f, 1.0f, 0.0f, 1.0f));
-    }else{
-        // Area C: interpolate. Maybe need to check at borders too.
-        // write_imagef(outData, globalId, read_imagef(inData, nearestIntSmp, globalId));
-        // write_imagef(outData, globalId, (float4)(0.0f, 0.0f, 1.0f, 1.0f));
-        write_imagef(outData, globalId, itp_imagef_with_bound_check(inData, globalId, g_values.y, globalId.y % g_values.y, globalId.x % g_values.y));
-    }
-    // write_imagef(outData, globalId, read_imagef(inData, nearestIntSmp, globalId));
+		int2 d_pos_1 = (int2)(globalId.x + g_values.x - globalId.x % g_values.x, globalId.y - globalId.y % g_values.x);
+		int2 d_pos_2 = (int2)(globalId.x + g_values.y - globalId.x % g_values.y, globalId.y - globalId.y % g_values.y);
+		int2 d_pos = in_ell2 ? d_pos_1 : d_pos_2;
+
+		int2 b_pos_1 = (int2)(globalId.x + g_values.x - globalId.x % g_values.x, globalId.y + g_values.x - globalId.y % g_values.x);
+		int2 b_pos_2 = (int2)(globalId.x + g_values.y - globalId.x % g_values.y, globalId.y + g_values.y - globalId.y % g_values.y);
+		int2 b_pos = in_ell2 ? b_pos_1 : b_pos_2;
+
+
+		float a_koeff = native_divide(convert_float(d * g_minus_e), g_square);
+		float b_koeff = native_divide(convert_float(d * e), g_square);
+		float c_koeff = native_divide(convert_float(g_minus_e * g_minus_d), g_square);
+		float d_koeff = native_divide(convert_float(e * g_minus_d), g_square);
+		
+		bool a_in_ell2 = checkPointInEllipse(cursorPos, ell2_div_2.x, ell2_div_2.y, convert_float2_rtz(a_pos));
+		bool b_in_ell2 = checkPointInEllipse(cursorPos, ell2_div_2.x, ell2_div_2.y, convert_float2_rtz(b_pos));
+		bool c_in_ell2 = checkPointInEllipse(cursorPos, ell2_div_2.x, ell2_div_2.y, convert_float2_rtz(c_pos));
+		bool d_in_ell2 = checkPointInEllipse(cursorPos, ell2_div_2.x, ell2_div_2.y, convert_float2_rtz(d_pos));
+
+		/*if(in_ell2){ 
+			if(!c_in_ell2){
+				write_imagef(outData, globalId, read_imagef(inData, nearestIntSmp, c_pos_2));
+				return;
+			}else{ 
+				if(!a_in_ell2){ 
+					write_imagef(outData, globalId, read_imagef(inData, nearestIntSmp, a_pos_2));
+					return;
+				}else{
+					if(!b_in_ell2){ 
+						write_imagef(outData, globalId, read_imagef(inData, nearestIntSmp, b_pos_2));
+						return;
+					}else{
+						if(!d_in_ell2){ 
+							write_imagef(outData, globalId, read_imagef(inData, nearestIntSmp, d_pos_2));
+							return;
+						}	
+					}
+				}
+			}
+		}else{ 
+			if(c_in_ell2){
+				write_imagef(outData, globalId, read_imagef(inData, nearestIntSmp, c_pos_2));
+				return;
+			}else{ 
+				if(a_in_ell2){ 
+					write_imagef(outData, globalId, read_imagef(inData, nearestIntSmp, a_pos_2));
+					return;
+				}else{
+					if(b_in_ell2){ 
+						write_imagef(outData, globalId, read_imagef(inData, nearestIntSmp, b_pos_2));
+						return;
+					}else{
+						if(d_in_ell2){ 
+							write_imagef(outData, globalId, read_imagef(inData, nearestIntSmp, d_pos_2));
+							return;
+						}	
+					}
+				}
+			}
+		}*/
+
+		float4 a_color = read_imagef(inData, nearestIntSmp, a_pos);
+		float4 b_color = read_imagef(inData, nearestIntSmp, b_pos);
+		float4 c_color = read_imagef(inData, nearestIntSmp, c_pos);
+		float4 d_color = read_imagef(inData, nearestIntSmp, d_pos);
+
+		float4 result_color = a_koeff * a_color + b_koeff * b_color + c_koeff * c_color + d_koeff * d_color;
+
+		write_imagef(outData, globalId, result_color);
+
+	}
+
     return;
 }
 
