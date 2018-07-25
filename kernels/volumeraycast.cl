@@ -422,13 +422,13 @@ float4 itp_imagef_with_bound_check(__read_only image2d_t image, int2 coord, int 
         // return (float4)(1.0f,0.0f,0.0f,1.0f);
         return c_color;
     }
-    float a_koeff = native_divide(convert_float(d * (g - e)), convert_float(g));
-    float b_koeff = native_divide(convert_float(d * e), convert_float(g));
-    float c_koeff = native_divide(convert_float((g-e) * (g-d)), convert_float(g));
-    float d_koeff = native_divide(convert_float(e * (g-d)), convert_float(g));
+    float a_koeff = native_divide(convert_float(d * (g - e)), convert_float(g * g));
+    float b_koeff = native_divide(convert_float(d * e), convert_float(g * g));
+    float c_koeff = native_divide(convert_float((g-e) * (g-d)), convert_float(g * g));
+    float d_koeff = native_divide(convert_float(e * (g-d)), convert_float(g * g));
 
-    return c_color;
-    // return a_koeff * a_color + b_koeff * b_color + c_koeff * c_color + d_koeff * d_color;
+    // return c_color;
+    return a_koeff * a_color + b_koeff * b_color + c_koeff * c_color + d_koeff * d_color;
 }
 
 
@@ -474,12 +474,15 @@ __kernel void volumeRender(  __read_only image3d_t volData
                 break;
         case 1: // distance dependent discarding
                 // distance will be read from rectangle or ell1
+
                 switch(invert){
                     case 0: // Area C
                         // img_bounds = get_image_dim(outData);
                         maxSize = max(img_bounds.x, img_bounds.y);
                         globalId = old_2d_to_new_2d_coord(globalId, img_bounds.x, round(resolutionfactor), get_global_size(0));
                         
+						// create always a grid
+						globalId = (int2)(globalId.x - (convert_int(globalId.x) % convert_int(round(resolutionfactor))), globalId.y - (convert_int(globalId.y) % convert_int(round(resolutionfactor))));
 
                         // discard if inside ell2
                         if(checkPointInEllipse(cursorPos, ell2.x / 2, ell2.y / 2, convert_float2_rtz(globalId))) return;
@@ -488,6 +491,9 @@ __kernel void volumeRender(  __read_only image3d_t volData
                         maxSize = max(img_bounds.x, img_bounds.y);
                         globalId = old_2d_to_new_2d_coord(globalId, round(ell2.x), round(resolutionfactor), get_global_size(0));
                         globalId += convert_int2_rtz(cursorPos) - (int2)(0.5 * ell2.x, 0.5 * ell2.y);
+
+						// create always a grid
+						globalId = (int2)(globalId.x - (convert_int(globalId.x) % convert_int(round(resolutionfactor))), globalId.y - (convert_int(globalId.y) % convert_int(round(resolutionfactor))));
 
                         // discard if in ell1
                         if(checkPointInEllipse(cursorPos, rectangle.x / 2, rectangle.y / 2, convert_float2_rtz(globalId))) return;
@@ -509,7 +515,7 @@ __kernel void volumeRender(  __read_only image3d_t volData
 
                 // discard if out of range
                 if(any(globalId >= get_image_dim(outData)))
-                    return;s
+                    return;
                 
                 break;
         case 2: // discard with rect
@@ -592,16 +598,6 @@ __kernel void volumeRender(  __read_only image3d_t volData
                 write_imagef(outData, texCoords, background);
                 break;
         case 1: // distance dependent
-                /*if(distance(texCoords_nlzd, cursorPos) > 0.1f){ // outside the range: discard every second ray
-                    if(globalId.x % 2 == 0 && globalId.y % 2 == 0){ // not blacked out, also write the other three texel
-						write_imagef_with_bounds_check(img_bounds, outData, (int2)(texCoords.x, texCoords.y - 1) , background); // bottom
-                        write_imagef_with_bounds_check(img_bounds, outData, texCoords - (int2)(1,1), background); // bottom right
-                        write_imagef_with_bounds_check(img_bounds, outData, (int2)(texCoords.x - 1, texCoords.y), background); // right
-                    }
-                }else{
-                    // inside the range, behave normally
-                    
-                }*/
 				write_imagef(outData, texCoords, background);
                 break;
         case 2: // discard with rect
@@ -801,25 +797,6 @@ __kernel void volumeRender(  __read_only image3d_t volData
                 write_imagef(outData, texCoords, result);
                 break;
         case 1: // distance dependent
-                /*if(distance(texCoords_nlzd, cursorPos) > 0.1f){ // outside the range: discard every second ray
-                    if(globalId.x % 2== 0 && globalId.y % 2 == 0){ // not blacked out, also write the other three texel
-                        write_imagef_with_bounds_check(img_bounds, outData, (int2)(texCoords.x, texCoords.y - 1) , result); // bottom
-                        write_imagef_with_bounds_check(img_bounds, outData, texCoords - (int2)(1,1), result); // bottom right
-                        write_imagef_with_bounds_check(img_bounds, outData, (int2)(texCoords.x - 1, texCoords.y), result); // right
-                    }
-                }else{
-                    // inside the range, behave normally
-                    // check if still needed to write to lower, lower right and right because those are discards
-                    if(texCoords.x % 2== 1 || texCoords.y - 1 % 2 == 1){ // also write the other texel
-                        write_imagef_with_bounds_check(img_bounds, outData, (int2)(texCoords.x, texCoords.y - 1) , result); // bottom
-                    }
-                    if(texCoords.x -1 % 2== 1 || texCoords.y -1 % 2 == 1){ // also write the other texel
-                        write_imagef_with_bounds_check(img_bounds, outData, texCoords - (int2)(1,1), result); // bottom right
-                    }
-                    if(texCoords.x - 1 % 2 == 1 || texCoords.y % 2 == 1){ // also write the other texel
-                        write_imagef_with_bounds_check(img_bounds, outData, (int2)(texCoords.x - 1, texCoords.y), result); // right
-                    }
-                }*/
 				write_imagef(outData, texCoords, result);
                 break;
         case 2: // discard with rect
@@ -892,11 +869,11 @@ __kernel void interpolateTexelsFromDDC(   __read_only image2d_t inData  // data 
         return;
     }*/
 
-    //if(checkPointInEllipse(cursorPos, ell1.x / 2, ell1.y / 2, convert_float2_rtz(globalId))){
+    if(checkPointInEllipse(cursorPos, ell1.x / 2, ell1.y / 2, convert_float2_rtz(globalId))){
         // Area A: discard because all texels are set anyway
         write_imagef(outData, globalId, read_imagef(inData, nearestIntSmp, globalId));
         return;
-    //}
+    }
 
     if(checkPointInEllipse(cursorPos, ell2.x / 2, ell2.y / 2, convert_float2_rtz(globalId))){
         // Area B: interpolate. Maybe need to check at borders
