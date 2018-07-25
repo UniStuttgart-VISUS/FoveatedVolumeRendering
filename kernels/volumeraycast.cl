@@ -859,34 +859,117 @@ __kernel void interpolateTexelsFromDDC(   __read_only image2d_t inData  // data 
 
 
 		// begin
+		// in theory, at least on of them should be good
+
+		bool a_good = false;
+		bool b_good = false;
+		bool c_good = false;
+		bool d_good = false;
+
+		bool c_in_ell2 = checkPointInEllipse(cursorPos, ell2_div_2.x, ell2_div_2.y, convert_float2(c_pos));
+		bool a_in_ell2 = checkPointInEllipse(cursorPos, ell2_div_2.x, ell2_div_2.y, convert_float2(a_pos));
+		bool b_in_ell2 = checkPointInEllipse(cursorPos, ell2_div_2.x, ell2_div_2.y, convert_float2(b_pos));
+		bool d_in_ell2 = checkPointInEllipse(cursorPos, ell2_div_2.x, ell2_div_2.y, convert_float2(d_pos));
+
+		if(in_ell2){ 
+			if(c_in_ell2){ 
+				// c is ok
+				c_good = true;
+			}
+
+			if(a_in_ell2){ 
+				// a is ok
+				a_good = true;
+			}
+
+			if(b_in_ell2){ 
+				// b is ok
+				b_good = true;
+			}
+
+			if(d_in_ell2){ 
+				// d is ok
+				d_good = true;
+			}
+		}else{ 
+			if(!c_in_ell2){ 
+				// c is ok
+				c_good = true;
+			}
+
+			if(!a_in_ell2){ 
+				// a is ok
+				a_good = true;
+			}
+
+			if(!b_in_ell2){ 
+				// b is ok
+				b_good = true;
+			}
+
+			if(!d_in_ell2){ 
+				// d is ok
+				d_good = true;
+			}
+		}
 
 
+		if(!a_good && !b_good && !c_good && !d_good){ 
+			// should not happen
+			write_imagef(outData, globalId, (float4)(1.0f, 0.0f, 0.0f, 1.0f));
+			return;
+		}
 
+		if(a_good){
+			if(!b_good){ 
+				b_pos = a_pos;
+			}
+			if(!c_good){ 
+				c_pos = a_pos;
+			}
+			if(!d_good){ 
+				d_pos = a_pos;
+			}
+		}
 
+		if(b_good){
+			if(!a_good){ 
+				a_pos = b_pos;
+			}
+			if(!d_good){ 
+				d_pos = b_pos;
+			}
+			if(!c_good){ 
+				c_pos = b_pos;
+			}
+		}
 
+		if(c_good){
+			if(!a_good){ 
+				a_pos = c_pos;
+			}
+			if(!d_good){ 
+				d_pos = c_pos;
+			}
+			if(!b_good){ 
+				b_pos = c_pos;
+			}
+		}
 
-
-
-
-
-
-
-
-
-
-
-
+		if(d_good){
+			if(!b_good){ 
+				b_pos = d_pos;
+			}
+			if(!c_good){ 
+				c_pos = d_pos;
+			}
+			if(!a_good){ 
+				a_pos = d_pos;
+			}
+		}
 
 
 		// end
-
-
-
-
-
-
-
-
 
 
 		float4 a_color = read_imagef(inData, nearestIntSmp, a_pos);
