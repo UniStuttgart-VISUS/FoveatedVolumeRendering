@@ -457,29 +457,29 @@ __kernel void volumeRender(  __read_only image3d_t volData
 						globalId = (int2)(globalId.x - (convert_int(globalId.x) % convert_int(round(resolutionfactor))), globalId.y - (convert_int(globalId.y) % convert_int(round(resolutionfactor))));
 
                         // discard if inside ell2
-                        if(checkPointInEllipse(cursorPos, ell2.x / 2, ell2.y / 2, convert_float2_rtz(globalId))) return;
+                        if(checkPointInEllipse(cursorPos, ell2.x * 0.45f, ell2.y * 0.45f, convert_float2_rtz(globalId))) return;
                         break;
                     case 1: // Area B
                         maxSize = max(img_bounds.x, img_bounds.y);
                         globalId = old_2d_to_new_2d_coord(globalId, round(ell2.x), round(resolutionfactor), get_global_size(0));
-                        globalId += convert_int2_rtz(cursorPos) - (int2)(0.5 * ell2.x, 0.5 * ell2.y);
+                        globalId += convert_int2_rtz(cursorPos) - (int2)(0.5f * ell2.x, 0.5f * ell2.y);
 
 						// create always a grid
 						globalId = (int2)(globalId.x - (convert_int(globalId.x) % convert_int(round(resolutionfactor))), globalId.y - (convert_int(globalId.y) % convert_int(round(resolutionfactor))));
 
                         // discard if in ell1
-                        if(checkPointInEllipse(cursorPos, rectangle.x / 2, rectangle.y / 2, convert_float2_rtz(globalId))) return;
+                        if(checkPointInEllipse(cursorPos, rectangle.x * 0.45f, rectangle.y * 0.45f, convert_float2_rtz(globalId))) return;
 
                         // discard outside ell2
-                        if(!checkPointInEllipse(cursorPos, ell2.x / 2, ell2.y / 2, convert_float2_rtz(globalId))) return;
+                        if(!checkPointInEllipse(cursorPos, ell2.x * 0.55f, ell2.y * 0.55f, convert_float2_rtz(globalId))) return;
                         break;
                     case 2: // Area A
                         maxSize = max(img_bounds.x, img_bounds.y);
                         globalId = old_2d_to_new_2d_coord(globalId, round(rectangle.x), round(resolutionfactor), get_global_size(0));
-                        globalId += convert_int2_rtz(cursorPos) - (int2)(0.5 * rectangle.x, 0.5 * rectangle.y);
+                        globalId += convert_int2_rtz(cursorPos) - (int2)(0.5f * rectangle.x, 0.5f * rectangle.y);
 
                         // discard outside ell1
-                        if(!checkPointInEllipse(cursorPos, rectangle.x / 2, rectangle.y / 2, convert_float2_rtz(globalId))) return;
+                        if(!checkPointInEllipse(cursorPos, rectangle.x * 0.55f, rectangle.y * 0.55f, convert_float2_rtz(globalId))) return;
                         break;
                     default:
                         break;
@@ -818,12 +818,12 @@ __kernel void interpolateTexelsFromDDC(   __read_only image2d_t inData  // data 
 
 		if(in_ell2){	// Area B
 			g = g_values.x;
-			d = globalId.y % g_values.x;
-			e = globalId.x % g_values.x;		
+			d = globalId.y % g;
+			e = globalId.x % g;		
 		}else{	// Area C
 			g = g_values.y;
-			d = globalId.y % g_values.y;
-			e = globalId.x % g_values.y;
+			d = globalId.y % g;
+			e = globalId.x % g;
 		}
 
 		float g_square = convert_float(g * g);
@@ -857,32 +857,50 @@ __kernel void interpolateTexelsFromDDC(   __read_only image2d_t inData  // data 
 		bool c_in_ell2 = checkPointInEllipse(cursorPos, ell2_div_2.x, ell2_div_2.y, convert_float2_rtz(c_pos));
 		bool d_in_ell2 = checkPointInEllipse(cursorPos, ell2_div_2.x, ell2_div_2.y, convert_float2_rtz(d_pos));
 
-		if(in_ell2){ 
-			if(!c_in_ell2){
-				c_pos = c_pos_2;
-			}
-			if(!a_in_ell2){ 
-				a_pos = a_pos_2;
-			}
-			if(!b_in_ell2){ 
-				b_pos = b_pos_2;
-			}
-			if(!d_in_ell2){
-				d_pos = d_pos_2;
-			}
-		}else{ 
-			if(c_in_ell2){
-				c_pos = c_pos_2;
-			}
+		bool a_1_in_ell2 = checkPointInEllipse(cursorPos, ell2_div_2.x, ell2_div_2.y, convert_float2_rtz(a_pos_1));
+		bool b_1_in_ell2 = checkPointInEllipse(cursorPos, ell2_div_2.x, ell2_div_2.y, convert_float2_rtz(b_pos_1));
+		bool c_1_in_ell2 = checkPointInEllipse(cursorPos, ell2_div_2.x, ell2_div_2.y, convert_float2_rtz(c_pos_1));
+		bool d_1_in_ell2 = checkPointInEllipse(cursorPos, ell2_div_2.x, ell2_div_2.y, convert_float2_rtz(d_pos_1));
+
+		bool a_2_in_ell2 = checkPointInEllipse(cursorPos, ell2_div_2.x, ell2_div_2.y, convert_float2_rtz(a_pos_2));
+		bool b_2_in_ell2 = checkPointInEllipse(cursorPos, ell2_div_2.x, ell2_div_2.y, convert_float2_rtz(b_pos_2));
+		bool c_2_in_ell2 = checkPointInEllipse(cursorPos, ell2_div_2.x, ell2_div_2.y, convert_float2_rtz(c_pos_2));
+		bool d_2_in_ell2 = checkPointInEllipse(cursorPos, ell2_div_2.x, ell2_div_2.y, convert_float2_rtz(d_pos_2));
+
+		if(in_ell2 && a_in_ell2 && b_in_ell2 && c_in_ell2 && d_in_ell2){ 
+			// ok
+			
+		}else{
+			if(in_ell2){
+			
 			if(a_in_ell2){ 
-				a_pos = a_pos_2;
+				b_pos = a_pos;
+				c_pos = a_pos;
+				d_pos = a_pos;
+			}else{ 
+				if(b_in_ell2){ 
+					a_pos = b_pos;
+					c_pos = b_pos;
+					d_pos = b_pos;
+				}else{ 
+					if(c_in_ell2){ 
+						a_pos = c_pos;
+						b_pos = c_pos;
+						d_pos = c_pos;
+					}else{ 
+						if(d_in_ell2){ 
+							a_pos = d_pos;
+							b_pos = d_pos;
+							c_pos = d_pos;
+						}else{ 
+							write_imagef(outData, globalId, (float4)(1.0f, 0.0f, 0.0f, 1.0f));
+							return;
+						}
+					}
+				}
 			}
-			if(b_in_ell2){
-				b_pos = b_pos_2;
 			}
-			if(d_in_ell2){
-				d_pos = d_pos_2;
-			}
+			
 		}
 
 		float4 a_color = read_imagef(inData, nearestIntSmp, a_pos);

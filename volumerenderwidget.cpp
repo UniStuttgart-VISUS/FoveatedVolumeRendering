@@ -495,7 +495,7 @@ void VolumeRenderWidget::paintGL_distance_dc()
 	std::tuple<float, float> ell1(0.3 * texture_width, 0.2 * texture_height); // Area A
 	std::tuple<float, float> ell2(0.5 * texture_width, 0.3 * texture_height);	// Area B
 
-	std::tuple<int, int> g_values(6, 3);	// first Area C, second Area B
+	std::tuple<int, int> g_values(5, 3);	// first Area C, second Area B
 	std::tuple<float, float> cursorPos;
 
 	{	// only set once for all opencl kernel calls in this rendering case:
