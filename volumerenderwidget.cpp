@@ -492,6 +492,7 @@ void VolumeRenderWidget::paintGL_distance_dc()
 	double texture_height = floor(this->size().height() * _imgSamplingRate);
 	double execution_time = 0.0;
 
+
 	std::tuple<float, float> ell1(0.3 * texture_width, 0.2 * texture_height); // Area A
 	std::tuple<float, float> ell2(0.5 * texture_width, 0.3 * texture_height);	// Area B
 
@@ -536,7 +537,7 @@ void VolumeRenderWidget::paintGL_distance_dc()
 					float g = std::get<0>(g_values);
 					_volumerender.setInvert(+0);
 					_volumerender.setResolutionFactor(g);
-					_volumerender.runRaycast(texture_width / g, texture_height / g);
+					_volumerender.runRaycast((texture_width / g), (texture_height / g));
 					execution_time += _volumerender.getLastExecTime();
 				}
 
@@ -545,7 +546,7 @@ void VolumeRenderWidget::paintGL_distance_dc()
 					float g = std::get<1>(g_values);
 					_volumerender.setInvert(+1);
 					_volumerender.setResolutionFactor(g);
-					_volumerender.runRaycast(std::get<0>(ell2) / g, std::get<1>(ell2) / g);
+					_volumerender.runRaycast((std::get<0>(ell2) / g), (std::get<1>(ell2) / g));
 					execution_time += _volumerender.getLastExecTime();
 				}
 
@@ -554,7 +555,7 @@ void VolumeRenderWidget::paintGL_distance_dc()
 					float g = 1;
 					_volumerender.setInvert(+2);
 					_volumerender.setResolutionFactor(g);
-					_volumerender.runRaycast(std::get<0>(ell1) / g, std::get<1>(ell1) / g);
+					_volumerender.runRaycast((std::get<0>(ell1) / g), (std::get<1>(ell1) / g));
 					execution_time += _volumerender.getLastExecTime();
 				}
 
