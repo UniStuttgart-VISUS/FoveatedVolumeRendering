@@ -857,47 +857,33 @@ __kernel void interpolateTexelsFromDDC(   __read_only image2d_t inData  // data 
 		bool c_in_ell2 = checkPointInEllipse(cursorPos, ell2_div_2.x, ell2_div_2.y, convert_float2_rtz(c_pos));
 		bool d_in_ell2 = checkPointInEllipse(cursorPos, ell2_div_2.x, ell2_div_2.y, convert_float2_rtz(d_pos));
 
-		/*if(in_ell2){ 
+		if(in_ell2){ 
 			if(!c_in_ell2){
-				write_imagef(outData, globalId, read_imagef(inData, nearestIntSmp, c_pos_2));
-				return;
-			}else{ 
-				if(!a_in_ell2){ 
-					write_imagef(outData, globalId, read_imagef(inData, nearestIntSmp, a_pos_2));
-					return;
-				}else{
-					if(!b_in_ell2){ 
-						write_imagef(outData, globalId, read_imagef(inData, nearestIntSmp, b_pos_2));
-						return;
-					}else{
-						if(!d_in_ell2){ 
-							write_imagef(outData, globalId, read_imagef(inData, nearestIntSmp, d_pos_2));
-							return;
-						}	
-					}
-				}
+				c_pos = c_pos_2;
+			}
+			if(!a_in_ell2){ 
+				a_pos = a_pos_2;
+			}
+			if(!b_in_ell2){ 
+				b_pos = b_pos_2;
+			}
+			if(!d_in_ell2){
+				d_pos = d_pos_2;
 			}
 		}else{ 
 			if(c_in_ell2){
-				write_imagef(outData, globalId, read_imagef(inData, nearestIntSmp, c_pos_2));
-				return;
-			}else{ 
-				if(a_in_ell2){ 
-					write_imagef(outData, globalId, read_imagef(inData, nearestIntSmp, a_pos_2));
-					return;
-				}else{
-					if(b_in_ell2){ 
-						write_imagef(outData, globalId, read_imagef(inData, nearestIntSmp, b_pos_2));
-						return;
-					}else{
-						if(d_in_ell2){ 
-							write_imagef(outData, globalId, read_imagef(inData, nearestIntSmp, d_pos_2));
-							return;
-						}	
-					}
-				}
+				c_pos = c_pos_2;
 			}
-		}*/
+			if(a_in_ell2){ 
+				a_pos = a_pos_2;
+			}
+			if(b_in_ell2){
+				b_pos = b_pos_2;
+			}
+			if(d_in_ell2){
+				d_pos = d_pos_2;
+			}
+		}
 
 		float4 a_color = read_imagef(inData, nearestIntSmp, a_pos);
 		float4 b_color = read_imagef(inData, nearestIntSmp, b_pos);
