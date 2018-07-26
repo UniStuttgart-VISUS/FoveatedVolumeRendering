@@ -148,12 +148,13 @@ void VolumeRenderCL::initKernel(const std::string fileName, const std::string bu
         _raycastKernel.setArg(AO, 0);                   // ambient occlusion off by default
         _raycastKernel.setArg(CONTOURS, 0);             // contour lines off by default
         _raycastKernel.setArg(AERIAL, 0);               // aerial perspective off by default
-		cl_float2 cp = { {0.f,0.f} };
+		cl_float2 cp = { 0.f,0.f };
 		_raycastKernel.setArg(CURSOR_POS, cp);
 		_raycastKernel.setArg(RECTANGLE_EXTS, cp);
 		_raycastKernel.setArg(ELLIPSE_2, cp);
-		_raycastKernel.setArg(INVERT, 1);
-		cl_float3 rf = { {1.0f, 1.0f, 1.0f} };
+		cl_uint3 inverts = {1, 0, 0};
+		_raycastKernel.setArg(INVERT, inverts);
+		cl_float3 rf = { 1.0f, 1.0f, 1.0f };
 		_raycastKernel.setArg(RESOLUTIONFACTOR, rf);
 		_raycastKernel.setArg(MODE, 0);					// Standard
 
@@ -864,7 +865,13 @@ void VolumeRenderCL::setEllipse2(float width, float height)
 // False := 0, True := !False
 void VolumeRenderCL::setInvert(unsigned int inv)
 {
-	_raycastKernel.setArg(INVERT, inv);
+	cl_uint3 inverts = { inv, 0, 0 };
+	_raycastKernel.setArg(INVERT, inverts);
+}
+
+void VolumeRenderCL::setInverts(cl_uint3 inverts)
+{
+	_raycastKernel.setArg(INVERT, inverts);
 }
 
 void VolumeRenderCL::setResolutionFactors(cl_float3 factor)

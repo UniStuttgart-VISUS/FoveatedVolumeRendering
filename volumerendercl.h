@@ -54,8 +54,8 @@ public:
 		, CURSOR_POS	 // cursor pos								 cl_float2
 		, RECTANGLE_EXTS // rectangle extends, also used for ell1	 cl_float2
 		, ELLIPSE_2		 // ellipse 2								 cl_float2
-		, INVERT		 // invert									 cl_uint (bool)
-		, RESOLUTIONFACTOR // resolution factor						 cl_float
+		, INVERT		 // invert									 cl_uint3 (bool), max 1d-index of each area in mode 1
+		, RESOLUTIONFACTOR // resolution factor						 cl_float3
 		, MODE			// modus									 cl_uint
 	};
 
@@ -221,6 +221,10 @@ public:
 	* @param color
 	*/
 	void setInvert(unsigned int inv);
+	/*
+	sets inverts for areas max index
+	*/
+	void setInverts(cl_uint3 inverts);
 	/**
 	* @brief setResolutionFactor
 	* @param factor

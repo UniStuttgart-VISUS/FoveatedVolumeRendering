@@ -534,6 +534,8 @@ void VolumeRenderWidget::paintGL_distance_dc()
 		{
 			if (_useGL) {
 
+				/* old begin
+
 				// first call: render area C (everything outside of ellipse 2) g = gap_size + 1
 				{
 					float g = g_values.x;
@@ -558,7 +560,22 @@ void VolumeRenderWidget::paintGL_distance_dc()
 					execution_time += _volumerender.getLastExecTime();
 				}
 
-				// forth call: interpolate and combine them
+				old end */
+
+				// raytrace
+				{
+					cl_float2 x_y_dimension_C = { texture_width / g_values.x , texture_height / g_values.x };
+					cl_float2 x_y_dimension_B = { std::get<0>(ell2) / g_values.y , std::get<1>(ell2) / g_values.y };
+					cl_float2 x_y_dimension_A = { std::get<0>(ell1) / g_values.z , std::get<1>(ell1) / g_values.z };
+
+					cl_uint3 inverts = {x_y_dimension_C.x * x_y_dimension_C.y + x_y_dimension_B.x * x_y_dimension_B.y + x_y_dimension_A.x * x_y_dimension_A.y, x_y_dimension_B.x * x_y_dimension_B.y + x_y_dimension_A.x * x_y_dimension_A.y, x_y_dimension_A.x * x_y_dimension_A.y  };
+					_volumerender.setInverts(inverts);
+
+					int x_y_dimension_total = x_y_dimension_C.x * x_y_dimension_C.y + x_y_dimension_B.x * x_y_dimension_B.y + x_y_dimension_A.y * x_y_dimension_A.y;
+					_volumerender.runRaycast(std::sqrt(x_y_dimension_total) + 2, std::sqrt(x_y_dimension_total) + 2);
+				}
+
+				// interpolate and combine them
 				{
 					setOutputTextures(texture_width,
 						texture_height, _outTexId0, GL_TEXTURE0);
