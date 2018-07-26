@@ -493,10 +493,10 @@ void VolumeRenderWidget::paintGL_distance_dc()
 	double execution_time = 0.0;
 
 
-	std::tuple<float, float> ell1(0.3 * texture_width, 0.2 * texture_height); // Area A
-	std::tuple<float, float> ell2(0.5 * texture_width, 0.3 * texture_height);	// Area B
+	std::tuple<float, float> ell1(0.3 * texture_width, 0.3 * texture_height); // Area A
+	std::tuple<float, float> ell2(0.5 * texture_width, 0.5 * texture_height);	// Area B
 
-	cl_float3 g_values{4.0f,2.0f,1.0f};	// first Area C, second Area B, third A
+	cl_float3 g_values{8.0f,4.0f,1.0f};	// first Area C, second Area B, third A
 	std::tuple<float, float> cursorPos;
 
 	{	// only set once for all opencl kernel calls in this rendering case:
@@ -568,11 +568,19 @@ void VolumeRenderWidget::paintGL_distance_dc()
 					cl_float2 x_y_dimension_B = { std::get<0>(ell2) / g_values.y , std::get<1>(ell2) / g_values.y };
 					cl_float2 x_y_dimension_A = { std::get<0>(ell1) / g_values.z , std::get<1>(ell1) / g_values.z };
 
-					cl_uint3 inverts = {x_y_dimension_C.x * x_y_dimension_C.y + x_y_dimension_B.x * x_y_dimension_B.y + x_y_dimension_A.x * x_y_dimension_A.y, x_y_dimension_B.x * x_y_dimension_B.y + x_y_dimension_A.x * x_y_dimension_A.y, x_y_dimension_A.x * x_y_dimension_A.y  };
+					cl_float area_c = x_y_dimension_C.x * x_y_dimension_C.y;
+					cl_float area_b = x_y_dimension_B.x * x_y_dimension_B.y + area_c;
+					cl_float area_a = area_b + x_y_dimension_A.x * x_y_dimension_A.y;
+
+					cl_uint3 inverts = { cl_uint(area_c), cl_uint(area_b), cl_uint(area_a)};
 					_volumerender.setInverts(inverts);
 
-					int x_y_dimension_total = x_y_dimension_C.x * x_y_dimension_C.y + x_y_dimension_B.x * x_y_dimension_B.y + x_y_dimension_A.y * x_y_dimension_A.y;
-					_volumerender.runRaycast(std::sqrt(x_y_dimension_total) + 2, std::sqrt(x_y_dimension_total) + 2);
+					float x_y_dimension_total = x_y_dimension_C.x * x_y_dimension_C.y + x_y_dimension_B.x * x_y_dimension_B.y + x_y_dimension_A.y * x_y_dimension_A.x;
+
+					// std::cout << "total: " << x_y_dimension_total << ", C: " << area_c << ", B: " << area_b << ", A: " << area_a << std::endl;
+
+					_volumerender.runRaycast(std::ceilf(std::sqrtf(x_y_dimension_total)) + 1, std::ceil(std::sqrtf(x_y_dimension_total)) + 1);
+					execution_time += _volumerender.getLastExecTime();
 				}
 
 				// interpolate and combine them
