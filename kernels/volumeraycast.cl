@@ -463,7 +463,7 @@ __kernel void volumeRender(  __read_only image3d_t volData
 					globalId = (int2)(globalId.x - (convert_int(globalId.x) % g_c), globalId.y - (convert_int(globalId.y) % g_c));
 
 					//discard if inside ell2
-					if(checkPointInEllipse(cursorPos, ell2.x * 0.5f, ell2.y * 0.5f, convert_float2_rtz(globalId))) return;
+					if(checkPointInEllipse(cursorPos, ell2.x * 0.45f, ell2.y * 0.45f, convert_float2_rtz(globalId))) return;
                 }else{
                     if(index_1d < inverts.y){   // Area B
                     
@@ -478,10 +478,10 @@ __kernel void volumeRender(  __read_only image3d_t volData
 						globalId = (int2)(globalId.x - (convert_int(globalId.x) % g_b), globalId.y - (convert_int(globalId.y) % g_b));
 
                         // discard if in ell1
-                        if(checkPointInEllipse(cursorPos, rectangle.x * 0.5f, rectangle.y * 0.5f, convert_float2_rtz(globalId))) return;
+                        if(checkPointInEllipse(cursorPos, rectangle.x * 0.45f, rectangle.y * 0.45f, convert_float2_rtz(globalId))) return;
 
                         // discard outside ell2
-                        if(!checkPointInEllipse(cursorPos, ell2.x * 0.5f, ell2.y * 0.5f, convert_float2_rtz(globalId))) return;
+                        if(!checkPointInEllipse(cursorPos, ell2.x * 0.55f, ell2.y * 0.55f, convert_float2_rtz(globalId))) return;
                     }else{
                     
                         int g_a = round(resolutionfactor.z);
@@ -493,7 +493,7 @@ __kernel void volumeRender(  __read_only image3d_t volData
 					    globalId += convert_int2_rtz(cursorPos) - (int2)(0.5f * rectangle.x, 0.5f * rectangle.y);
 
                         // discard outside ell1
-                        //if(!checkPointInEllipse(cursorPos, rectangle.x * 0.5f, rectangle.y * 0.5f, convert_float2_rtz(globalId))) return;
+                        if(!checkPointInEllipse(cursorPos, rectangle.x * 0.55f, rectangle.y * 0.55f, convert_float2_rtz(globalId))) return;
                     }
                 }
                 }
@@ -860,8 +860,8 @@ __kernel void interpolateTexelsFromDDC(   __read_only image2d_t inData  // data 
 
 	// new begin
 
-	float2 ell2_div_2 = ell2 * 0.5f;
-	float2 ell1_div_2 = ell1 * 0.5f;
+	float2 ell2_div_2 = ell2 * 0.45f;
+	float2 ell1_div_2 = ell1 * 0.45f;
 
 	float2 globalId_f = convert_float2_rtz(globalId);
 	
