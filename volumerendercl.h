@@ -225,7 +225,7 @@ public:
 	* @brief setResolutionFactor
 	* @param factor
 	*/
-	void setResolutionFactor(float factor);
+	void setResolutionFactors(cl_float3 factor);
 	/**
 	* @brief setMode, 0 = Standard, 1 = dc with rect, 2 = sin res, else = standard
 	* @param mode
@@ -235,7 +235,7 @@ public:
 	/*
 	* Sets interpolation parameters for mode 1.
 	*/
-	void setInterpolationParameters(cl_int2 g_values, cl_float2 cursorPos, cl_float2 ell1, cl_float2 ell2);
+	void setInterpolationParameters(cl_float3 g_values, cl_float2 cursorPos, cl_float2 ell1, cl_float2 ell2);
 
     /**
      * @brief Get the execution time of the last kernel run.

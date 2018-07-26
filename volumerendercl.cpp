@@ -153,7 +153,8 @@ void VolumeRenderCL::initKernel(const std::string fileName, const std::string bu
 		_raycastKernel.setArg(RECTANGLE_EXTS, cp);
 		_raycastKernel.setArg(ELLIPSE_2, cp);
 		_raycastKernel.setArg(INVERT, 1);
-		_raycastKernel.setArg(RESOLUTIONFACTOR, 1);
+		cl_float3 rf = { {1.0f, 1.0f, 1.0f} };
+		_raycastKernel.setArg(RESOLUTIONFACTOR, rf);
 		_raycastKernel.setArg(MODE, 0);					// Standard
 
         _genBricksKernel = cl::Kernel(program, "generateBricks");
@@ -866,7 +867,7 @@ void VolumeRenderCL::setInvert(unsigned int inv)
 	_raycastKernel.setArg(INVERT, inv);
 }
 
-void VolumeRenderCL::setResolutionFactor(float factor)
+void VolumeRenderCL::setResolutionFactors(cl_float3 factor)
 {
 	_raycastKernel.setArg(RESOLUTIONFACTOR, factor);
 }
@@ -876,7 +877,7 @@ void VolumeRenderCL::setMode(unsigned int mode)
 	_raycastKernel.setArg(MODE, mode);
 }
 
-void VolumeRenderCL::setInterpolationParameters(cl_int2 g_values, cl_float2 cursorPos, cl_float2 ell1, cl_float2 ell2)
+void VolumeRenderCL::setInterpolationParameters(cl_float3 g_values, cl_float2 cursorPos, cl_float2 ell1, cl_float2 ell2)
 {
 	_interpolationKernel.setArg(2, g_values);
 	_interpolationKernel.setArg(3, cursorPos);

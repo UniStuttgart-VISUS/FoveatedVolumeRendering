@@ -427,7 +427,7 @@ __kernel void volumeRender(  __read_only image3d_t volData
                            , const float2 rectangle  // rectangle extends mapped to [0,1] x [0,1], also used for ellipse 1, contains rx and ry, not normalized
                            , const float2 ell2 // vector used for ellipse 2, contains rx and ry, not normalized
                            , const uint invert  // if true (nonzero), draws everything outside the rectangle, else everything inside, tells in mode=1 which area is being drawn (A, B or C ad 2, 1 or 0)
-                           , const float resolutionfactor // is used as g for mode: discard_dc, m is derived from the mode and from the texture width, ell1 and ell2 rx.
+                           , const float3 resolutionfactor // is used as g for mode: discard_dc, m is derived from the mode and from the texture width, ell1 and ell2 rx.
                            , const uint mode
                            )
 {
@@ -451,10 +451,11 @@ __kernel void volumeRender(  __read_only image3d_t volData
                     case 0: // Area C
                         // img_bounds = get_image_dim(outData);
                         maxSize = max(img_bounds.x, img_bounds.y);
-                        globalId = old_2d_to_new_2d_coord(globalId, img_bounds.x, round(resolutionfactor), get_global_size(0));
+						int g_c = round(resolutionfactor.x);
+                        globalId = old_2d_to_new_2d_coord(globalId, img_bounds.x, g_c, get_global_size(0));
                         
 						// create always a grid
-						globalId = (int2)(globalId.x - (convert_int(globalId.x) % convert_int(round(resolutionfactor))), globalId.y - (convert_int(globalId.y) % convert_int(round(resolutionfactor))));
+						globalId = (int2)(globalId.x - (convert_int(globalId.x) % g_c), globalId.y - (convert_int(globalId.y) % g_c));
 
                         // discard if inside ell2
                         if(checkPointInEllipse(cursorPos, ell2.x * 0.5f, ell2.y * 0.5f, convert_float2_rtz(globalId))) return;
@@ -464,11 +465,14 @@ __kernel void volumeRender(  __read_only image3d_t volData
                         break;
                     case 1: // Area B
                         maxSize = max(img_bounds.x, img_bounds.y);
-                        globalId = old_2d_to_new_2d_coord(globalId, round(ell2.x), round(resolutionfactor), get_global_size(0));
+
+						int g_b = round(resolutionfactor.y);
+
+                        globalId = old_2d_to_new_2d_coord(globalId, round(ell2.x), g_b, get_global_size(0));
                         globalId += convert_int2_rtz(cursorPos) - (int2)(0.5f * ell2.x, 0.5f * ell2.y);
 
 						// create always a grid
-						globalId = (int2)(globalId.x - (convert_int(globalId.x) % convert_int(round(resolutionfactor))), globalId.y - (convert_int(globalId.y) % convert_int(round(resolutionfactor))));
+						globalId = (int2)(globalId.x - (convert_int(globalId.x) % g_b), globalId.y - (convert_int(globalId.y) % g_b));
 
                         // discard if in ell1
                         if(checkPointInEllipse(cursorPos, rectangle.x * 0.5f, rectangle.y * 0.5f, convert_float2_rtz(globalId))) return;
@@ -481,7 +485,10 @@ __kernel void volumeRender(  __read_only image3d_t volData
                         break;
                     case 2: // Area A
                         maxSize = max(img_bounds.x, img_bounds.y);
-                        globalId = old_2d_to_new_2d_coord(globalId, round(rectangle.x), round(resolutionfactor), get_global_size(0));
+
+						int g_a = round(resolutionfactor.z);
+
+                        globalId = old_2d_to_new_2d_coord(globalId, round(rectangle.x), g_a, get_global_size(0));
                         globalId += convert_int2_rtz(cursorPos) - (int2)(0.5f * rectangle.x, 0.5f * rectangle.y);
 
                         // discard outside ell1
@@ -796,7 +803,7 @@ __kernel void volumeRender(  __read_only image3d_t volData
 //************************** Interpolate Pixels ***************************
 __kernel void interpolateTexelsFromDDC(   __read_only image2d_t inData  // data to interpolate
                                         , __write_only image2d_t outData // outData
-                                        , const uint2 g_values  // x is g for ell1, y is g for ell2
+                                        , const float3 g_values  // x is g for ell1, y is g for ell2
                                         , const float2 cursorPos // cursor position in texels
                                         , const float2 ell1 // rx, ry for ell1 in texels
                                         , const float2 ell2 // rx, ry for ell2 in texels
@@ -833,11 +840,11 @@ __kernel void interpolateTexelsFromDDC(   __read_only image2d_t inData  // data 
 		bool in_ell2 = checkPointInEllipse(cursorPos, ell2_div_2.x, ell2_div_2.y, globalId_f);
 
 		if(in_ell2){	// Area B
-			g = g_values.x;
+			g = round(g_values.y);
 			d = globalId.y % g;
 			e = globalId.x % g;		
 		}else{	// Area C
-			g = g_values.y;
+			g = round(g_values.x);
 			d = globalId.y % g;
 			e = globalId.x % g;
 		}

@@ -496,7 +496,7 @@ void VolumeRenderWidget::paintGL_distance_dc()
 	std::tuple<float, float> ell1(0.3 * texture_width, 0.2 * texture_height); // Area A
 	std::tuple<float, float> ell2(0.5 * texture_width, 0.3 * texture_height);	// Area B
 
-	std::tuple<int, int> g_values(4, 2);	// first Area C, second Area B
+	cl_float3 g_values{4.0f,2.0f,1.0f};	// first Area C, second Area B, third A
 	std::tuple<float, float> cursorPos;
 
 	{	// only set once for all opencl kernel calls in this rendering case:
@@ -519,6 +519,8 @@ void VolumeRenderWidget::paintGL_distance_dc()
 		// rx and ry for ellipse 2. Here not normalized (in pixel)!
 		_volumerender.setEllipse2(std::get<0>(ell2), std::get<1>(ell2));	// Area B
 	
+		_volumerender.setResolutionFactors(g_values);
+
 		setOutputTextures(texture_width,
 			texture_height, _outTexId1, GL_TEXTURE0);
 	}
@@ -534,27 +536,24 @@ void VolumeRenderWidget::paintGL_distance_dc()
 
 				// first call: render area C (everything outside of ellipse 2) g = gap_size + 1
 				{
-					float g = std::get<0>(g_values);
+					float g = g_values.x;
 					_volumerender.setInvert(+0);
-					_volumerender.setResolutionFactor(g);
 					_volumerender.runRaycast((texture_width / g), (texture_height / g));
 					execution_time += _volumerender.getLastExecTime();
 				}
 
 				// second call: render area B (everything inside of ellipse 2 and outside of ellipse 1)
 				{
-					float g = std::get<1>(g_values);
+					float g = g_values.y;
 					_volumerender.setInvert(+1);
-					_volumerender.setResolutionFactor(g);
 					_volumerender.runRaycast((std::get<0>(ell2) / g), (std::get<1>(ell2) / g));
 					execution_time += _volumerender.getLastExecTime();
 				}
 
 				// third call: render area A (everything inside of ellipse 1) with gap size 0 -> g = 1
 				{
-					float g = 1;
+					float g = g_values.z;
 					_volumerender.setInvert(+2);
-					_volumerender.setResolutionFactor(g);
 					_volumerender.runRaycast((std::get<0>(ell1) / g), (std::get<1>(ell1) / g));
 					execution_time += _volumerender.getLastExecTime();
 				}
@@ -563,7 +562,7 @@ void VolumeRenderWidget::paintGL_distance_dc()
 				{
 					setOutputTextures(texture_width,
 						texture_height, _outTexId0, GL_TEXTURE0);
-					_volumerender.setInterpolationParameters(cl_int2{ std::get<1>(g_values),std::get<0>(g_values) }, cl_float2{ std::get<0>(cursorPos),std::get<1>(cursorPos) }, cl_float2{ std::get<0>(ell1),std::get<1>(ell1) }, cl_float2{ std::get<0>(ell2),std::get<1>(ell2) });
+					_volumerender.setInterpolationParameters(g_values, cl_float2{ std::get<0>(cursorPos),std::get<1>(cursorPos) }, cl_float2{ std::get<0>(ell1),std::get<1>(ell1) }, cl_float2{ std::get<0>(ell2),std::get<1>(ell2) });
 					_volumerender.runInterpolation(texture_width, texture_height, _outTexId1, _outTexId0);
 					// don't need to add last exec time because of the construction of calcFPS()
 				}
