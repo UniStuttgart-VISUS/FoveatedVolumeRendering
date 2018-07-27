@@ -89,10 +89,17 @@ MainWindow::MainWindow(QWidget *parent) :
 	connect(ui->actionSelectMonitor, &QAction::triggered,
 		ui->volumeRenderWidget, &VolumeRenderWidget::actionSelectMonitor);
     connect(ui->actionAbout, &QAction::triggered, this, &MainWindow::showAboutDialog);
-	connect(ui->actionDistanzbasiertes_Discarding, &QAction::triggered,
-		ui->volumeRenderWidget, &VolumeRenderWidget::showDDCSettings);
-	connect(ui->actionMouse_Square_with_Discard, &QAction::triggered,
-		ui->volumeRenderWidget, &VolumeRenderWidget::showMSDCSettings);
+	
+	connect(ui->actionSet_G_Values, &QAction::triggered,
+		ui->volumeRenderWidget, &VolumeRenderWidget::showGValuesSettings);
+	connect(ui->actionSet_Inner_Ellipse, &QAction::triggered,
+		ui->volumeRenderWidget, &VolumeRenderWidget::showinnerEllipseSettings);
+	connect(ui->actionSet_Outer_Ellipse, &QAction::triggered,
+		ui->volumeRenderWidget, &VolumeRenderWidget::showouterEllipseSettings);
+
+	connect(ui->actionSet_Rectangle_Extends, &QAction::triggered,
+		ui->volumeRenderWidget, &VolumeRenderWidget::showRectExtendsSettings);
+
 
     // future watcher for concurrent data loading
     _watcher = new QFutureWatcher<void>(this);

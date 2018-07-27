@@ -46,7 +46,7 @@
      </property>
      <property name="icon">
       <iconset theme="document-save-as">
-       <normaloff>.</normaloff>.</iconset>
+       <normaloff>../../.designer/backup</normaloff>../../.designer/backup</iconset>
      </property>
      <addaction name="actionSaveRawTff_2"/>
      <addaction name="actionSaveCpTff"/>
@@ -99,8 +99,22 @@
     <property name="title">
      <string>More Rendering Settings</string>
     </property>
-    <addaction name="actionDistanzbasiertes_Discarding"/>
-    <addaction name="actionMouse_Square_with_Discard"/>
+    <widget class="QMenu" name="menuDistanzbasiertes_Discarding">
+     <property name="title">
+      <string>Distanzbasiertes Discarding</string>
+     </property>
+     <addaction name="actionSet_G_Values"/>
+     <addaction name="actionSet_Inner_Ellipse"/>
+     <addaction name="actionSet_Outer_Ellipse"/>
+    </widget>
+    <widget class="QMenu" name="menuMouse_Square_with_Discard">
+     <property name="title">
+      <string>Mouse Square with Discard</string>
+     </property>
+     <addaction name="actionSet_Rectangle_Extends"/>
+    </widget>
+    <addaction name="menuDistanzbasiertes_Discarding"/>
+    <addaction name="menuMouse_Square_with_Discard"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -421,7 +435,7 @@
   <action name="actionOpen">
    <property name="icon">
     <iconset theme="document-open">
-     <normaloff>.</normaloff>.</iconset>
+     <normaloff>../../.designer/backup</normaloff>../../.designer/backup</iconset>
    </property>
    <property name="text">
     <string>Open volume dataset...</string>
@@ -433,7 +447,7 @@
   <action name="actionQuit">
    <property name="icon">
     <iconset theme="application-exit">
-     <normaloff>.</normaloff>.</iconset>
+     <normaloff>../../.designer/backup</normaloff>../../.designer/backup</iconset>
    </property>
    <property name="text">
     <string>Quit</string>
@@ -495,7 +509,7 @@
   <action name="actionScreenshot">
    <property name="icon">
     <iconset theme="insert-image">
-     <normaloff>.</normaloff>.</iconset>
+     <normaloff>../../.designer/backup</normaloff>../../.designer/backup</iconset>
    </property>
    <property name="text">
     <string>Save current screen</string>
@@ -518,7 +532,7 @@
   <action name="actionResetCam">
    <property name="icon">
     <iconset theme="view-refresh">
-     <normaloff>.</normaloff>.</iconset>
+     <normaloff>../../.designer/backup</normaloff>../../.designer/backup</iconset>
    </property>
    <property name="text">
     <string>Reset camera</string>
@@ -581,7 +595,7 @@
   <action name="actionAbout">
    <property name="icon">
     <iconset theme="help-about">
-     <normaloff>.</normaloff>.</iconset>
+     <normaloff>../../.designer/backup</normaloff>../../.designer/backup</iconset>
    </property>
    <property name="text">
     <string>About...</string>
@@ -612,14 +626,24 @@
     <string>Select Monitor</string>
    </property>
   </action>
-  <action name="actionDistanzbasiertes_Discarding">
+  <action name="actionSet_G_Values">
    <property name="text">
-    <string>Distanzbasiertes Discarding</string>
+    <string>Set G_Values</string>
    </property>
   </action>
-  <action name="actionMouse_Square_with_Discard">
+  <action name="actionSet_Inner_Ellipse">
    <property name="text">
-    <string>Mouse Square with Discard</string>
+    <string>Set Inner Ellipse</string>
+   </property>
+  </action>
+  <action name="actionSet_Outer_Ellipse">
+   <property name="text">
+    <string>Set Outer Ellipse</string>
+   </property>
+  </action>
+  <action name="actionSet_Rectangle_Extends">
+   <property name="text">
+    <string>Set Rectangle Extends</string>
    </property>
   </action>
  </widget>

@@ -41,6 +41,7 @@
 #include <QPropertyAnimation>
 #include <qopenglfunctions_4_3_core.h>
 #include <QPainter>
+#include <qnumeric.h>
 
 
 #include <TOBIIRESEARCH\tobii_research.h>
@@ -122,12 +123,14 @@ public slots:
 	void setGValues(float c, float b, float a = 1.0f);
 	void setInnerEllipseExtends(float rx, float ry);
 	void setOuterEllipseExtends(float rx, float ry);
-	void showDDCSettings();
+	void showGValuesSettings();
+	void showinnerEllipseSettings();
+	void showouterEllipseSettings();
 
 
 	// square dc
 	void setRectExtends(int width, int height);
-	void showMSDCSettings();
+	void showRectExtendsSettings();
 
     void saveFrame();
     void toggleVideoRecording();

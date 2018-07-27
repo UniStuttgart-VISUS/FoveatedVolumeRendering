@@ -227,19 +227,73 @@ void VolumeRenderWidget::setOuterEllipseExtends(float rx, float ry)
 	_outerEllipse = { rx, ry };
 }
 
-void VolumeRenderWidget::showDDCSettings()
+void VolumeRenderWidget::showGValuesSettings()
 {
+	bool ok;
+	bool ok2;
+	int g_c = QInputDialog::getInt(this, tr("Set G_Values:"), tr("Area C:"), 4, 1, std::numeric_limits<int>::max(), 1, &ok);
+	int g_b = QInputDialog::getInt(this, tr("Set G_Values:"), tr("Area B:"), 2, 1, std::numeric_limits<int>::max(), 1, &ok2);
+
+	if (ok && ok2) {
+		setGValues(static_cast<float>(g_c), static_cast<float>(g_b));
+	}
+	else {
+		qCritical() << "Failed to set G_Values!";
+	}
 
 }
+
+void VolumeRenderWidget::showinnerEllipseSettings()
+{
+	bool ok;
+	bool ok2;
+	double rx = QInputDialog::getDouble(this, tr("Set Inner Ellipse:"), tr("rx:"), 0.3, 0.0, 1.0, 2, &ok);
+	double ry = QInputDialog::getDouble(this, tr("Set Inner Ellipse:"), tr("ry:"), 0.2, 0.0, 1.0, 2, &ok2);
+
+	if (ok && ok2) {
+		setInnerEllipseExtends(static_cast<float>(rx), static_cast<float>(ry));
+	}
+	else {
+		qCritical() << "Failed to set inner Ellipse extends!";
+	}
+}
+
+void VolumeRenderWidget::showouterEllipseSettings()
+{
+	bool ok;
+	bool ok2;
+	double rx = QInputDialog::getDouble(this, tr("Set Outer Ellipse:"), tr("rx:"), 0.5, 0.0, 1.0, 2, &ok);
+	double ry = QInputDialog::getDouble(this, tr("Set Outer Ellipse:"), tr("ry:"), 0.4, 0.0, 1.0, 2, &ok2);
+
+	if (ok && ok2) {
+		setOuterEllipseExtends(static_cast<float>(rx), static_cast<float>(ry));
+	}
+	else {
+		qCritical() << "Failed to set outer Ellipse extends!";
+	}
+}
+
 
 void VolumeRenderWidget::setRectExtends(int width, int height)
 {
 	_rect_extends = { width, height };
 }
 
-void VolumeRenderWidget::showMSDCSettings()
+void VolumeRenderWidget::showRectExtendsSettings()
 {
+	bool ok;
+	bool ok2;
+	int width = QInputDialog::getInt(this, tr("Set Rectangle Extends:"), tr("width:"), 350, 0, std::numeric_limits<int>::max(), 1, &ok);
+	int height = QInputDialog::getInt(this, tr("Set Rectangle Extends:"), tr("height:"), 350, 0, std::numeric_limits<int>::max(), 1, &ok2);
+
+	if (ok && ok2) {
+		setRectExtends(width, height);
+	}
+	else {
+		qCritical() << "Failed to set Rectangle Extends!";
+	}
 }
+
 
 /**
  * @brief VolumeRenderWidget::saveFrame
