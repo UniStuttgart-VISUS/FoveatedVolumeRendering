@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1142</width>
-    <height>1081</height>
+    <width>1766</width>
+    <height>1265</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -25,7 +25,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1142</width>
+     <width>1766</width>
      <height>21</height>
     </rect>
    </property>
@@ -95,11 +95,19 @@
     <addaction name="actionSelectEyetrackingDevice"/>
     <addaction name="actionSelectMonitor"/>
    </widget>
+   <widget class="QMenu" name="menuMore_Rendering_Settings">
+    <property name="title">
+     <string>More Rendering Settings</string>
+    </property>
+    <addaction name="actionDistanzbasiertes_Discarding"/>
+    <addaction name="actionMouse_Square_with_Discard"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
    <addaction name="menuView"/>
    <addaction name="menuHelp"/>
    <addaction name="menuEyetracking"/>
+   <addaction name="menuMore_Rendering_Settings"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <widget class="QDockWidget" name="dockSettings">
@@ -206,32 +214,6 @@
         <string>Rendering</string>
        </property>
        <layout class="QGridLayout" name="gridLayout">
-        <item row="3" column="1">
-         <widget class="QDoubleSpinBox" name="dsbImgSampling">
-          <property name="minimum">
-           <double>0.010000000000000</double>
-          </property>
-          <property name="maximum">
-           <double>8.000000000000000</double>
-          </property>
-          <property name="singleStep">
-           <double>0.010000000000000</double>
-          </property>
-          <property name="value">
-           <double>1.000000000000000</double>
-          </property>
-         </widget>
-        </item>
-        <item row="8" column="0" colspan="2">
-         <widget class="QCheckBox" name="chbLinear">
-          <property name="text">
-           <string>Interpolation</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
         <item row="3" column="0">
          <widget class="QLabel" name="label_2">
           <property name="text">
@@ -239,17 +221,18 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="3">
-         <widget class="QCheckBox" name="chbEyetracking">
-          <property name="text">
-           <string>Use Eyetracking</string>
+        <item row="5" column="2" colspan="3">
+         <widget class="QPushButton" name="pbBgColor">
+          <property name="autoFillBackground">
+           <bool>false</bool>
           </property>
-         </widget>
-        </item>
-        <item row="3" column="2">
-         <widget class="QLabel" name="label_4">
+          <property name="styleSheet">
+           <string notr="true">QPushButton:default {
+   background: yellow;
+}</string>
+          </property>
           <property name="text">
-           <string>Ray</string>
+           <string>Background color</string>
           </property>
          </widget>
         </item>
@@ -277,29 +260,17 @@
           </item>
          </widget>
         </item>
-        <item row="3" column="3" colspan="2">
-         <widget class="QDoubleSpinBox" name="dsbSamplingRate">
-          <property name="decimals">
-           <number>1</number>
-          </property>
-          <property name="minimum">
-           <double>0.100000000000000</double>
-          </property>
-          <property name="maximum">
-           <double>20.000000000000000</double>
-          </property>
-          <property name="singleStep">
-           <double>0.100000000000000</double>
-          </property>
-          <property name="value">
-           <double>1.500000000000000</double>
+        <item row="3" column="2">
+         <widget class="QLabel" name="label_4">
+          <property name="text">
+           <string>Ray</string>
           </property>
          </widget>
         </item>
-        <item row="2" column="0" colspan="5">
-         <widget class="QLabel" name="label">
+        <item row="10" column="2" colspan="3">
+         <widget class="QCheckBox" name="chbAerial">
           <property name="text">
-           <string>Sampling rate</string>
+           <string>Aerial perspective</string>
           </property>
          </widget>
         </item>
@@ -320,6 +291,35 @@
           </property>
           <property name="checked">
            <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="3" colspan="2">
+         <widget class="QDoubleSpinBox" name="dsbSamplingRate">
+          <property name="decimals">
+           <number>1</number>
+          </property>
+          <property name="minimum">
+           <double>0.100000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>20.000000000000000</double>
+          </property>
+          <property name="singleStep">
+           <double>0.100000000000000</double>
+          </property>
+          <property name="value">
+           <double>1.500000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="0" colspan="2">
+         <widget class="QCheckBox" name="chbLinear">
+          <property name="text">
+           <string>Interpolation</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -355,6 +355,13 @@
           </item>
          </widget>
         </item>
+        <item row="1" column="3">
+         <widget class="QCheckBox" name="chbEyetracking">
+          <property name="text">
+           <string>Use Eyetracking</string>
+          </property>
+         </widget>
+        </item>
         <item row="5" column="0" colspan="2">
          <widget class="QLabel" name="label_5">
           <property name="text">
@@ -362,10 +369,10 @@
           </property>
          </widget>
         </item>
-        <item row="10" column="2" colspan="3">
-         <widget class="QCheckBox" name="chbAerial">
+        <item row="2" column="0" colspan="5">
+         <widget class="QLabel" name="label">
           <property name="text">
-           <string>Aerial perspective</string>
+           <string>Sampling rate</string>
           </property>
          </widget>
         </item>
@@ -389,18 +396,19 @@
           </property>
          </widget>
         </item>
-        <item row="5" column="2" colspan="3">
-         <widget class="QPushButton" name="pbBgColor">
-          <property name="autoFillBackground">
-           <bool>false</bool>
+        <item row="3" column="1">
+         <widget class="QDoubleSpinBox" name="dsbImgSampling">
+          <property name="minimum">
+           <double>0.010000000000000</double>
           </property>
-          <property name="styleSheet">
-           <string notr="true">QPushButton:default {
-   background: yellow;
-}</string>
+          <property name="maximum">
+           <double>8.000000000000000</double>
           </property>
-          <property name="text">
-           <string>Background color</string>
+          <property name="singleStep">
+           <double>0.010000000000000</double>
+          </property>
+          <property name="value">
+           <double>1.000000000000000</double>
           </property>
          </widget>
         </item>
@@ -602,6 +610,16 @@
   <action name="actionSelectMonitor">
    <property name="text">
     <string>Select Monitor</string>
+   </property>
+  </action>
+  <action name="actionDistanzbasiertes_Discarding">
+   <property name="text">
+    <string>Distanzbasiertes Discarding</string>
+   </property>
+  </action>
+  <action name="actionMouse_Square_with_Discard">
+   <property name="text">
+    <string>Mouse Square with Discard</string>
    </property>
   </action>
  </widget>

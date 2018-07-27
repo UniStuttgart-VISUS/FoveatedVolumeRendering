@@ -118,6 +118,17 @@ public slots:
     void setShowOverlay(bool showOverlay);
 	void setEyetracking(bool eyetracking);
 
+	// distance dc
+	void setGValues(float c, float b, float a = 1.0f);
+	void setInnerEllipseExtends(float rx, float ry);
+	void setOuterEllipseExtends(float rx, float ry);
+	void showDDCSettings();
+
+
+	// square dc
+	void setRectExtends(int width, int height);
+	void showMSDCSettings();
+
     void saveFrame();
     void toggleVideoRecording();
     void setTimeStep(int timestep);
@@ -183,6 +194,14 @@ private:
 	int _curr_monitor_width;
 	int _curr_monitor_height;
 
+	// distance dc
+	cl_float3 _g_values;
+	std::tuple<float, float> _innerEllipse;
+	std::tuple<float, float> _outerEllipse;
+
+	// square dc
+	std::array<int, 2> _rect_extends;
+
     // OpenGL
     QOpenGLVertexArrayObject _screenQuadVao;
     QOpenGLShaderProgram _spScreenQuad;
@@ -221,6 +240,4 @@ private:
     bool _useGL;
     bool _showOverlay;
 	RenderingMethod _renderingMethod;
-	std::array<int, 2> _rect_extends;
-	float _resolutionfactor;
 };
