@@ -247,8 +247,8 @@ void VolumeRenderWidget::showinnerEllipseSettings()
 {
 	bool ok;
 	bool ok2;
-	double rx = QInputDialog::getDouble(this, tr("Set Inner Ellipse:"), tr("rx:"), 0.3, 0.0, 1.0, 2, &ok);
-	double ry = QInputDialog::getDouble(this, tr("Set Inner Ellipse:"), tr("ry:"), 0.2, 0.0, 1.0, 2, &ok2);
+	double rx = QInputDialog::getDouble(this, tr("Set Inner Ellipse:"), tr("rx in percent:"), 30, 0.0, 100.0, 2, &ok) * 0.01;
+	double ry = QInputDialog::getDouble(this, tr("Set Inner Ellipse:"), tr("ry in percent:"), 20, 0.0, 100.0, 2, &ok2) * 0.01;
 
 	if (ok && ok2) {
 		setInnerEllipseExtends(static_cast<float>(rx), static_cast<float>(ry));
@@ -262,8 +262,8 @@ void VolumeRenderWidget::showouterEllipseSettings()
 {
 	bool ok;
 	bool ok2;
-	double rx = QInputDialog::getDouble(this, tr("Set Outer Ellipse:"), tr("rx:"), 0.5, 0.0, 1.0, 2, &ok);
-	double ry = QInputDialog::getDouble(this, tr("Set Outer Ellipse:"), tr("ry:"), 0.4, 0.0, 1.0, 2, &ok2);
+	double rx = QInputDialog::getDouble(this, tr("Set Outer Ellipse:"), tr("rx in percent:"), 50, 0.0, 100.0, 2, &ok) * 0.01;
+	double ry = QInputDialog::getDouble(this, tr("Set Outer Ellipse:"), tr("ry in percent:"), 40, 0.0, 100.0, 2, &ok2) * 0.01;
 
 	if (ok && ok2) {
 		setOuterEllipseExtends(static_cast<float>(rx), static_cast<float>(ry));
