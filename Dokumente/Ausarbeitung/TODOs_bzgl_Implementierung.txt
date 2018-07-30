@@ -1,4 +1,3 @@
 Implementierung auf eine Textur umbasteln!
-INTERPOLIEREN! Profiler Werte der Warps messen!
+Profiler Werte der Warps messen!
 ddc: compute optimum for kernel call dimension in x and y according to the gap size.
-gap_size, ellipse 1/2 sizes, rect size (sqdc) variable machen und während dem program start veränderbar machen.
