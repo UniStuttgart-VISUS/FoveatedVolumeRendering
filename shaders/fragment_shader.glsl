@@ -24,39 +24,7 @@ void renderingMethod0(){ // Standard
 }
 
 void renderingMethod1(){ // DISTANCE_DC
-	/*vec4 cur = texture(outTex0, texCoord);
-	vec2 windows_coord = tex0_size * texCoord;
-    
-	int x = int(windows_coord.x);
-	int y = int(windows_coord.y);
-
-	vec4 red = vec4(1.0f, 0.0f, 0.0f, 1.0f);
-	vec4 green = vec4(0.0f, 1.0f, 0.0f, 1.0f);
-	vec4 blue = vec4(0.0f, 0.0f, 1.0f, 1.0f);
-
-	if(x % 2== 1 || y % 2 == 1){ // blacked out, take another texel
-        // determine which texel to take
-		if(x % 2== 1 && y % 2 == 1){
-			// take top left
-			//fragColor = texture(outTex0, texCoord - rectExt);
-			fragColor = red;
-		}else{
-			if(x % 2== 0 && y % 2 == 1){
-				// top
-				//fragColor = texture(outTex0, texCoord - vec2(0, rectExt.y));
-				fragColor = green;
-			}else{
-				if(x % 2== 1 && y % 2 == 0){
-					// left
-					//fragColor = texture(outTex0, texCoord - vec2(rectExt.x, 0));
-					fragColor = blue;
-				}
-			}
-		}
-    }else{*/
-		fragColor = texture(outTex0, texCoord);
-		// same texel
-	//}
+	fragColor = texture(outTex0, texCoord);
 	return;
 }
 

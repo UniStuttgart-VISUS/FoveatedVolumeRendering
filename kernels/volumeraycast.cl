@@ -499,52 +499,9 @@ __kernel void volumeRender(  __read_only image3d_t volData
                 }
 
 
-				/*if(index_1d < inverts.z){ // Area A
-					int g_a = round(resolutionfactor.z);
-
-                    // old: globalId = old_2d_to_new_2d_coord(globalId, round(rectangle.x), g_a, get_global_size(0));
-					globalId = mapped_2d_index_from_1d(index_1d, round(rectangle.x), g_a);	// Area A, no offset
-                    
-					
-					globalId += convert_int2_rtz(cursorPos) - (int2)(0.5f * rectangle.x, 0.5f * rectangle.y);
-
-                    // discard outside ell1
-                    if(!checkPointInEllipse(cursorPos, rectangle.x * 0.5f, rectangle.y * 0.5f, convert_float2_rtz(globalId))) return;
-				}else{ 
-					if(index_1d < inverts.y){ // Area B
-						
-						int g_b = round(resolutionfactor.y);
-
-                        // old: globalId = old_2d_to_new_2d_coord(globalId, round(ell2.x), g_b, get_global_size(0));
-						globalId = mapped_2d_index_from_1d(index_1d - inverts.x, round(ell2.x), g_b);	// Area B, minus A offset
-                        
-						
-						globalId += convert_int2_rtz(cursorPos) - (int2)(0.5f * ell2.x, 0.5f * ell2.y);
-
-						// create always a grid
-						globalId = (int2)(globalId.x - (convert_int(globalId.x) % g_b), globalId.y - (convert_int(globalId.y) % g_b));
-
-                        // discard if in ell1
-                        if(checkPointInEllipse(cursorPos, rectangle.x * 0.5f, rectangle.y * 0.5f, convert_float2_rtz(globalId))) return;
-
-                        // discard outside ell2
-                        if(!checkPointInEllipse(cursorPos, ell2.x * 0.5f, ell2.y * 0.5f, convert_float2_rtz(globalId))) return;
-					}else{ // Area C
-						int g_c = round(resolutionfactor.x);
-						// old: globalId = old_2d_to_new_2d_coord(globalId, img_bounds.x, g_c, get_global_size(0));
-                        globalId = mapped_2d_index_from_1d(index_1d - inverts.y, img_bounds.x, g_c);	// Area C, minus A and B offset
-                        
-
-						// create always a grid
-						globalId = (int2)(globalId.x - (convert_int(globalId.x) % g_c), globalId.y - (convert_int(globalId.y) % g_c));
-
-						//discard if inside ell2
-						if(checkPointInEllipse(cursorPos, ell2.x * 0.5f, ell2.y * 0.5f, convert_float2_rtz(globalId))) return;
-					}
-				}*/
-
+				
                 // discard if out of range
-                if(any(globalId >= get_image_dim(outData)))
+                if(globalId.x >=img_bounds.x || globalId.y >= img_bounds.y|| globalId.x < 0 || globalId.y < 0)
                     return;
                 
                 break;
@@ -865,10 +822,10 @@ __kernel void interpolateTexelsFromDDC(   __read_only image2d_t inData  // data 
 
 	float2 globalId_f = convert_float2_rtz(globalId);
 	
-	/*{	// debug
+	{	// debug
 	write_imagef(outData, globalId, read_imagef(inData, nearestIntSmp, globalId));
 	return;
-	}*/
+	}
 
 	if(checkPointInEllipse(cursorPos, ell1_div_2.x, ell1_div_2.y, globalId_f)){	// Area A
 		write_imagef(outData, globalId, read_imagef(inData, nearestIntSmp, globalId));

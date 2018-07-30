@@ -588,32 +588,17 @@ void VolumeRenderWidget::paintGL_distance_dc()
 
 	std::tuple<float, float> cursorPos;
 
-	{	// only set once for all opencl kernel calls in this rendering case:
-
-		// cursor position or eyetracking position is not normalized in this rendering case! cursor pos is center of ellipse 1 and ellipse 2.
-		if (_useEyetracking) {
-			smoothed_nmlzd_coords(); // updates moving average
-			std::tuple<float, float> nlzd = _moving_average_gaze_data_nmlz;
-			cursorPos = std::tuple<float, float>(std::get<0>(nlzd) * texture_width, std::get<1>(nlzd) * texture_height);
-		}
-		else {
-			cursorPos = std::tuple<float, float>(_lastLocalCursorPos.x() * _imgSamplingRate, _lastLocalCursorPos.y() * _imgSamplingRate);
-		}
-
-		_volumerender.setCursorPos(std::get<0>(cursorPos), std::get<1>(cursorPos));
-
-		// rx and ry for ellipse 1. Here not normalized (in pixel)!
-		_volumerender.setRectangleExtends(std::get<0>(ell1), std::get<1>(ell1)); // Area A
-
-		// rx and ry for ellipse 2. Here not normalized (in pixel)!
-		_volumerender.setEllipse2(std::get<0>(ell2), std::get<1>(ell2));	// Area B
-	
-		_volumerender.setResolutionFactors(_g_values);
-
-		setOutputTextures(texture_width,
-			texture_height, _outTexId1, GL_TEXTURE0);
+	// cursor position or eyetracking position is not normalized in this rendering case! cursor pos is center of ellipse 1 and ellipse 2.
+	if (_useEyetracking) {
+		smoothed_nmlzd_coords(); // updates moving average
+		std::tuple<float, float> nlzd = _moving_average_gaze_data_nmlz;
+		cursorPos = std::tuple<float, float>(std::get<0>(nlzd) * texture_width, std::get<1>(nlzd) * texture_height);
+	}
+	else {
+		cursorPos = std::tuple<float, float>(_lastLocalCursorPos.x() * _imgSamplingRate, _lastLocalCursorPos.y() * _imgSamplingRate);
 	}
 
+	
 	// -- begin
 	
 	if (this->_loadingFinished && _volumerender.hasData() && !_noUpdate)
@@ -636,9 +621,25 @@ void VolumeRenderWidget::paintGL_distance_dc()
 					cl_uint3 inverts = { cl_uint(area_c), cl_uint(area_b), cl_uint(area_a)};
 					_volumerender.setInverts(inverts);
 
-					float x_y_dimension_total = x_y_dimension_C.x * x_y_dimension_C.y + x_y_dimension_B.x * x_y_dimension_B.y + x_y_dimension_A.y * x_y_dimension_A.x;
+					float x_y_dimension_total = area_a;
 
 					// std::cout << "total: " << x_y_dimension_total << ", C: " << area_c << ", B: " << area_b << ", A: " << area_a << std::endl;
+
+					_volumerender.setCursorPos(std::get<0>(cursorPos), std::get<1>(cursorPos));
+
+					// rx and ry for ellipse 1. Here not normalized (in pixel)!
+					_volumerender.setRectangleExtends(std::get<0>(ell1), std::get<1>(ell1)); // Area A
+
+																							 // rx and ry for ellipse 2. Here not normalized (in pixel)!
+					_volumerender.setEllipse2(std::get<0>(ell2), std::get<1>(ell2));	// Area B
+
+					_volumerender.setResolutionFactors(_g_values);
+
+					std::cout << "tex0: " << _outTexId0 << ", tex1: " << _outTexId1 << std::endl;
+
+					setOutputTextures(texture_width,
+						texture_height, _outTexId1, GL_TEXTURE0);
+
 
 					_volumerender.runRaycast(std::ceilf(std::sqrtf(x_y_dimension_total)) + 1, std::ceil(std::sqrtf(x_y_dimension_total)) + 1);
 					execution_time += _volumerender.getLastExecTime();
@@ -647,7 +648,7 @@ void VolumeRenderWidget::paintGL_distance_dc()
 				// interpolate and combine them
 				{
 					setOutputTextures(texture_width,
-						texture_height, _outTexId0, GL_TEXTURE0);
+						texture_height, _outTexId0, GL_TEXTURE1);
 					_volumerender.setInterpolationParameters(_g_values, cl_float2{ std::get<0>(cursorPos),std::get<1>(cursorPos) }, cl_float2{ std::get<0>(ell1),std::get<1>(ell1) }, cl_float2{ std::get<0>(ell2),std::get<1>(ell2) });
 					_volumerender.runInterpolation(texture_width, texture_height, _outTexId1, _outTexId0);
 					// don't need to add last exec time because of the construction of calcFPS()
