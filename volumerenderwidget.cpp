@@ -341,8 +341,6 @@ void VolumeRenderWidget::setImageSamplingRate(const double samplingRate)
  */
 void VolumeRenderWidget::paintGL()
 {
-	double fps = 0.0;
-
 	// sets an uniform for the fragment shader to distinguish the rendering methods
 	
 	{
@@ -575,9 +573,6 @@ void VolumeRenderWidget::paintGL_standard()
 */
 void VolumeRenderWidget::paintGL_distance_dc()
 {
-
-	float width_renderer = static_cast<float>(this->size().width());
-	float height_renderer = static_cast<float>(this->size().height());
 	double texture_width = floor(this->size().width() * _imgSamplingRate);
 	double texture_height = floor(this->size().height() * _imgSamplingRate);
 	double execution_time = 0.0;
@@ -1736,7 +1731,6 @@ bool VolumeRenderWidget::check_eyetracker_availability()
 		TobiiResearchEyeTrackers* eyetrackers = NULL;
 
 		TobiiResearchStatus result;
-		size_t i = 0;
 		result = tobii_research_find_all_eyetrackers(&eyetrackers);
 		if (result != TOBII_RESEARCH_STATUS_OK) {
 			qCritical() << "Finding trackers to check status failed. Error: " << result << "\n";
