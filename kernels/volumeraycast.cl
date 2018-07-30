@@ -448,48 +448,59 @@ __kernel void volumeRender(  __read_only image3d_t volData
 				maxSize = max(img_bounds.x, img_bounds.y);
 				int index_1d = index_from_2d(globalId, get_global_size(0)); // maps globalId to 1d index
 
-
-                if(index_1d < inverts.x){ // Id is smaller than max Id possible with Area C // Area C
-                    int g_c = round(resolutionfactor.x);
-					// old: globalId = old_2d_to_new_2d_coord(globalId, img_bounds.x, g_c, get_global_size(0));
-                    globalId = mapped_2d_index_from_1d(index_1d, img_bounds.x, g_c);	// Area C, minus A and B offset
-
-					// create always a grid
-					globalId = (int2)(globalId.x - (convert_int(globalId.x) % g_c), globalId.y - (convert_int(globalId.y) % g_c));
-
-					//discard if inside ell2
-					if(checkPointInEllipse(cursorPos, ell2.x * 0.45f, ell2.y * 0.45f, convert_float2_rtz(globalId))) return;
+                int g;
+                int m;
+                int index_offset;
+                float2 area_offset;
+                int area_offset_needed = 1;
+               
+                if(index_1d < inverts.x){
+                    // Area C
+                    g = round(resolutionfactor.x);
+                    m = img_bounds.x;
+                    index_offset = 0;
+                    area_offset = (float2)(0.0,0.0);
+                    area_offset_needed = 0;
                 }else{
-                    if(index_1d < inverts.y){   // Area B
-                    
-                        int g_b = round(resolutionfactor.y);
-
-						globalId = mapped_2d_index_from_1d(index_1d - inverts.x, round(ell2.x), g_b);	// Area B, minus A offset
-						globalId += convert_int2_rtz(cursorPos) - (int2)(0.5f * ell2.x, 0.5f * ell2.y);
-
-						// create always a grid
-						globalId = (int2)(globalId.x - (convert_int(globalId.x) % g_b), globalId.y - (convert_int(globalId.y) % g_b));
-
-                        // discard if in ell1
-                        if(checkPointInEllipse(cursorPos, rectangle.x * 0.45f, rectangle.y * 0.45f, convert_float2_rtz(globalId))) return;
-
-                        // discard outside ell2
-                        if(!checkPointInEllipse(cursorPos, ell2.x * 0.55f, ell2.y * 0.55f, convert_float2_rtz(globalId))) return;
+                    if(index_1d < inverts.y){
+                        // Area B
+                        g = round(resolutionfactor.y);
+                        m = round(ell2.x);
+                        index_offset = inverts.x;
+                        area_offset = ell2;
                     }else{
                         if(index_1d < inverts.z){
-                            int g_a = round(resolutionfactor.z);
-
-					        globalId = mapped_2d_index_from_1d(index_1d - inverts.y, round(rectangle.x), g_a);	// Area A, no offset
-					        globalId += convert_int2_rtz(cursorPos) - (int2)(0.5f * rectangle.x, 0.5f * rectangle.y);
-
-                            // discard outside ell1
-                            if(!checkPointInEllipse(cursorPos, rectangle.x * 0.55f, rectangle.y * 0.55f, convert_float2_rtz(globalId))) return;
+                            // Area A
+                            g = round(resolutionfactor.z);
+                            m = round(rectangle.x);
+                            index_offset = inverts.y;
+                            area_offset = rectangle;
                         }else{
                             return;
                         }
                     }
                 }
 
+                globalId = mapped_2d_index_from_1d(index_1d - index_offset, m, g);
+                globalId += area_offset_needed * (convert_int2_rtz(cursorPos) - (int2)(0.5f * area_offset.x, 0.5f * area_offset.y)); // create always a grid
+
+                if(index_1d < inverts.y){
+                    globalId = (int2)(globalId.x - (convert_int(globalId.x) % g), globalId.y - (convert_int(globalId.y) % g));
+                }
+
+                if(index_1d < inverts.x){
+                    if(checkPointInEllipse(cursorPos, ell2.x * 0.45f, ell2.y * 0.45f, convert_float2_rtz(globalId))) return; //discard if inside ell2
+                }else{
+                    if(index_1d < inverts.y){
+                        if(checkPointInEllipse(cursorPos, rectangle.x * 0.45f, rectangle.y * 0.45f, convert_float2_rtz(globalId))) return; // discard if in ell1
+                        if(!checkPointInEllipse(cursorPos, ell2.x * 0.55f, ell2.y * 0.55f, convert_float2_rtz(globalId))) return; // discard outside ell2
+                    }else{
+                        if(index_1d < inverts.z){
+                            if(!checkPointInEllipse(cursorPos, rectangle.x * 0.55f, rectangle.y * 0.55f, convert_float2_rtz(globalId))) return; // discard outside ell1
+                        }
+                    }
+                }
+                
                 // discard if out of range
                 if(globalId.x >=img_bounds.x || globalId.y >= img_bounds.y|| globalId.x < 0 || globalId.y < 0)
                     return;
