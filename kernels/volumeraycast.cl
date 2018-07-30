@@ -899,48 +899,60 @@ __kernel void interpolateTexelsFromDDC(   __read_only image2d_t inData  // data 
 		if(a_good){
 			if(!b_good){ 
 				b_pos = a_pos;
+                // b_good = true;
 			}
 			if(!c_good){ 
 				c_pos = a_pos;
+                c_good = true;
 			}
 			if(!d_good){ 
 				d_pos = a_pos;
+                // d_good = true;
 			}
 		}
 
 		if(b_good){
 			if(!a_good){ 
 				a_pos = b_pos;
+                // a_good = true;
 			}
 			if(!d_good){ 
 				d_pos = b_pos;
+                d_good = true;
 			}
 			if(!c_good){ 
 				c_pos = b_pos;
+                // c_good = true;
 			}
 		}
 
 		if(c_good){
 			if(!a_good){ 
 				a_pos = c_pos;
+                a_good = true;
 			}
 			if(!d_good){ 
 				d_pos = c_pos;
+                // d_good = true;
 			}
 			if(!b_good){ 
 				b_pos = c_pos;
+                // b_good = true;
 			}
 		}
 
 		if(d_good){
 			if(!b_good){ 
 				b_pos = d_pos;
+                b_good = true;
 			}
 			if(!c_good){ 
 				c_pos = d_pos;
+                // c_good = true;
 			}
 			if(!a_good){ 
 				a_pos = d_pos;
+                // a_good= true;
 			}
 		}
 
