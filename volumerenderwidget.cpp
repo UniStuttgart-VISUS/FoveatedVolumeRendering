@@ -635,10 +635,10 @@ void VolumeRenderWidget::paintGL_distance_dc()
 
 					_volumerender.setResolutionFactors(_g_values);
 
-					std::cout << "tex0: " << _outTexId0 << ", tex1: " << _outTexId1 << std::endl;
+					// std::cout << "tex0: " << _outTexId0 << ", tex1: " << _outTexId1 << std::endl;
 
 					setOutputTextures(texture_width,
-						texture_height, _outTexId1, GL_TEXTURE0);
+						texture_height, _outTexId1, GL_TEXTURE1);
 
 
 					_volumerender.runRaycast(std::ceilf(std::sqrtf(x_y_dimension_total)) + 1, std::ceil(std::sqrtf(x_y_dimension_total)) + 1);
@@ -648,7 +648,8 @@ void VolumeRenderWidget::paintGL_distance_dc()
 				// interpolate and combine them
 				{
 					setOutputTextures(texture_width,
-						texture_height, _outTexId0, GL_TEXTURE1);
+						texture_height, _outTexId0, GL_TEXTURE0);
+
 					_volumerender.setInterpolationParameters(_g_values, cl_float2{ std::get<0>(cursorPos),std::get<1>(cursorPos) }, cl_float2{ std::get<0>(ell1),std::get<1>(ell1) }, cl_float2{ std::get<0>(ell2),std::get<1>(ell2) });
 					_volumerender.runInterpolation(texture_width, texture_height, _outTexId1, _outTexId0);
 					// don't need to add last exec time because of the construction of calcFPS()

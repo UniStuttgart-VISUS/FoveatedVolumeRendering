@@ -808,12 +808,14 @@ __kernel void interpolateTexelsFromDDC(   __read_only image2d_t inData  // data 
                                         , const float2 ell2 // rx, ry for ell2 in texels
                                         )
 {
+    
+    
     // interpolate data. Note: to interpolate correctly: need to know the area one is in.
 	int2 in_img_dim = get_image_dim(inData);
 
     if(any(in_img_dim != get_image_dim(outData))) return;
     int2 globalId = (int2)(get_global_id(0), get_global_id(1));
-    if(any(globalId > in_img_dim)) return;
+    if(globalId.x < 0 || globalId.y < 0 || globalId.x >= in_img_dim.x || globalId.y >= in_img_dim.y) return;
 
 	// new begin
 
@@ -822,10 +824,7 @@ __kernel void interpolateTexelsFromDDC(   __read_only image2d_t inData  // data 
 
 	float2 globalId_f = convert_float2_rtz(globalId);
 	
-	{	// debug
-	write_imagef(outData, globalId, read_imagef(inData, nearestIntSmp, globalId));
-	return;
-	}
+	
 
 	if(checkPointInEllipse(cursorPos, ell1_div_2.x, ell1_div_2.y, globalId_f)){	// Area A
 		write_imagef(outData, globalId, read_imagef(inData, nearestIntSmp, globalId));
