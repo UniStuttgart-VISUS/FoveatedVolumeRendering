@@ -445,19 +445,14 @@ __kernel void volumeRender(  __read_only image3d_t volData
         case 0: // Standard
                 break;
         case 1: // distance dependent discarding
-                // distance will be read from rectangle or ell1
-
 				maxSize = max(img_bounds.x, img_bounds.y);
-
 				int index_1d = index_from_2d(globalId, get_global_size(0)); // maps globalId to 1d index
 
-                {   // Area C
-                if(index_1d < inverts.x){ // Id is smaller than max Id possible with Area C
-                    
+
+                if(index_1d < inverts.x){ // Id is smaller than max Id possible with Area C // Area C
                     int g_c = round(resolutionfactor.x);
 					// old: globalId = old_2d_to_new_2d_coord(globalId, img_bounds.x, g_c, get_global_size(0));
                     globalId = mapped_2d_index_from_1d(index_1d, img_bounds.x, g_c);	// Area C, minus A and B offset
-                        
 
 					// create always a grid
 					globalId = (int2)(globalId.x - (convert_int(globalId.x) % g_c), globalId.y - (convert_int(globalId.y) % g_c));
@@ -469,9 +464,7 @@ __kernel void volumeRender(  __read_only image3d_t volData
                     
                         int g_b = round(resolutionfactor.y);
 
-                        // old: globalId = old_2d_to_new_2d_coord(globalId, round(ell2.x), g_b, get_global_size(0));
 						globalId = mapped_2d_index_from_1d(index_1d - inverts.x, round(ell2.x), g_b);	// Area B, minus A offset
-                        
 						globalId += convert_int2_rtz(cursorPos) - (int2)(0.5f * ell2.x, 0.5f * ell2.y);
 
 						// create always a grid
@@ -483,23 +476,20 @@ __kernel void volumeRender(  __read_only image3d_t volData
                         // discard outside ell2
                         if(!checkPointInEllipse(cursorPos, ell2.x * 0.55f, ell2.y * 0.55f, convert_float2_rtz(globalId))) return;
                     }else{
-                    
-                        int g_a = round(resolutionfactor.z);
+                        if(index_1d < inverts.z){
+                            int g_a = round(resolutionfactor.z);
 
-                        // old: globalId = old_2d_to_new_2d_coord(globalId, round(rectangle.x), g_a, get_global_size(0));
-					    globalId = mapped_2d_index_from_1d(index_1d - inverts.y, round(rectangle.x), g_a);	// Area A, no offset
-                    
-					
-					    globalId += convert_int2_rtz(cursorPos) - (int2)(0.5f * rectangle.x, 0.5f * rectangle.y);
+					        globalId = mapped_2d_index_from_1d(index_1d - inverts.y, round(rectangle.x), g_a);	// Area A, no offset
+					        globalId += convert_int2_rtz(cursorPos) - (int2)(0.5f * rectangle.x, 0.5f * rectangle.y);
 
-                        // discard outside ell1
-                        if(!checkPointInEllipse(cursorPos, rectangle.x * 0.55f, rectangle.y * 0.55f, convert_float2_rtz(globalId))) return;
+                            // discard outside ell1
+                            if(!checkPointInEllipse(cursorPos, rectangle.x * 0.55f, rectangle.y * 0.55f, convert_float2_rtz(globalId))) return;
+                        }else{
+                            return;
+                        }
                     }
                 }
-                }
 
-
-				
                 // discard if out of range
                 if(globalId.x >=img_bounds.x || globalId.y >= img_bounds.y|| globalId.x < 0 || globalId.y < 0)
                     return;
@@ -580,24 +570,7 @@ __kernel void volumeRender(  __read_only image3d_t volData
     hit = intersectBox(camPos, rayDir, &tnear, &tfar);
     if (!hit || tfar < 0)
     {
-        switch(mode){ // no hit, set background
-        case 0: // Standard
-                write_imagef(outData, texCoords, background);
-                break;
-        case 1: // distance dependent
-				write_imagef(outData, texCoords, background);
-                break;
-        case 2: // discard with rect
-                write_imagef(outData, texCoords, background);
-                break;
-        case 3: // sinus resolution
-                write_imagef(outData, texCoords, background);
-                break;
-        
-        default: // Standard
-                write_imagef(outData, texCoords, background);
-                break;
-        }
+        write_imagef(outData, texCoords, background);
         return;
     }
 
@@ -779,24 +752,7 @@ __kernel void volumeRender(  __read_only image3d_t volData
 
     result.w = alpha;
     // if(invert == 0) result.xyz += 0.5f;
-    switch(mode){ // result
-        case 0: // Standard
-                write_imagef(outData, texCoords, result);
-                break;
-        case 1: // distance dependent
-				write_imagef(outData, texCoords, result);
-                break;
-        case 2: // discard with rect
-                write_imagef(outData, texCoords, result);
-                break;
-        case 3: // sinus resolution
-                write_imagef(outData, texCoords, result);
-                break;
-        
-        default: // Standard
-                write_imagef(outData, texCoords, result);
-                break;
-        }
+    write_imagef(outData, texCoords, result);
 }
 
 //************************** Interpolate Pixels ***************************
