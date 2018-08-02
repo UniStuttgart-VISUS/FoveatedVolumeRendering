@@ -605,9 +605,9 @@ void VolumeRenderWidget::paintGL_distance_dc()
 
 				// raycast
 				{
-					cl_float2 x_y_dimension_C = { texture_width / _g_values.x , texture_height / _g_values.x };
-					cl_float2 x_y_dimension_B = { std::get<0>(ell2) / _g_values.y , std::get<1>(ell2) / _g_values.y };
-					cl_float2 x_y_dimension_A = { std::get<0>(ell1) / _g_values.z , std::get<1>(ell1) / _g_values.z };
+					cl_float2 x_y_dimension_C = { (texture_width / _g_values.x) + 1, (texture_height / _g_values.x) + 1};
+					cl_float2 x_y_dimension_B = { (std::get<0>(ell2) / _g_values.y) + 1 , (std::get<1>(ell2) / _g_values.y) + 1 };
+					cl_float2 x_y_dimension_A = { (std::get<0>(ell1) / _g_values.z) + 1 , (std::get<1>(ell1) / _g_values.z) + 1 };
 
 					cl_float area_c = x_y_dimension_C.x * x_y_dimension_C.y;
 					cl_float area_b = x_y_dimension_B.x * x_y_dimension_B.y + area_c;
@@ -619,6 +619,7 @@ void VolumeRenderWidget::paintGL_distance_dc()
 					float x_y_dimension_total = area_a;
 
 					// std::cout << "total: " << x_y_dimension_total << ", C: " << area_c << ", B: " << area_b << ", A: " << area_a << std::endl;
+					// std::cout << "tex_width: " << texture_width << ", tex_height: " << texture_height << std::endl;
 
 					_volumerender.setCursorPos(std::get<0>(cursorPos), std::get<1>(cursorPos));
 
@@ -1833,7 +1834,7 @@ void VolumeRenderWidget::keyPressEvent(QKeyEvent *event) {
  */
 void VolumeRenderWidget::keyReleaseEvent(QKeyEvent *event)
 {
-	std::cout << "released\n";
+	// std::cout << "released\n";
     // nothing yet
     event->accept();
 }

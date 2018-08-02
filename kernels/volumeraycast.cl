@@ -481,7 +481,7 @@ __kernel void volumeRender(  __read_only image3d_t volData
                     }
                 }
 
-                globalId = mapped_2d_index_from_1d(index_1d - index_offset, m, g);
+                globalId = mapped_2d_index_from_1d(index_1d - index_offset, m + g, g);
                 globalId += area_offset_needed * (convert_int2_rtz(cursorPos) - (int2)(0.5f * area_offset.x, 0.5f * area_offset.y)); // create always a grid
 
                 if(index_1d < inverts.y){
@@ -766,6 +766,12 @@ __kernel void volumeRender(  __read_only image3d_t volData
     write_imagef(outData, texCoords, result);
 }
 
+bool inRange(int2 img_bounds, int2 coord){
+    if(coord.x < 0 || coord.y < 0 || coord.y >= img_bounds.y || coord.x >= img_bounds.x) return false;
+    return true;
+}
+
+
 //************************** Interpolate Pixels ***************************
 __kernel void interpolateTexelsFromDDC(   __read_only image2d_t inData  // data to interpolate
                                         , __write_only image2d_t outData // outData
@@ -791,7 +797,10 @@ __kernel void interpolateTexelsFromDDC(   __read_only image2d_t inData  // data 
 
 	float2 globalId_f = convert_float2_rtz(globalId);
 	
-	
+	/*{ // debug
+		write_imagef(outData, globalId, read_imagef(inData, nearestIntSmp, globalId));
+		return;
+	}*/
 
 	if(checkPointInEllipse(cursorPos, ell1_div_2.x, ell1_div_2.y, globalId_f)){	// Area A
 		write_imagef(outData, globalId, read_imagef(inData, nearestIntSmp, globalId));
@@ -889,6 +898,10 @@ __kernel void interpolateTexelsFromDDC(   __read_only image2d_t inData  // data 
 			}
 		}
 
+        if(!inRange(in_img_dim, a_pos)) a_good = false;
+        if(!inRange(in_img_dim, b_pos)) b_good = false;
+        if(!inRange(in_img_dim, c_pos)) c_good = false;
+        if(!inRange(in_img_dim, d_pos)) d_good = false;
 
 		if(!a_good && !b_good && !c_good && !d_good){ 
 			// should not happen
@@ -967,7 +980,7 @@ __kernel void interpolateTexelsFromDDC(   __read_only image2d_t inData  // data 
 
 		float4 result_color = a_koeff * a_color + b_koeff * b_color + c_koeff * c_color + d_koeff * d_color;
 
-		/*if(a_color.x < 0.05f || b_color.x < 0.5f || c_color.x < 0.05f || d_color.x < 0.05f){ 
+		/*if(result_color.x < 0.05f && result_color.y < 0.5f && result_color.z < 0.05f && result_color.w < 0.05f){ 
 			write_imagef(outData, globalId, (float4)(1.0f, 0.5f, 0.3f, 1.0f));
 			return;
 		}*/
