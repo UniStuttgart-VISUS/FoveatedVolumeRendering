@@ -1,0 +1,11 @@
+Perception-driven Accelerated Rendering (M.Weier et. Al):
+
+Abstract:
+digital images with more complexity, realism
+trend to more pixels per display, more bits per pixel, more views per pixel (stereo, multi-view, ..)
+also higher refresh rates are wanted
+-> technical challenges, limited compute power
+human visual system (hvs) has limitiations
+-> highest possible visual quality not always necessary
+-> methods to exploit these limitations to decrease computational efforts while maintaining visual experience
+

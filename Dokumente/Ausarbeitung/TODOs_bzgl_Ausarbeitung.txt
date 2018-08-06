@@ -1,1 +1,2 @@
 Latex: Detex oder so verwenden um einfach Latexbefehle zu entfernen und Word Rechtschreibung und Grammatikkorektur verwenden.
+Bezüglich star-report pdr: was sind cycles per degree (cpd)?
