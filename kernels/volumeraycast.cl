@@ -905,8 +905,10 @@ __kernel void interpolateTexelsFromDDC(   __read_only image2d_t inData  // data 
 
 		if(!a_good && !b_good && !c_good && !d_good){ 
 			// should not happen
-			write_imagef(outData, globalId, (float4)(1.0f, 0.0f, 0.0f, 1.0f));
-			return;
+			/* write_imagef(outData, globalId, (float4)(1.0f, 0.0f, 0.0f, 1.0f));
+			return; */
+            a_pos = a_pos - (int2)(g, g);
+            a_good = true;
 		}
 
 		if(a_good){

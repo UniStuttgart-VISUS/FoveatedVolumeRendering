@@ -1786,10 +1786,12 @@ void VolumeRenderWidget::smoothed_nmlzd_coords()
 {
 	std::tuple<float, float> new_nmlz_data = normalized_ogl_widget_coords();
 
-	if (std::get<0>(new_nmlz_data) > 1.2f || std::get<0>(new_nmlz_data) < -1.2f ||
+	/*if (std::get<0>(new_nmlz_data) > 1.2f || std::get<0>(new_nmlz_data) < -1.2f ||
 		std::get<1>(new_nmlz_data) > 1.2f || std::get<1>(new_nmlz_data) < -1.2f) {
 		return;
-	}
+	}*/
+
+	if (!_gaze_data.right_eye.gaze_point.validity || !_gaze_data.left_eye.gaze_point.validity) return;
 
 	std::get<0>(_moving_average_gaze_data_nmlz) += (1.0f / _moving_average_values) * std::get<0>(new_nmlz_data);
 	std::get<1>(_moving_average_gaze_data_nmlz) += (1.0f / _moving_average_values) * std::get<1>(new_nmlz_data);

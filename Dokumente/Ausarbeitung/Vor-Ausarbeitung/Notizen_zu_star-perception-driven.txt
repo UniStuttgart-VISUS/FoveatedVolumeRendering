@@ -9,3 +9,73 @@ human visual system (hvs) has limitiations
 -> highest possible visual quality not always necessary
 -> methods to exploit these limitations to decrease computational efforts while maintaining visual experience
 
+Introduction:
+realistische grafiken + hohe fps (144 hz monitore im gaming bereich) + hohe pixel (2k -> 4k) + großes fov (Head mounted displays) + stereo rendering (hmds) -> sehr berechnungsaufwändig
+Perceptive driven rendering (pdr) geht das Problem an
+Benötigt gutes verständniss des menschlichen visuellen Wahrnehmungsapparates (human visual system (HVS))
+HVS hat limitierungen, diese werden im pdr ausgenutzt
+
+visual input -> optics: sampled & filtered -> optical nerves: compressed & transmitted
+
+Limitierungen:
+Sehschärfe ist ungleich auf der Retina verteilt
+Zentral: maximal (fovea), kleiner Bereich
+Außen: nach außen hin abnehmend (peripherer bereich)
+
+-> verringerung der Bildqualität im äußeren Bereich möglicherweise nicht wahrnehmbar
+
+Key Challenge (im pdr): Rechenaufwand zu reduzieren und gleichzeitig hohe qualität der visuellen wahrnehmung erhalten
+
+HVS:
+horizontal FOV: bis 190°, mit Augenrotation bis 290°
+
+visuelle Reize über das gesamte FOV, aber starke Unterschiede, wie sie verarbeitet werden je Bereich auf Retina
+
+Pupille: 2 mm bis 8 mm
+
+Retina: Photosensitive Schicht des Auges
+besteht aus zwei Typen von photorezeptoren: 6*10^6 Zapfen (cones), 20 mal so viele Stäbchen (rods)
+Stäbchen: bestehen aus einem typ von lichtsensitivem pigment. Verantwortlich für Helligkeitswahrnehmung
+Zapfen: drei Typen: L-Zapfen (für lange Wellenlängen), M-Zapfen (mittlere Wellenlängen) und S-Zapfen (kurze Wellenlängen). Verantwortlich für Farberkennung
+
+Zentraler Bereich der Retina: 
+Fova: ca. 5,2° um das Zentrum herum. Besteht fast nur aus Zapfen. Anzahl Zapfen verringert sich stark je weiter weg vom Zentrum
+Parafovea: ca. 5,2° bis 9°
+Perifovea: ca. 9° bis 17°
+Fovea, Parafovea und Perifovea sind für die Zentrale Sicht verantwortlich. Alles außerhalb ist die Periphere Sicht.
+
+Höchste Dichte von Stäbchen bei ca. 15° - 20° um die Fovea herum. Anzahl verringert sich nach außen hin ca. linear.
+Dichtevertelung von Zapfen und Stäbchen sind unterschiedlich, folgen aber beide einer Poisson-Disc Verteilungsmuster.
+Dichte der Zapfen ist direkt mit der Sehschärfe verknüpft. Sehschärfe fällt daher sehr stark nach außen hin, weg von der fovea. Schon 75% weniger Sehschärfe bei 6°.
+MAR: Minimum angle of resolution.
+
+Sehschärfe hängt auch von der Kontraststärke der Reize ab.
+Die Sensivität für Kontraste hängt von der Anzahl auf den Reiz reagierender neuronaler Zellen ab.
+Diese sinkt auch nach außen hin von der Fova aus stark.
+
+
+Farbsensitivität hängt auch von der Verteilung von Stäbchen und Zapfen ab.
+Fovea eher auf grün und rot ausgerichtet. grün rot eher weniger in der peripherie.
+nur 9% der Zapfen für blau aber dafür blau eher in peripherie als fovea.
+
+Rezpetoren passen sich schnell an helligkeit an aber nur langsam an dunkelheit
+
+Augen dauerhaft in Bewegung
+Sechs externe Muskeln
+Zeil der Augenbewegung: Objekt of interest (OOI) in die fovea zu bringen (fokussieren)
+
+wichtigste Art von Augenbewegungen: saccades, vestibular-ocular reflex, smooth pursuit eye motion (SPEM) und coupled vergence-accommodation motion.
+vestibular-ocular reflex: passiert schnell, Latenz: 7-15 ms, robust für schnelle Kopfbewegungen
+Menschen scannen dauerhaft ihre Umgebung: saccades und fixations hier am wichtigsten
+saccades: schnelles springen von einem OOI zu einem anderen. Geschwindigkeiten von bis zu 900°/s. Starke schwächung der sehsensivität wärend einer saccade (saccade suppression)
+Fixation: 100ms - 1.5s. Wenn ein OOI angeschaut wird, die Augen darauf beruhen
+
+In natürlicher Szene: 2-3 saccades pro sekunde und durchschnittliche fixationszeit ca 250ms
+Räumlicher Abstand zwischen Fixierungen: ca 7°. Mehr als 30° sind unangenehm -> Kopfbewegung.
+In einer Fixation macht das Auge trotzdem kleine wichtige Bewegungen: Tremor motion
+Unterdrückung von Tremor Motion resultiert in einem davon schwindendem Bild
+
+smooth pursuit eye motion (SPEM): reflex artiges fixieren, wenn ein sich bewegendes Objekt die Aufmerksamkeit erlangt
+
+Kleine Augenbewegungen (bis zu 2.5°/s) haben kaum einen Effekt auf die Sehschärfe.
+

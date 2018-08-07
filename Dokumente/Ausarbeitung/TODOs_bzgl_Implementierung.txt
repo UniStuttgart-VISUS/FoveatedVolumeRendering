@@ -5,3 +5,5 @@ ddc: compute optimum for kernel call dimension in x and y according to the gap s
 Transferfunktion dynamisch anpassen.
 Zoom und Rotation ggf. dynamisch anpassen.
 G-Values ggf. dynamisch anpassen. (z.B. innerhalb einer saccade reicht es vielleicht nur area c zu rendern).
+
+Testen, wie ob es sich bessert, wenn die gaze-position nur geupdatet wird, wenn der neue eine bestimmte differenz zum alten wert hat.

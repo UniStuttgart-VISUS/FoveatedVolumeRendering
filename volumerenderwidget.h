@@ -192,7 +192,7 @@ private:
 	TobiiResearchGazeData _gaze_data;
 	std::vector<std::tuple<float, float>> _last_few_gaze_data;
 	std::tuple<float, float> _moving_average_gaze_data_nmlz;
-	const int _moving_average_values = 1;
+	const int _moving_average_values = 3;
 	QPoint _monitor_offset;
 	int _curr_monitor_width;
 	int _curr_monitor_height;
