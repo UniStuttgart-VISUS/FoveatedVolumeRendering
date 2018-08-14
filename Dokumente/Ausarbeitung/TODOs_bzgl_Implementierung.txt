@@ -7,3 +7,5 @@ Zoom und Rotation ggf. dynamisch anpassen.
 G-Values ggf. dynamisch anpassen. (z.B. innerhalb einer saccade reicht es vielleicht nur area c zu rendern).
 
 Testen, wie ob es sich bessert, wenn die gaze-position nur geupdatet wird, wenn der neue eine bestimmte differenz zum alten wert hat.
+
+Schauen, ob es möglich ist, die globalId's einmal zu berechnen und per Tabelle dann einen look-up zu machen, solange sich die Auflösung nicht ändert.
