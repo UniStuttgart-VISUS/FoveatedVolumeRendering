@@ -79,3 +79,27 @@ smooth pursuit eye motion (SPEM): reflex artiges fixieren, wenn ein sich bewegen
 
 Kleine Augenbewegungen (bis zu 2.5°/s) haben kaum einen Effekt auf die Sehschärfe.
 
+Über 30% des primären sehverarbeitungsbereichs des gehirns ist für die Verarbeitung der zentralen 5° des Sehfeldes zuständig. Die Peripherie ist untervertreten.
+
+Peripherie liefert trotzdem einen großen und wichigen Teil der Informationen. Besonderst für das Erkennen von Kontrasten, Objekten und Tieren.
+
+Farbveränderungen in der Peripherie haben einen größeren Einfluss als eine Veränderung der Ausrichtung. Außerdem macht das HVS großen Nutzen aus kontextuellen Informationen durch die peripherie.
+Dadurch werden Informationen vorverarbeitet.
+
+Die Aufmerksamkeit spielt eine wichtige Rolle in der Verarbeitung von visuellen stimuli. Selective attention, focused attention, divided attention.
+
+visuelles tunneling: fokussieren auf einen bestimmten punkt wodurch ein großteil der peripheren informationen nicht mehr oder stark reduziert wahrgenommen werden.
+
+Visuelle auflösung reduziert sich grob linear für die ersten 20-30 grad. Aber jedes lineare Modell für das HVS ist immer nur eine Annäherung.
+
+Farben haben einen großen Einfluss auf das HVS, um Kontraste wahrzunehmen.
+
+Bewegungserkennung ist sowohl in der Fovea als auch in der Peripherie ähnlich oder genauso gut.
+
+Für aktive messungen (z.b. eyetracking) zum rendern und vermeidung von artifakten, müssen latenz und genauigkeit des messgerätes (eyetrackers) beachtet werden.
+
+Um eine Bildveränderung nicht zu bemerken, muss ein update ca 5ms bis 60 ms nach der augenbewegung gestartet worden sein, abhängig davon, wie weit die unscharfe fläche von der fovea entfernt ist.
+
+Raytracing methoden sind gut geeignet für eyetracking methoden. Eine einfach Möglichkeit ist, die Anzahl der Samples pro Strahl abhängig von der Entfernugn zur fovea zu reduzieren.
+
+Für bessere Performanz beim (Volumen-) Rendering, kann Raytracing mit Rasterung kombiniert werden.
