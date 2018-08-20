@@ -1,2 +1,4 @@
 Latex: Detex oder so verwenden um einfach Latexbefehle zu entfernen und Word Rechtschreibung und Grammatikkorektur verwenden.
 Bezüglich star-report pdr: was sind cycles per degree (cpd)?
+Soll ich all die Ideen, die ich hatte bezüglich der Umsetzung aufschreiben und diskutieren, warum ich diese verwendet oder nicht verwendet habe?
+Definitiv das mit der TFF und Parameteranpassung!!!

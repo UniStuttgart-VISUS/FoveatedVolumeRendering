@@ -2,7 +2,7 @@ Implementierung auf eine Textur umbasteln!
 Profiler Werte der Warps messen!
 ddc: compute optimum for kernel call dimension in x and y according to the gap size.
 
-Transferfunktion dynamisch anpassen.
+Transferfunktion dynamisch anpassen!!!!!!!!!!
 Zoom und Rotation ggf. dynamisch anpassen.
 G-Values ggf. dynamisch anpassen. (z.B. innerhalb einer saccade reicht es vielleicht nur area c zu rendern).
 
@@ -11,3 +11,7 @@ Testen, wie ob es sich bessert, wenn die gaze-position nur geupdatet wird, wenn 
 Schauen, ob es möglich ist, die globalId's einmal zu berechnen und per Tabelle dann einen look-up zu machen, solange sich die Auflösung nicht ändert.
 
 Sampling Rate der Strahlen auch anpassen!
+
+Wenn das Bild sich nicht verändert (auch keine dynamische Transferfunktion aktiv ist), dann sollte sich der scharfe Bereich auf das gesamte Bild ausweiten. 
+Dafür könnte man zum Beispiel für jeden Pixel einen Zustand halten, der Besagt, in welchem Bereich der Pixel ist und nur überschrieben wird, 
+wenn der neue Bereich besser ist, als der aktuelle oder wenn das Bild sich seit dem letzten Draw call verändert hat.
