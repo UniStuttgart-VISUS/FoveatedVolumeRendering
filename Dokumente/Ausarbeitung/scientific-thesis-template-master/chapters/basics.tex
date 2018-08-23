@@ -32,22 +32,35 @@ In ihrer Implementierung verwendeten sie 2D und 3D mip maps, einen Eye Tracker u
 Um die geringere Abtastung in der Peripherie gut nutzen zu können, wurde aus den 3D Volumendaten eine 3D mip map erstellt.
 Die 3D mip map wird durch den Ray-Tracing Algorithmus abgetastet und durch trilineare Interpolation eine 2D mip map erstellt.
 Die 2D mip map ist Grundlage für die Erstellung des endgültigen Bildes.
-In ihren Ergebnissen konnten sie die Rendering Kosten für ein teilweise hochauflösendes Bild im Vergleich zu einem vollständig hochauflösenden Bildes um bis einen Faktor fünf zu senken.
+In ihren Ergebnissen konnten sie die Rendering Kosten für ein teilweise hochauflösendes Bild im Vergleich zu einem vollständig hochauflösenden Bildes, um bis den Faktor fünf, senken.
 
-In einer Arbeit von Guenter et. Al. \cite{foveated-3d-graphics} wurde ähnlich zu dem Paper von Levoy und Whitaker der Abfall der visuellen Auflösung des Auges außerhalb des visuellen Zentrums, der Fovea, ausgenutzt, um eine beschleunigte Berechnung des Bildes zu erhalten.
+In einer Arbeit von Guenter et. Al. \enquote{Foveated 3D Graphics} \cite{foveated-3d-graphics}, wurde ähnlich zu dem Paper von Levoy und Whitaker, der Abfall der visuellen Auflösung des Auges außerhalb des visuellen Zentrums, der Fovea, ausgenutzt, um eine beschleunigte Berechnung des Bildes zu erhalten.
 Im Gegensatz zu der davor genannten Arbeit, ist das darunterliegende System hier kein Ray-Tracer für Volumendaten, sondern eine Grafikpipeline für 3D Szenen.
 Das Bild wird hier aus drei Teilbilder zusammengesetzt, welche jeweils mit unterschiedlichen Auflösungen berechnet wurden und wie Schichten übereinander gelegt werden.
 Die drei Schichten sind: innere Schicht, mittlere Schicht und äußere Schicht.
 Die innere Schicht hat ungefähr die Größe des fovealen Bereichs auf dem Bildschirm und wird in der maximalen Auflösung berechnet.
 Ihr Mittelpunkt ist der Blickfokus des Betrachters.
-Die mittlere ist ein bisschen größer als die innere Schicht und wird mit einer niedrigeren Auflösung berechnet. Sie wird ebenfalls auf den Blickfokus des Betrachters zentriert.
+Die mittlere Schicht ist ein bisschen größer als die innere Schicht und wird mit einer niedrigeren Auflösung berechnet. 
+Sie wird ebenfalls auf den Blickfokus des Betrachters zentriert.
 Die äußerste Schicht überdeckt den gesamten Bildbereich und wird in der niedrigsten Auflösung berechnet.
 Um die Schichten zusammensetzen zu können, werden die mittlere und äußere Schicht jeweils zur nativen Auflösung des Bildschirms, die gleiche Auflösung wie die innere Schicht, interpoliert.
-Scharfe Kanten zwischen den Schichten werden dadurch vermieden, dass diese sich leicht überlappen und spezielle Blend-Masken verwendet werden.
+Scharfe Kanten zwischen den Schichten werden dadurch vermieden, dass diese sich leicht überlappen und spezielle Blend-Masken verwendet werden, um die verschiedenen Schichten glatt übereinander zu blenden.
+In ihrer Arbeit nahmen sie sich auch das Problem an, dass das starke Unterabtasten, um bis zu dem Faktor sechs in jede Dimension, in der mittleren und äußeren Schicht zu störenden und sich bewegenden Artefakten führen kann.
+Um dies entgegen zu wirken, verwendeten sie drei Antialiasing Techniken: Hardware Multi-Sample Antialiasing (MSAA), \enquote{Temporal Reprojection} und \enquote{whole frame jitter sampling}.
+Um die Blickposition zu erfassen nutzten sie den Tobii Tx 300 Eye Tracker mit einer Worst-Case Latency von 10 ms.
+Das Bild wurde auf einem Computer mit Intel Xeon CPU (E5640 mit 2.67 Ghz) und einer NVidia GeForce GTX 580 GPU berechnet.
+Dargestellt wurde es auf einem 23" 1920x1080 LCD Monitor mit einer Bildwiederholungsrate von 120 Hz.
+Mit ihrem System und Techniken erlangten sie eine Performanz-Verbesserung von einem Faktor zwischen fünf und sechs auf einem Monitor mit HD Auflösung.
+Dabei erreichten sie eine Darstellungsqualität, die vergleichbar mit dem Rendern eines hochauflösenden Bildes über den gesamten Bildschirm ist.
 
-
-\todo{Related Work dafür}
 \subsection{Wahrnehmungsorientiertes Volumenrendering zur Qualitätssteigerung}
+R. Englund und T. Ropinski stellten in ihrem Paper \enquote{Quantitative and Qualitative Analysis of the Perception of Semi-Transparent Structure in Direct Volume Rendering} \cite{doi:10.1111/cgf.13320} verschiedene Techniken, zur Verbesserung der Wahrnehmung von komplexen volumetrischen Daten, vor.
+In einer Studie mit über 300 Teilnehmern untersuchten sie, wie diese Techniken zur verbesserten Wahrnehmung von Volumen beitragen und verglichen die verschiedenen Ansätze miteinander.
+Dabei mussten die Teilnehmer jeweils kleine Aufgaben absolvieren, so dass Rückschlüsse darauf geschlossen werden können, wie sehr eine gewisse Technik dem Teilnehmer bei der Erkennung von Form und Tiefe eines Objekts in einem Volumen beiträgt.
+In ihrer Studie haben sie sechs Techniken ausgewertet. Darunter \enquote{Direct Volume Raytracing} (DVR) als grundlegende Technik und \enquote{Depth Darkening} wobei Tiefeneffekte ähnlich zu \enquote{Ambient Occlusion} dadurch hervorgerufen werden, dass tiefere Objekte dunkler gezeichnet werden. 
+In ihrer Auswertung kamen sie unter Anderem dazu, dass Techniken, die natürliche Lichteffekte in den Volumendaten simulieren, deutliche Vorteile gegenüber die anderen getesteten Ansätze gezeigt haben.
+
+
 \todo{Related Work dafür.}
 
 \section{Sehapparat}
