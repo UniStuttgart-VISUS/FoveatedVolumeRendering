@@ -17,3 +17,7 @@ Sampling Rate der Strahlen auch anpassen!
 Wenn das Bild sich nicht verändert (auch keine dynamische Transferfunktion aktiv ist), dann sollte sich der scharfe Bereich auf das gesamte Bild ausweiten. 
 Dafür könnte man zum Beispiel für jeden Pixel einen Zustand halten, der Besagt, in welchem Bereich der Pixel ist und nur überschrieben wird, 
 wenn der neue Bereich besser ist, als der aktuelle oder wenn das Bild sich seit dem letzten Draw call verändert hat.
+
+Zuerst versuchen, statt Punkte bei der interpolation zu verwerfen, den weiter äußeren Punkt aus Area C zu verwenden.
+
+Anstelle der GlobalId's aufwenig umzurechnen, einfach drei durchläufe machen und jeweils die id's lediglich zu multiplizieren. Anschließend die Bilder einzeln interpolieren und dann zusammensetzen.
