@@ -524,10 +524,28 @@ __kernel void volumeRender(  __read_only image3d_t volData
                 switch(inverts.x){
                     case 0: // outer layer (lo)
                         globalId *= round(resolutionfactor.x); // globalId in x- und y-Richtung mit G-Value für outer Layer multiplizieren um die "Gaps" zu schaffen.
+
+                        // discard falls in r2
+                        if(length(convert_float2(globalId) - cursorPos) < rectangle.y) return;
                         break;
                     case 1: // middle layer (lm)
+                        globalId *= round(resolutionfactor.y);
+
+                        // offset der maus
+                        globalId += convert_int2_rtz(cursorPos) - (int2)(ell2.x,ell2.x);
+
+                        // discard falls in ir
+                        if(length(convert_float2(globalId) - cursorPos) < ell2.y) return;
+
+                        // discard falls außerhalb von mr
+                        if(length(convert_float2(globalId) - cursorPos) > ell2.x) return;
                         break;
                     case 2: // inner layer (li)
+                        // offset der maus
+                        globalId += convert_int2_rtz(cursorPos) - (int2)(ell2.y,ell2.y);
+
+                        // discard falls außerhalb von ir
+                        if(length(convert_float2(globalId) - cursorPos) > ell2.y) return;
                         break;
                     default: // should not happen
                         return;
@@ -1007,6 +1025,70 @@ __kernel void interpolateTexelsFromDDC(   __read_only image2d_t inData  // data 
 		write_imagef(outData, globalId, result_color);
 
 	}
+
+    return;
+}
+
+__kernel void interpolateTexelsFromTRI(   __read_only image2d_t inData  // data to interpolate
+                                        , __write_only image2d_t outData // outData
+                                        , const float3 g_values  // x is g for ell1, y is g for ell2
+                                        , const float2 cursorPos // cursor position in texels
+                                        , const float2 r1r2 // radius without alpha for c1 and c2
+                                        , const float2 irmr // radius with alpha for c1 and c2
+                                        , const uint run // tells which run it is
+                                        )
+{
+	int2 in_img_dim = get_image_dim(inData);
+
+    if(any(in_img_dim != get_image_dim(outData))) return;
+    int2 globalId = (int2)(get_global_id(0), get_global_id(1));
+    if(globalId.x < 0 || globalId.y < 0 || globalId.x >= in_img_dim.x || globalId.y >= in_img_dim.y) return;
+
+    /*{ // debug
+		write_imagef(outData, globalId, read_imagef(inData, nearestIntSmp, globalId));
+		return;
+	}*/
+
+    switch(run){
+        case 0: // outer layer
+
+            // discard falls in r2
+            if(length(convert_float2(globalId) - cursorPos) < r1r2.y) return;
+
+            int g = round(g_values.x);
+		    int d = globalId.y % g;
+		    int e = globalId.x % g;
+
+		    float g_square = convert_float(g * g);
+		    int g_minus_e = g - e;
+		    int g_minus_d = g - d;
+		
+		    int2 c_pos = (int2)(globalId.x - e, globalId.y -d);
+		    int2 a_pos = (int2)(globalId.x - e, globalId.y + g_minus_d);
+		    int2 d_pos = (int2)(globalId.x + g_minus_e, globalId.y - d);
+		    int2 b_pos = (int2)(globalId.x + g_minus_e, globalId.y + g_minus_d);
+
+		    float a_koeff = native_divide(convert_float(d * g_minus_e), g_square);
+		    float b_koeff = native_divide(convert_float(d * e), g_square);
+		    float c_koeff = native_divide(convert_float(g_minus_e * g_minus_d), g_square);
+		    float d_koeff = native_divide(convert_float(e * g_minus_d), g_square);
+
+            float4 a_color = read_imagef(inData, nearestIntSmp, a_pos);
+		    float4 b_color = read_imagef(inData, nearestIntSmp, b_pos);
+		    float4 c_color = read_imagef(inData, nearestIntSmp, c_pos);
+		    float4 d_color = read_imagef(inData, nearestIntSmp, d_pos);
+
+		    float4 result_color = a_koeff * a_color + b_koeff * b_color + c_koeff * c_color + d_koeff * d_color;
+
+		    write_imagef(outData, globalId, result_color);
+            break;
+        case 1: // middle layer
+            break;
+        case 2: // inner layer
+            break;
+        default: // should not happen
+            break;
+    }
 
     return;
 }

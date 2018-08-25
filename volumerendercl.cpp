@@ -160,7 +160,8 @@ void VolumeRenderCL::initKernel(const std::string fileName, const std::string bu
 
         _genBricksKernel = cl::Kernel(program, "generateBricks");
         _downsamplingKernel = cl::Kernel(program, "downsampling");
-		_interpolationKernel = cl::Kernel(program, "interpolateTexelsFromDDC");
+		_interpolationKernelForDDC = cl::Kernel(program, "interpolateTexelsFromDDC");
+		_interpolationKernelForTRI = cl::Kernel(program, "interpolateTexelsFromTRI");
     }
     catch (cl::Error err)
     {
@@ -203,8 +204,11 @@ void VolumeRenderCL::setMemObjectsInterpolation(GLuint inTexId, GLuint outTexId)
 	_inputMem = cl::ImageGL(_contextCL, CL_MEM_READ_ONLY, GL_TEXTURE_2D, 0, inTexId);
 	_outputMem = cl::ImageGL(_contextCL, CL_MEM_WRITE_ONLY, GL_TEXTURE_2D, 0, outTexId);
 
-	_interpolationKernel.setArg(0, _inputMem); // in Data
-	_interpolationKernel.setArg(1, _outputMem);	// out Data
+	_interpolationKernelForDDC.setArg(0, _inputMem); // in Data
+	_interpolationKernelForDDC.setArg(1, _outputMem);	// out Data
+
+	_interpolationKernelForTRI.setArg(0, _inputMem); // in Data
+	_interpolationKernelForTRI.setArg(1, _outputMem);	// out Data
 }
 
 
@@ -884,12 +888,21 @@ void VolumeRenderCL::setMode(unsigned int mode)
 	_raycastKernel.setArg(MODE, mode);
 }
 
-void VolumeRenderCL::setInterpolationParameters(cl_float3 g_values, cl_float2 cursorPos, cl_float2 ell1, cl_float2 ell2)
+void VolumeRenderCL::setInterpolationParametersForDDC(cl_float3 g_values, cl_float2 cursorPos, cl_float2 ell1, cl_float2 ell2)
 {
-	_interpolationKernel.setArg(2, g_values);
-	_interpolationKernel.setArg(3, cursorPos);
-	_interpolationKernel.setArg(4, ell1);
-	_interpolationKernel.setArg(5, ell2);
+	_interpolationKernelForDDC.setArg(2, g_values);
+	_interpolationKernelForDDC.setArg(3, cursorPos);
+	_interpolationKernelForDDC.setArg(4, ell1);
+	_interpolationKernelForDDC.setArg(5, ell2);
+}
+
+void VolumeRenderCL::setInterpolationParametersForTRI(cl_float3 g_values, cl_float2 cursorPos, cl_float2 ell1, cl_float2 ell2, int run)
+{
+	_interpolationKernelForTRI.setArg(2, g_values);
+	_interpolationKernelForTRI.setArg(3, cursorPos);
+	_interpolationKernelForTRI.setArg(4, ell1);
+	_interpolationKernelForTRI.setArg(5, ell2);
+	_interpolationKernelForTRI.setArg(6, run);
 }
 
 
@@ -902,7 +915,7 @@ double VolumeRenderCL::getLastExecTime()
     return _lastExecTime;
 }
 
-void VolumeRenderCL::runInterpolation(const size_t width, const size_t height, GLuint inTexId, GLuint outTexId)
+void VolumeRenderCL::runInterpolationForDDC(const size_t width, const size_t height, GLuint inTexId, GLuint outTexId)
 {
 	if (!this->_volLoaded)
 		return;
@@ -919,7 +932,43 @@ void VolumeRenderCL::runInterpolation(const size_t width, const size_t height, G
 		memObj.push_back(_inputMem);
 		_queueCL.enqueueAcquireGLObjects(&memObj);
 		_queueCL.enqueueNDRangeKernel(
-			_interpolationKernel, cl::NullRange, globalThreads, localThreads, NULL, &ndrEvt);
+			_interpolationKernelForDDC, cl::NullRange, globalThreads, localThreads, NULL, &ndrEvt);
+		_queueCL.enqueueReleaseGLObjects(&memObj);
+		_queueCL.finish();    // global sync
+
+#ifdef CL_QUEUE_PROFILING_ENABLE
+		cl_ulong start = 0;
+		cl_ulong end = 0;
+		ndrEvt.getProfilingInfo(CL_PROFILING_COMMAND_START, &start);
+		ndrEvt.getProfilingInfo(CL_PROFILING_COMMAND_END, &end);
+		_lastExecTime = static_cast<double>(end - start)*1e-9;
+		//        std::cout << "Kernel time: " << _lastExecTime << std::endl << std::endl;
+#endif
+	}
+	catch (cl::Error err)
+	{
+		logCLerror(err);
+	}
+}
+
+void VolumeRenderCL::runInterpolationForTRI(const size_t width, const size_t height, GLuint inTexId, GLuint outTexId)
+{
+	if (!this->_volLoaded)
+		return;
+	try // opencl scope
+	{
+		setMemObjectsInterpolation(inTexId, outTexId);
+		size_t lDim = 8;    // local work group dimension
+		cl::NDRange globalThreads(width + (lDim - width % lDim), height + (lDim - height % lDim));
+		cl::NDRange localThreads(lDim, lDim);
+		cl::Event ndrEvt;
+
+		std::vector<cl::Memory> memObj;
+		memObj.push_back(_outputMem);
+		memObj.push_back(_inputMem);
+		_queueCL.enqueueAcquireGLObjects(&memObj);
+		_queueCL.enqueueNDRangeKernel(
+			_interpolationKernelForTRI, cl::NullRange, globalThreads, localThreads, NULL, &ndrEvt);
 		_queueCL.enqueueReleaseGLObjects(&memObj);
 		_queueCL.finish();    // global sync
 

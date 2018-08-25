@@ -239,17 +239,28 @@ public:
 	/*
 	* Sets interpolation parameters for mode 1.
 	*/
-	void setInterpolationParameters(cl_float3 g_values, cl_float2 cursorPos, cl_float2 ell1, cl_float2 ell2);
+	void setInterpolationParametersForDDC(cl_float3 g_values, cl_float2 cursorPos, cl_float2 ell1, cl_float2 ell2);
+
+	/*
+	* Sets interpolation parameters for mode 3.
+	*/
+	void setInterpolationParametersForTRI(cl_float3 g_values, cl_float2 cursorPos, cl_float2 r1r2, cl_float2 irmr, int run);
 
     /**
      * @brief Get the execution time of the last kernel run.
      * @return The kernel runtime in seconds.
      */
     double getLastExecTime();
+
 	/**
 	*  Run the kernel to interpolate the values from distance_dc
 	*/
-	void runInterpolation(const size_t width, const size_t height, GLuint inTexId, GLuint outTexId);
+	void runInterpolationForDDC(const size_t width, const size_t height, GLuint inTexId, GLuint outTexId);
+
+	/**
+	*  Run the kernel to interpolate the values from TRI
+	*/
+	void runInterpolationForTRI(const size_t width, const size_t height, GLuint inTexId, GLuint outTexId);
 
     /**
      * @brief getPlatformNames
@@ -344,7 +355,8 @@ private:
     cl::Kernel _raycastKernel;
     cl::Kernel _genBricksKernel;
     cl::Kernel _downsamplingKernel;
-	cl::Kernel _interpolationKernel;
+	cl::Kernel _interpolationKernelForDDC;
+	cl::Kernel _interpolationKernelForTRI;
 
     std::vector<cl::Image3D> _volumesMem;
     std::vector<cl::Image3D> _bricksMem;

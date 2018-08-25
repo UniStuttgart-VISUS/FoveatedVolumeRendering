@@ -163,7 +163,7 @@ private:
     void paintFPS(QPainter &p, const double fps, const double lastTime);
     double calcFPS(double offset = 0.0);
 
-    void setOutputTextures(int width, int height, GLuint texture, GLuint tex_unit);
+    void setOutputTextures(int width, int height, GLuint texture, GLuint tex_unit, bool recreateTexture = true);
 
 	void paintGL_standard();
 	void paintGL_distance_dc(); // elliptical discards in multiple rendering calls

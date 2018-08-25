@@ -60,7 +60,7 @@ VolumeRenderWidget::VolumeRenderWidget(QWidget *parent)
 	, _g_values({ 4.0f, 2.0f, 1.0f })
 	, _innerEllipse({ 0.3, 0.2 })
 	, _outerEllipse({ 0.5, 0.4 })
-	, _circle_radiuses({ 100.0f, 100.0f })
+	, _circle_radiuses({ 100.0f, 400.0f })
 	, _eyetracker(nullptr)
 	, _useEyetracking(false)
 {
@@ -411,7 +411,7 @@ void VolumeRenderWidget::resizeGL(int w, int h)
  * @brief VolumeRenderWidget::setOutputTextures
  * works on Texture tex_unit and type GL_TEXTURE_2D
  */
-void VolumeRenderWidget::setOutputTextures(int width, int height, GLuint texture, GLuint tex_unit)
+void VolumeRenderWidget::setOutputTextures(int width, int height, GLuint texture, GLuint tex_unit, bool recreateTexture)
 {
 	// if(texture == _outTexId0)
 	
@@ -421,7 +421,8 @@ void VolumeRenderWidget::setOutputTextures(int width, int height, GLuint texture
 	std::string s = std::string("Drop your volume data file here.").append(" width: ").append(std::to_string(width))
 		.append(", height: ").append(std::to_string(height));
 	
-	{// recreate the texture
+	if(recreateTexture){
+		// recreate the texture
 		glDeleteTextures(1, &texture);
 		glGenTextures(1, &texture);
 	}
@@ -461,6 +462,7 @@ void VolumeRenderWidget::setOutputTextures(int width, int height, GLuint texture
 void VolumeRenderWidget::paintGL_standard()
 {
 	setOutputTextures(floor(this->size().width() * _imgSamplingRate),
+
 		floor(this->size().height()*_imgSamplingRate), _outTexId0, GL_TEXTURE0);
 
 	if (this->_loadingFinished && _volumerender.hasData() && !_noUpdate)
@@ -635,6 +637,7 @@ void VolumeRenderWidget::paintGL_distance_dc()
 					// std::cout << "tex0: " << _outTexId0 << ", tex1: " << _outTexId1 << std::endl;
 
 					setOutputTextures(texture_width,
+
 						texture_height, _outTexId1, GL_TEXTURE1);
 
 
@@ -645,6 +648,7 @@ void VolumeRenderWidget::paintGL_distance_dc()
 				// interpolate and combine them
 				{
 					setOutputTextures(texture_width,
+
 						texture_height, _outTexId0, GL_TEXTURE0);
 
 					_volumerender.setInterpolationParametersForDDC(_g_values, cl_float2{ std::get<0>(cursorPos),std::get<1>(cursorPos) }, cl_float2{ std::get<0>(ell1),std::get<1>(ell1) }, cl_float2{ std::get<0>(ell2),std::get<1>(ell2) });
@@ -783,6 +787,7 @@ void VolumeRenderWidget::paintGL_square_dc()
 
 					setOutputTextures(floor(this->size().width() * _imgSamplingRate),
 
+
 						floor(this->size().height()*_imgSamplingRate), _outTexId0, GL_TEXTURE0);
 
 					_volumerender.setCursorPos(0.0, 0.0);
@@ -807,6 +812,7 @@ void VolumeRenderWidget::paintGL_square_dc()
 					double img_width = this->size().width() * _imgSamplingRate;
 					double img_height = this->size().height()*_imgSamplingRate;
 					setOutputTextures(floor(img_width),
+
 						floor(img_height), _outTexId1, GL_TEXTURE1);
 
 					_volumerender.setCursorPos(xPos_nlzd, yPos_nlzd);
@@ -921,8 +927,6 @@ void VolumeRenderWidget::paintGL_ThreeRenderInvocations() {
 
 	std::tuple<float, float> cursorPos;
 
-	float alpha = 10.0f; // offset in pixel to the radius of each circle
-
 	// cursor position or eyetracking position is not normalized in this rendering case! cursor pos is center of ellipse 1 and ellipse 2.
 	if (_useEyetracking) {
 		smoothed_nmlzd_coords(); // updates moving average
@@ -942,11 +946,19 @@ void VolumeRenderWidget::paintGL_ThreeRenderInvocations() {
 		try
 		{
 			if (_useGL) {
+				_volumerender.setCursorPos(std::get<0>(cursorPos), std::get<1>(cursorPos));
 				_volumerender.setResolutionFactors(_g_values); // gaps for the different layers.
-				_volumerender.setRectangleExtends(std::get<0>(circles_radiuses), std::get<1>(circles_radiuses)); // set circle radiuses without offset alpha
-				double dimension_lm = std::get<1>(circles_radiuses) + alpha;
-				double dimension_li = std::get<0>(circles_radiuses) + alpha;
-				_volumerender.setEllipse2(dimension_lm, dimension_li); // set circle radiuses with offset alpha
+				
+				float r1_adjusted_to_sr = std::get<0>(circles_radiuses) * _imgSamplingRate;
+				float r2_adjusted_to_sr = std::get<1>(circles_radiuses) * _imgSamplingRate;
+				
+				_volumerender.setRectangleExtends(r1_adjusted_to_sr, r2_adjusted_to_sr); // set circle radiuses without offset alpha
+
+				float mr = r2_adjusted_to_sr + 2 * _g_values.x;
+				float ir = r1_adjusted_to_sr + 2 * _g_values.y;
+
+				cl_float2 cursorPos_atsr = cl_float2{ static_cast<float>(std::get<0>(cursorPos)), static_cast<float>(std::get<1>(cursorPos)) };
+				_volumerender.setEllipse2(mr, ir); // set circle radiuses with offset alpha
 				{ // Outer Layer Lo
 
 					{ // raycast
@@ -956,12 +968,17 @@ void VolumeRenderWidget::paintGL_ThreeRenderInvocations() {
 							texture_height, _outTexId1, GL_TEXTURE1);
 
 						_volumerender.runRaycast(texture_width / _g_values.x + 1, texture_width / _g_values.x + 1); // run raycast on tex 1
+
+						execution_time += _volumerender.getLastExecTime();
 					}
 
 					{ // interpolation
 						setOutputTextures(texture_width,
 							texture_height, _outTexId0, GL_TEXTURE0);
-						// run interpolation with output to tex 0
+
+						_volumerender.setInterpolationParametersForTRI(_g_values, cursorPos_atsr, cl_float2{ r1_adjusted_to_sr, r2_adjusted_to_sr }, cl_float2{ ir, mr }, 0);
+						_volumerender.runInterpolationForTRI(texture_width, texture_height, _outTexId1, _outTexId0); // run interpolation with output to tex 0
+						execution_time += _volumerender.getLastExecTime();
 					}
 				}
 
@@ -971,15 +988,19 @@ void VolumeRenderWidget::paintGL_ThreeRenderInvocations() {
 						_volumerender.setInvert(1);
 
 						setOutputTextures(texture_width,
-							texture_height, _outTexId1, GL_TEXTURE1);
+							texture_height, _outTexId0, GL_TEXTURE0, false);
 
-						_volumerender.runRaycast(dimension_lm, dimension_lm); // run raycast on tex 1
+						_volumerender.runRaycast(mr, mr); // run raycast on tex 0
+						execution_time += _volumerender.getLastExecTime();
 					}
 
 					{ // interpolation and then blending with outer layer
 						setOutputTextures(texture_width,
-							texture_height, _outTexId0, GL_TEXTURE0);
-						// run interpolation with output to tex 0
+							texture_height, _outTexId1, GL_TEXTURE1, false);
+
+						_volumerender.setInterpolationParametersForTRI(_g_values, cursorPos_atsr, cl_float2{ r1_adjusted_to_sr, r2_adjusted_to_sr }, cl_float2{ ir, mr }, 1);
+						_volumerender.runInterpolationForTRI(texture_width, texture_height, _outTexId1, _outTexId0); // run interpolation with output to tex 0
+						execution_time += _volumerender.getLastExecTime();
 					}
 				}
 
@@ -989,15 +1010,18 @@ void VolumeRenderWidget::paintGL_ThreeRenderInvocations() {
 						_volumerender.setInvert(2);
 
 						setOutputTextures(texture_width,
-							texture_height, _outTexId1, GL_TEXTURE1);
+							texture_height, _outTexId1, GL_TEXTURE1, false);
 
-						_volumerender.runRaycast(dimension_li, dimension_li); // run raycast on tex 1
+						_volumerender.runRaycast(ir, ir); // run raycast on tex 1
+						execution_time += _volumerender.getLastExecTime();
 					}
 
 					{ // interpolation and then blending with middle layer
 						setOutputTextures(texture_width,
-							texture_height, _outTexId0, GL_TEXTURE0);
-						// run interpolation with output to tex 0
+							texture_height, _outTexId0, GL_TEXTURE0, false);
+
+						_volumerender.setInterpolationParametersForTRI(_g_values, cursorPos_atsr, cl_float2{ r1_adjusted_to_sr, r2_adjusted_to_sr }, cl_float2{ ir, mr }, 2);
+						_volumerender.runInterpolationForTRI(texture_width, texture_height, _outTexId1, _outTexId0); // run interpolation with output to tex 0
 					}
 				}
 			}
@@ -1249,6 +1273,7 @@ void VolumeRenderWidget::showSelectOpenCL()
 
                 try {
                     setOutputTextures(floor(width()*_imgSamplingRate),
+
 
                                            floor(height()*_imgSamplingRate), _outTexId0, GL_TEXTURE0);
 					updateView(0, 0);
@@ -1751,6 +1776,9 @@ void VolumeRenderWidget::mouseMoveEvent(QMouseEvent *event)
 		update();
 		break;
 	case RenderingMethod::DISTANCE_DC:
+		update();
+		break;
+	case RenderingMethod::TRI:
 		update();
 		break;
 	default:
