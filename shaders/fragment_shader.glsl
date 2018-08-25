@@ -40,7 +40,7 @@ void renderingMethod2(){ // SQUARE_DC
 	return;
 }
 
-void renderingMethod3(){ // SINUS_RESOLUTION
+void renderingMethod3(){ // TRI
 	fragColor = texture(outTex0, texCoord);
 }
 

@@ -57,9 +57,10 @@ VolumeRenderWidget::VolumeRenderWidget(QWidget *parent)
 	, _showOverlay(true)
 	, _renderingMethod(STANDARD)
 	, _rect_extends({ 350, 350 })
-	, _g_values({4.0f, 2.0f, 1.0f})
-	, _innerEllipse({0.3, 0.2})
-	, _outerEllipse({0.5, 0.4})
+	, _g_values({ 4.0f, 2.0f, 1.0f })
+	, _innerEllipse({ 0.3, 0.2 })
+	, _outerEllipse({ 0.5, 0.4 })
+	, _circle_radiuses({ 100.0f, 100.0f })
 	, _eyetracker(nullptr)
 	, _useEyetracking(false)
 {
@@ -358,8 +359,8 @@ void VolumeRenderWidget::paintGL()
 	case SQUARE_DC:
 		paintGL_square_dc();
 		break;
-	case SINUS_RESOLUTION:
-		paintGL_SinusResolution();
+	case TRI:
+		paintGL_ThreeRenderInvocations();
 		break;
 	default: // case STANDARD:
 		_volumerender.setCursorPos(0.f, 0.f);
@@ -646,8 +647,8 @@ void VolumeRenderWidget::paintGL_distance_dc()
 					setOutputTextures(texture_width,
 						texture_height, _outTexId0, GL_TEXTURE0);
 
-					_volumerender.setInterpolationParameters(_g_values, cl_float2{ std::get<0>(cursorPos),std::get<1>(cursorPos) }, cl_float2{ std::get<0>(ell1),std::get<1>(ell1) }, cl_float2{ std::get<0>(ell2),std::get<1>(ell2) });
-					_volumerender.runInterpolation(texture_width, texture_height, _outTexId1, _outTexId0);
+					_volumerender.setInterpolationParametersForDDC(_g_values, cl_float2{ std::get<0>(cursorPos),std::get<1>(cursorPos) }, cl_float2{ std::get<0>(ell1),std::get<1>(ell1) }, cl_float2{ std::get<0>(ell2),std::get<1>(ell2) });
+					_volumerender.runInterpolationForDDC(texture_width, texture_height, _outTexId1, _outTexId0);
 					// don't need to add last exec time because of the construction of calcFPS()
 				}
 			}
@@ -735,8 +736,6 @@ void VolumeRenderWidget::paintGL_distance_dc()
 	p.end();
 
 	// -- end
-
-
 }
 
 /* The image is created in two render calls. The first one is a low resolution render call, the second is a high resolution
@@ -913,32 +912,98 @@ void VolumeRenderWidget::paintGL_square_dc()
 	}
 }
 
-void VolumeRenderWidget::paintGL_SinusResolution() {
-	setOutputTextures(floor(this->size().width() * _imgSamplingRate),
-		floor(this->size().height()*_imgSamplingRate), _outTexId0, GL_TEXTURE0);
+void VolumeRenderWidget::paintGL_ThreeRenderInvocations() {
+	double texture_width = floor(this->size().width() * _imgSamplingRate);
+	double texture_height = floor(this->size().height() * _imgSamplingRate);
+	double execution_time = 0.0;
+
+	std::tuple<float, float> circles_radiuses = _circle_radiuses; // Circle radiuses for inner circle (first) and outer cirlce (second) in pixel
+
+	std::tuple<float, float> cursorPos;
+
+	float alpha = 10.0f; // offset in pixel to the radius of each circle
+
+	// cursor position or eyetracking position is not normalized in this rendering case! cursor pos is center of ellipse 1 and ellipse 2.
+	if (_useEyetracking) {
+		smoothed_nmlzd_coords(); // updates moving average
+		std::tuple<float, float> nlzd = _moving_average_gaze_data_nmlz;
+		cursorPos = std::tuple<float, float>(std::get<0>(nlzd) * texture_width, std::get<1>(nlzd) * texture_height);
+	}
+	else {
+		cursorPos = std::tuple<float, float>(_lastLocalCursorPos.x() * _imgSamplingRate, _lastLocalCursorPos.y() * _imgSamplingRate);
+	}
+
+
+	// -- begin
 
 	if (this->_loadingFinished && _volumerender.hasData() && !_noUpdate)
 	{
 		// OpenCL raycast
 		try
 		{
-			if (_useGL)
-				_volumerender.runRaycast(floor(this->size().width() * _imgSamplingRate),
-					floor(this->size().height()* _imgSamplingRate), _timestep);
+			if (_useGL) {
+				_volumerender.setResolutionFactors(_g_values); // gaps for the different layers.
+				_volumerender.setRectangleExtends(std::get<0>(circles_radiuses), std::get<1>(circles_radiuses)); // set circle radiuses without offset alpha
+				double dimension_lm = std::get<1>(circles_radiuses) + alpha;
+				double dimension_li = std::get<0>(circles_radiuses) + alpha;
+				_volumerender.setEllipse2(dimension_lm, dimension_li); // set circle radiuses with offset alpha
+				{ // Outer Layer Lo
+
+					{ // raycast
+						_volumerender.setInvert(0);
+
+						setOutputTextures(texture_width,
+							texture_height, _outTexId1, GL_TEXTURE1);
+
+						_volumerender.runRaycast(texture_width / _g_values.x + 1, texture_width / _g_values.x + 1); // run raycast on tex 1
+					}
+
+					{ // interpolation
+						setOutputTextures(texture_width,
+							texture_height, _outTexId0, GL_TEXTURE0);
+						// run interpolation with output to tex 0
+					}
+				}
+
+				{ // Middle Layer Lm
+
+					{ // raycast
+						_volumerender.setInvert(1);
+
+						setOutputTextures(texture_width,
+							texture_height, _outTexId1, GL_TEXTURE1);
+
+						_volumerender.runRaycast(dimension_lm, dimension_lm); // run raycast on tex 1
+					}
+
+					{ // interpolation and then blending with outer layer
+						setOutputTextures(texture_width,
+							texture_height, _outTexId0, GL_TEXTURE0);
+						// run interpolation with output to tex 0
+					}
+				}
+
+				{ // Inner Layer Li
+
+					{ // raycast
+						_volumerender.setInvert(2);
+
+						setOutputTextures(texture_width,
+							texture_height, _outTexId1, GL_TEXTURE1);
+
+						_volumerender.runRaycast(dimension_li, dimension_li); // run raycast on tex 1
+					}
+
+					{ // interpolation and then blending with middle layer
+						setOutputTextures(texture_width,
+							texture_height, _outTexId0, GL_TEXTURE0);
+						// run interpolation with output to tex 0
+					}
+				}
+			}
 			else
 			{
-				std::vector<float> d;
-				_volumerender.runRaycastNoGL(floor(this->size().width() * _imgSamplingRate),
-					floor(this->size().height()* _imgSamplingRate),
-					_timestep, d);
-				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F,
-					floor(this->size().width() * _imgSamplingRate),
-					floor(this->size().height()* _imgSamplingRate),
-					0, GL_RGBA, GL_FLOAT,
-					d.data());
-				glGenerateMipmap(GL_TEXTURE_2D);
-				_volumerender.updateOutputImg(static_cast<size_t>(width()),
-					static_cast<size_t>(height()), _outTexId0);
+				qCritical() << "Distance dependent discarding only available if _useGL == true!\n";
 			}
 		}
 		catch (std::runtime_error e)
@@ -975,7 +1040,7 @@ void VolumeRenderWidget::paintGL_SinusResolution() {
 		_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("cursorPos"), cursorPos);
 		_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("rectExt"), rectExt);
 
-		_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("outTex0"), GL_TEXTURE0);
+
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		_screenQuadVao.release();
 		_quadVbo.release();
@@ -1001,7 +1066,7 @@ void VolumeRenderWidget::paintGL_SinusResolution() {
 	}
 	p.endNativePainting();
 
-	double fps = calcFPS();
+	double fps = calcFPS(execution_time);
 
 	// render overlays
 	if (_showOverlay)
@@ -1010,7 +1075,7 @@ void VolumeRenderWidget::paintGL_SinusResolution() {
 		paintOrientationAxis(p);
 	}
 
-	// recover opengl texture
+	//recover opengl texture
 	p.beginNativePainting();
 	{
 		glActiveTexture(GL_TEXTURE0);
@@ -1018,6 +1083,8 @@ void VolumeRenderWidget::paintGL_SinusResolution() {
 	}
 	p.endNativePainting();
 	p.end();
+
+	// -- end
 }
 
 void VolumeRenderWidget::setShowOverlay(bool showOverlay)

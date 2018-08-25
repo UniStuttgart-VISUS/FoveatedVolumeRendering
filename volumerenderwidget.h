@@ -93,7 +93,7 @@ public:
     QQuaternion getCamRotation() const;
     void setCamRotation(const QQuaternion &rotQuat);
 
-	enum RenderingMethod { STANDARD, DISTANCE_DC, SQUARE_DC, SINUS_RESOLUTION};
+	enum RenderingMethod { STANDARD, DISTANCE_DC, SQUARE_DC, TRI};
 	void setRenderingMethod(int rm);
 
 
@@ -168,7 +168,7 @@ private:
 	void paintGL_standard();
 	void paintGL_distance_dc(); // elliptical discards in multiple rendering calls
 	void paintGL_square_dc(); // square with discard
-	void paintGL_SinusResolution(); // not implemented
+	void paintGL_ThreeRenderInvocations(); // not implemented
 
 	bool check_eyetracker_availability();
 	static void gaze_data_callback(TobiiResearchGazeData *gaze_data, void *user_data);
@@ -197,13 +197,16 @@ private:
 	int _curr_monitor_width;
 	int _curr_monitor_height;
 
-	// distance dc
-	cl_float3 _g_values;
+	// distance dc and partly TRI
+	cl_float3 _g_values; // TRI, first is lowest resolution (highest g), third is normally always 1 (native resolution)
 	std::tuple<float, float> _innerEllipse;
 	std::tuple<float, float> _outerEllipse;
 
 	// square dc
 	std::array<int, 2> _rect_extends;
+
+	// TRI
+	std::tuple<float, float> _circle_radiuses; // Circle radiuses for inner circle (first) and outer cirlce (second) in pixel
 
     // OpenGL
     QOpenGLVertexArrayObject _screenQuadVao;

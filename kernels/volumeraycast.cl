@@ -445,7 +445,7 @@ __kernel void volumeRender(  __read_only image3d_t volData
         case 0: // Standard
                 break;
         case 1: // distance dependent discarding
-				maxSize = max(img_bounds.x, img_bounds.y);
+				maxSize = max(img_bounds.x, img_bounds.y); // glaube ist notwendig, um die richtige aspect ratio weiter unten zu berechnen
 				int index_1d = index_from_2d(globalId, get_global_size(0)); // maps globalId to 1d index
 
                 int g;
@@ -519,7 +519,24 @@ __kernel void volumeRender(  __read_only image3d_t volData
                     }
                 }
                 break;
-        case 3: // sinus resolution
+        case 3: // TRI
+                maxSize = max(img_bounds.x, img_bounds.y); // glaube ist notwendig, um die richtige aspect ratio weiter unten zu berechnen
+                switch(inverts.x){
+                    case 0: // outer layer (lo)
+                        globalId *= round(resolutionfactor.x); // globalId in x- und y-Richtung mit G-Value für outer Layer multiplizieren um die "Gaps" zu schaffen.
+                        break;
+                    case 1: // middle layer (lm)
+                        break;
+                    case 2: // inner layer (li)
+                        break;
+                    default: // should not happen
+                        return;
+                        break;
+                }
+                // discard if out of range
+                if(globalId.x >=img_bounds.x || globalId.y >= img_bounds.y|| globalId.x < 0 || globalId.y < 0)
+                    return;
+
                 break;
         
         default: // Standard
