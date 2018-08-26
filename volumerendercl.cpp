@@ -896,12 +896,12 @@ void VolumeRenderCL::setInterpolationParametersForDDC(cl_float3 g_values, cl_flo
 	_interpolationKernelForDDC.setArg(5, ell2);
 }
 
-void VolumeRenderCL::setInterpolationParametersForTRI(cl_float3 g_values, cl_float2 cursorPos, cl_float2 ell1, cl_float2 ell2, int run)
+void VolumeRenderCL::setInterpolationParametersForTRI(cl_float3 g_values, cl_float2 cursorPos, cl_float2 r1r2, cl_float2 irmr, int run)
 {
 	_interpolationKernelForTRI.setArg(2, g_values);
 	_interpolationKernelForTRI.setArg(3, cursorPos);
-	_interpolationKernelForTRI.setArg(4, ell1);
-	_interpolationKernelForTRI.setArg(5, ell2);
+	_interpolationKernelForTRI.setArg(4, r1r2);
+	_interpolationKernelForTRI.setArg(5, irmr);
 	_interpolationKernelForTRI.setArg(6, run);
 }
 
@@ -913,6 +913,144 @@ void VolumeRenderCL::setInterpolationParametersForTRI(cl_float3 g_values, cl_flo
 double VolumeRenderCL::getLastExecTime()
 {
     return _lastExecTime;
+}
+
+void VolumeRenderCL::runTRIMethod(const size_t texture_width, const size_t texture_height, const int t, cl_float2 cursorPos, cl_float3 go_gm_gi, cl_float2 r2r1, double imgSamplingRate, GLuint texIdLo, GLuint texIdLm, GLuint texIdLi)
+{
+	if (!this->_volLoaded)
+		return;
+	try // opencl scope
+	{
+		float r1_adjusted_to_sr = r2r1.y * imgSamplingRate;
+		float r2_adjusted_to_sr = r2r1.x * imgSamplingRate;
+
+		float mr = r2_adjusted_to_sr + 2 * go_gm_gi.x;
+		float ir = r1_adjusted_to_sr + 2 * go_gm_gi.y;
+
+		const size_t invocations_width_Lo = texture_width / go_gm_gi.x + 1;
+		const size_t invocations_height_Lo = texture_height / go_gm_gi.x + 1;
+
+		const size_t invocations_width_and_height_Lm = 2 * mr / go_gm_gi.y;
+
+		const size_t invocations_width_and_height_Li = 2 * ir;
+
+		// Images
+		cl::ImageGL imgLo;
+		cl::ImageGL imgLm;
+		cl::ImageGL imgLi;
+
+
+		size_t lDim = 8;    // local work group dimension
+		cl::NDRange globalThreads_OuterLayer(invocations_width_Lo + (lDim - invocations_width_Lo % lDim), invocations_height_Lo + (lDim - invocations_height_Lo % lDim));
+		cl::NDRange localThreads_OuterLayer(lDim, lDim);
+
+		cl::NDRange globalThreads_MiddleLayer(invocations_width_and_height_Lm + (lDim - invocations_width_and_height_Lm % lDim), invocations_width_and_height_Lm + (lDim - invocations_width_and_height_Lm % lDim));
+		cl::NDRange localThreads_MiddleLayer(lDim, lDim);
+
+		cl::NDRange globalThreads_InnerLayer(invocations_width_and_height_Li + (lDim - invocations_width_and_height_Li % lDim), invocations_width_and_height_Li + (lDim - invocations_width_and_height_Li % lDim));
+		cl::NDRange localThreads_InnerLayer(lDim, lDim);
+		
+		{	// set Mem Objects and Arguments which are the same for all raycastKernel runs
+			_raycastKernel.setArg(VOLUME, _volumesMem.at(t));
+			_raycastKernel.setArg(BRICKS, _bricksMem.at(t));
+			_raycastKernel.setArg(TFF, _tffMem);
+			_raycastKernel.setArg(TFF_PREFIX, _tffPrefixMem);
+			cl_float3 modelScale = { _modelScale[0], _modelScale[1], _modelScale[2] };
+			_raycastKernel.setArg(MODEL_SCALE, modelScale);
+			
+			_raycastKernel.setArg(CURSOR_POS, cursorPos);
+			_raycastKernel.setArg(RESOLUTIONFACTOR, go_gm_gi);
+			_raycastKernel.setArg(RECTANGLE_EXTS, cl_float2{ r1_adjusted_to_sr , r2_adjusted_to_sr });
+			_raycastKernel.setArg(ELLIPSE_2, cl_float2{mr, ir});
+		
+			{ // images
+				imgLo = cl::ImageGL(_contextCL, CL_MEM_WRITE_ONLY, GL_TEXTURE_2D, 0, texIdLo);
+				imgLm = cl::ImageGL(_contextCL, CL_MEM_WRITE_ONLY, GL_TEXTURE_2D, 0, texIdLm);
+				imgLi = cl::ImageGL(_contextCL, CL_MEM_WRITE_ONLY, GL_TEXTURE_2D, 0, texIdLi);
+			}
+		}
+		
+		{ // raycasts for outer, middle and inner layer on different images
+			{ // Lo
+				_raycastKernel.setArg(OUTPUT, imgLo);
+				_raycastKernel.setArg(INVERT, cl_uint3{ 0, 0, 0 });
+
+				cl::Event ndrEvt;
+
+				std::vector<cl::Memory> memObj;
+				memObj.push_back(imgLo);
+				memObj.push_back(_inputMem);
+				_queueCL.enqueueAcquireGLObjects(&memObj);
+				_queueCL.enqueueNDRangeKernel(
+					_interpolationKernelForDDC, cl::NullRange, globalThreads_OuterLayer, localThreads_OuterLayer, NULL, &ndrEvt);
+				_queueCL.enqueueReleaseGLObjects(&memObj);
+			}
+
+			{ // Lm
+				_raycastKernel.setArg(OUTPUT, imgLm);
+				_raycastKernel.setArg(INVERT, cl_uint3{ 1, 0, 0 });
+
+				cl::Event ndrEvt;
+
+				std::vector<cl::Memory> memObj;
+				memObj.push_back(imgLm);
+				memObj.push_back(_inputMem);
+				_queueCL.enqueueAcquireGLObjects(&memObj);
+				_queueCL.enqueueNDRangeKernel(
+					_interpolationKernelForDDC, cl::NullRange, globalThreads_OuterLayer, localThreads_OuterLayer, NULL, &ndrEvt);
+				_queueCL.enqueueReleaseGLObjects(&memObj);
+			}
+
+			{ // Li
+				_raycastKernel.setArg(OUTPUT, imgLi);
+				_raycastKernel.setArg(INVERT, cl_uint3{ 2, 0, 0 });
+
+				cl::Event ndrEvt;
+
+				std::vector<cl::Memory> memObj;
+				memObj.push_back(imgLi);
+				memObj.push_back(_inputMem);
+				_queueCL.enqueueAcquireGLObjects(&memObj);
+				_queueCL.enqueueNDRangeKernel(
+					_interpolationKernelForDDC, cl::NullRange, globalThreads_OuterLayer, localThreads_OuterLayer, NULL, &ndrEvt);
+				_queueCL.enqueueReleaseGLObjects(&memObj);
+			}
+		}
+
+		_queueCL.finish();    // global sync
+
+		{ // set interpolation parameters for all interpolationKernel runs
+			setInterpolationParametersForTRI(go_gm_gi, cursorPos, cl_float2{ r1_adjusted_to_sr, r2_adjusted_to_sr }, cl_float2{ ir, mr }, 0);
+		}
+
+		{ // interpolation for outer, middle and inner layer on different images
+			runInterpolationForTRI(texture_width, texture_height, _outTexId1, _outTexId0)
+		}
+
+		cl::Event ndrEvt;
+
+		std::vector<cl::Memory> memObj;
+		memObj.push_back(_outputMem);
+		memObj.push_back(_inputMem);
+		_queueCL.enqueueAcquireGLObjects(&memObj);
+		_queueCL.enqueueNDRangeKernel(
+			_interpolationKernelForDDC, cl::NullRange, globalThreads, localThreads, NULL, &ndrEvt);
+		_queueCL.enqueueReleaseGLObjects(&memObj);
+		_queueCL.finish();    // global sync
+
+#ifdef CL_QUEUE_PROFILING_ENABLE
+		cl_ulong start = 0;
+		cl_ulong end = 0;
+		ndrEvt.getProfilingInfo(CL_PROFILING_COMMAND_START, &start);
+		ndrEvt.getProfilingInfo(CL_PROFILING_COMMAND_END, &end);
+		_lastExecTime = static_cast<double>(end - start)*1e-9;
+		//        std::cout << "Kernel time: " << _lastExecTime << std::endl << std::endl;
+#endif
+	}
+	catch (cl::Error err)
+	{
+		logCLerror(err);
+	}
 }
 
 void VolumeRenderCL::runInterpolationForDDC(const size_t width, const size_t height, GLuint inTexId, GLuint outTexId)

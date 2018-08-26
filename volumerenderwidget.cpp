@@ -946,20 +946,75 @@ void VolumeRenderWidget::paintGL_ThreeRenderInvocations() {
 		try
 		{
 			if (_useGL) {
-				_volumerender.setCursorPos(std::get<0>(cursorPos), std::get<1>(cursorPos));
-				_volumerender.setResolutionFactors(_g_values); // gaps for the different layers.
+				// _volumerender.setCursorPos(std::get<0>(cursorPos), std::get<1>(cursorPos));
+				// _volumerender.setResolutionFactors(_g_values); // gaps for the different layers.
 				
-				float r1_adjusted_to_sr = std::get<0>(circles_radiuses) * _imgSamplingRate;
-				float r2_adjusted_to_sr = std::get<1>(circles_radiuses) * _imgSamplingRate;
-				
-				_volumerender.setRectangleExtends(r1_adjusted_to_sr, r2_adjusted_to_sr); // set circle radiuses without offset alpha
+				// _volumerender.setRectangleExtends(r1_adjusted_to_sr, r2_adjusted_to_sr); // set circle radiuses without offset alpha
 
-				float mr = r2_adjusted_to_sr + 2 * _g_values.x;
-				float ir = r1_adjusted_to_sr + 2 * _g_values.y;
+				// _volumerender.setEllipse2(mr, ir); // set circle radiuses with offset alpha
 
-				cl_float2 cursorPos_atsr = cl_float2{ static_cast<float>(std::get<0>(cursorPos)), static_cast<float>(std::get<1>(cursorPos)) };
-				_volumerender.setEllipse2(mr, ir); // set circle radiuses with offset alpha
-				{ // Outer Layer Lo
+				GLuint texLo;
+				GLuint texUnitLo = GL_TEXTURE2;
+
+				GLuint texLm;
+				GLuint texUnitLm = GL_TEXTURE3;
+
+				GLuint texLi;
+				GLuint texUnitLi = GL_TEXTURE4;
+
+				{ // set up textures for use only in runTRIMethod
+					{ // Lo
+						glGenTextures(1, &texLo);
+						glActiveTexture(texUnitLo);
+						glBindTexture(GL_TEXTURE_2D, texLo);
+						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+						glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8,
+							texture_width, texture_height, 0,
+							GL_RGBA, GL_UNSIGNED_BYTE,
+							NULL);
+						glGenerateMipmap(GL_TEXTURE_2D);
+					}
+					
+					{ // Lm
+						glGenTextures(1, &texLm);
+						glActiveTexture(texUnitLm);
+						glBindTexture(GL_TEXTURE_2D, texLm);
+						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+						glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8,
+							texture_width, texture_height, 0,
+							GL_RGBA, GL_UNSIGNED_BYTE,
+							NULL);
+						glGenerateMipmap(GL_TEXTURE_2D);
+					}
+
+					{ // Li
+						glGenTextures(1, &texLi);
+						glActiveTexture(texUnitLi);
+						glBindTexture(GL_TEXTURE_2D, texLi);
+						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+						glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+						glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8,
+							texture_width, texture_height, 0,
+							GL_RGBA, GL_UNSIGNED_BYTE,
+							NULL);
+						glGenerateMipmap(GL_TEXTURE_2D);
+					}
+				}
+
+
+				setOutputTextures(texture_width,
+					texture_height, _outTexId0, GL_TEXTURE0);	// set output texture to tex0 which will have the final image. images used temporarily are created and handled by runTRIMethod()
+				_volumerender.runTRIMethod(texture_width, texture_height, 0, { std::get<0>(cursorPos) , std::get<1>(cursorPos) }, _g_values, { std::get<1>(circles_radiuses),  std::get<0>(circles_radiuses) }, _imgSamplingRate, texLo, texLm, texLi);
+
+				/*{ // Outer Layer Lo
 
 					{ // raycast
 						_volumerender.setInvert(0);
@@ -967,7 +1022,7 @@ void VolumeRenderWidget::paintGL_ThreeRenderInvocations() {
 						setOutputTextures(texture_width,
 							texture_height, _outTexId1, GL_TEXTURE1);
 
-						_volumerender.runRaycast(texture_width / _g_values.x + 1, texture_width / _g_values.x + 1); // run raycast on tex 1
+						_volumerender.runRaycast(texture_width / _g_values.x + 1, texture_height / _g_values.x + 1); // run raycast on tex 1
 
 						execution_time += _volumerender.getLastExecTime();
 					}
@@ -980,31 +1035,31 @@ void VolumeRenderWidget::paintGL_ThreeRenderInvocations() {
 						_volumerender.runInterpolationForTRI(texture_width, texture_height, _outTexId1, _outTexId0); // run interpolation with output to tex 0
 						execution_time += _volumerender.getLastExecTime();
 					}
-				}
+				}*/
 
-				{ // Middle Layer Lm
+				/*{ // Middle Layer Lm
 
 					{ // raycast
 						_volumerender.setInvert(1);
 
 						setOutputTextures(texture_width,
-							texture_height, _outTexId0, GL_TEXTURE0, false);
+							texture_height, _outTexId1, GL_TEXTURE1, true);
 
-						_volumerender.runRaycast(mr, mr); // run raycast on tex 0
+						_volumerender.runRaycast(2 * mr / _g_values.y, 2 * mr / _g_values.y); // run raycast on tex 0
 						execution_time += _volumerender.getLastExecTime();
 					}
 
 					{ // interpolation and then blending with outer layer
 						setOutputTextures(texture_width,
-							texture_height, _outTexId1, GL_TEXTURE1, false);
+							texture_height, _outTexId0, GL_TEXTURE0, true);
 
 						_volumerender.setInterpolationParametersForTRI(_g_values, cursorPos_atsr, cl_float2{ r1_adjusted_to_sr, r2_adjusted_to_sr }, cl_float2{ ir, mr }, 1);
-						_volumerender.runInterpolationForTRI(texture_width, texture_height, _outTexId1, _outTexId0); // run interpolation with output to tex 0
+						_volumerender.runInterpolationForTRI(2 * mr, 2 * mr, _outTexId1, _outTexId0); // run interpolation with output to tex 0
 						execution_time += _volumerender.getLastExecTime();
 					}
-				}
+				}*/
 
-				{ // Inner Layer Li
+				/*{ // Inner Layer Li
 
 					{ // raycast
 						_volumerender.setInvert(2);
@@ -1023,7 +1078,14 @@ void VolumeRenderWidget::paintGL_ThreeRenderInvocations() {
 						_volumerender.setInterpolationParametersForTRI(_g_values, cursorPos_atsr, cl_float2{ r1_adjusted_to_sr, r2_adjusted_to_sr }, cl_float2{ ir, mr }, 2);
 						_volumerender.runInterpolationForTRI(texture_width, texture_height, _outTexId1, _outTexId0); // run interpolation with output to tex 0
 					}
+				}*/
+
+				{ // Delete Textures only used in TRI
+					glDeleteTextures(1, &texLo);
+					glDeleteTextures(1, &texLm);
+					glDeleteTextures(1, &texLi);
 				}
+
 			}
 			else
 			{

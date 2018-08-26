@@ -534,6 +534,8 @@ __kernel void volumeRender(  __read_only image3d_t volData
                         // offset der maus
                         globalId += convert_int2_rtz(cursorPos) - (int2)(ell2.x,ell2.x);
 
+                        globalId -= (int2)(globalId.x % convert_int(round(resolutionfactor.y)), globalId.y % convert_int(round(resolutionfactor.y))); // create always a grid, for interpolation because modulo operation
+
                         // discard falls in ir
                         if(length(convert_float2(globalId) - cursorPos) < ell2.y) return;
 
@@ -543,7 +545,7 @@ __kernel void volumeRender(  __read_only image3d_t volData
                     case 2: // inner layer (li)
                         // offset der maus
                         globalId += convert_int2_rtz(cursorPos) - (int2)(ell2.y,ell2.y);
-
+                        
                         // discard falls außerhalb von ir
                         if(length(convert_float2(globalId) - cursorPos) > ell2.y) return;
                         break;
@@ -1049,47 +1051,51 @@ __kernel void interpolateTexelsFromTRI(   __read_only image2d_t inData  // data 
 		return;
 	}*/
 
+    int g = 0;
+
     switch(run){
         case 0: // outer layer
-
+            g = round(g_values.x);
             // discard falls in r2
             if(length(convert_float2(globalId) - cursorPos) < r1r2.y) return;
-
-            int g = round(g_values.x);
-		    int d = globalId.y % g;
-		    int e = globalId.x % g;
-
-		    float g_square = convert_float(g * g);
-		    int g_minus_e = g - e;
-		    int g_minus_d = g - d;
-		
-		    int2 c_pos = (int2)(globalId.x - e, globalId.y -d);
-		    int2 a_pos = (int2)(globalId.x - e, globalId.y + g_minus_d);
-		    int2 d_pos = (int2)(globalId.x + g_minus_e, globalId.y - d);
-		    int2 b_pos = (int2)(globalId.x + g_minus_e, globalId.y + g_minus_d);
-
-		    float a_koeff = native_divide(convert_float(d * g_minus_e), g_square);
-		    float b_koeff = native_divide(convert_float(d * e), g_square);
-		    float c_koeff = native_divide(convert_float(g_minus_e * g_minus_d), g_square);
-		    float d_koeff = native_divide(convert_float(e * g_minus_d), g_square);
-
-            float4 a_color = read_imagef(inData, nearestIntSmp, a_pos);
-		    float4 b_color = read_imagef(inData, nearestIntSmp, b_pos);
-		    float4 c_color = read_imagef(inData, nearestIntSmp, c_pos);
-		    float4 d_color = read_imagef(inData, nearestIntSmp, d_pos);
-
-		    float4 result_color = a_koeff * a_color + b_koeff * b_color + c_koeff * c_color + d_koeff * d_color;
-
-		    write_imagef(outData, globalId, result_color);
             break;
         case 1: // middle layer
+            globalId += convert_int2_rtz(cursorPos) - (int2)(irmr.y, irmr.y);
+            
+            if(length(convert_float2(globalId) - cursorPos) > irmr.y) return;
+            if(length(convert_float2(globalId) - cursorPos) < irmr.x) return;
+            g = round(g_values.y);
             break;
         case 2: // inner layer
             break;
         default: // should not happen
             break;
     }
+    
+	int d = globalId.y % g;
+	int e = globalId.x % g;
 
+	float g_square = convert_float(g * g);
+	int g_minus_e = g - e;
+	int g_minus_d = g - d;
+		
+	int2 c_pos = (int2)(globalId.x - e, globalId.y -d);
+	int2 a_pos = (int2)(globalId.x - e, globalId.y + g_minus_d);
+	int2 d_pos = (int2)(globalId.x + g_minus_e, globalId.y - d);
+	int2 b_pos = (int2)(globalId.x + g_minus_e, globalId.y + g_minus_d);
+
+	float a_koeff = native_divide(convert_float(d * g_minus_e), g_square);
+	float b_koeff = native_divide(convert_float(d * e), g_square);
+	float c_koeff = native_divide(convert_float(g_minus_e * g_minus_d), g_square);
+	float d_koeff = native_divide(convert_float(e * g_minus_d), g_square);
+
+    float4 a_color = read_imagef(inData, nearestIntSmp, a_pos);
+	float4 b_color = read_imagef(inData, nearestIntSmp, b_pos);
+	float4 c_color = read_imagef(inData, nearestIntSmp, c_pos);
+	float4 d_color = read_imagef(inData, nearestIntSmp, d_pos);
+
+    float4 result_color = a_koeff * a_color + b_koeff * b_color + c_koeff * c_color + d_koeff * d_color;
+    write_imagef(outData, globalId, result_color);
     return;
 }
 
