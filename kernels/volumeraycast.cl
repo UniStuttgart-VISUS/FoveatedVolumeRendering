@@ -411,7 +411,7 @@ __kernel void volumeRender(  __read_only image3d_t volData
                            , __read_only image3d_t volBrickData
                            , __read_only image1d_t tffData     // constant transfer function values
                            , __write_only image2d_t outData
-                           , const float samplingRate
+                           , const float samplingRateC
                            , const float16 viewMat
                            , const uint orthoCam
                            , const uint illumType
@@ -439,6 +439,8 @@ __kernel void volumeRender(  __read_only image3d_t volData
 
     int2 img_bounds = get_image_dim(outData); //(int2)(get_global_size(0), get_global_size(1));
 
+    float samplingRate = samplingRateC;
+
     // check if imageCoord is in valid area according to cursorPos and rectangle (and invert)
     // shift rect that cursor is in its middle
     switch(mode){ // early discard here
@@ -461,6 +463,8 @@ __kernel void volumeRender(  __read_only image3d_t volData
                     index_offset = 0;
                     area_offset = (float2)(0.0,0.0);
                     area_offset_needed = 0;
+
+                    samplingRate *= 0.5f;
                 }else{
                     if(index_1d < inverts.y){
                         // Area B
@@ -468,6 +472,8 @@ __kernel void volumeRender(  __read_only image3d_t volData
                         m = round(ell2.x);
                         index_offset = inverts.x;
                         area_offset = ell2;
+
+                        samplingRate *= 0.75f;
                     }else{
                         if(index_1d < inverts.z){
                             // Area A
