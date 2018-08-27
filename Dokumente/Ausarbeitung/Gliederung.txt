@@ -1,7 +1,7 @@
 Gliederung:
 Abstrakt
 Einleitung - Motivation - Problemstellung / Aufgabenstellung - Zeitplanung
-Grundlagen für Arbeit (Related Work), Sehapparat, Raytracing, Volumenrendering, Eyetracking, GPU Architektur (Warps usw.)
+Grundlagen für Arbeit (Related Work), Sehapparat, Raycasting, Volumenrendering, Eyetracking, GPU Architektur (Warps usw.)
 Entwurf: Projekt, Raytracer, (Auswahl des) Eyetracker, Vorüberlegungen zur Umsetzung / Integration, Grundidee zur Umsetzung
 Entwurfsziele an die Umsetzung
 Implementation: Umsetzung, Probleme, Lösungen

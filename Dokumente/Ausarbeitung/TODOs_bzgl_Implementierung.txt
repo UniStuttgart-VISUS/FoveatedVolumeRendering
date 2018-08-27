@@ -22,3 +22,5 @@ Zuerst versuchen, statt Punkte bei der interpolation zu verwerfen, den weiter äu
 
 Anstelle der GlobalId's aufwenig umzurechnen, einfach drei durchläufe machen und jeweils die id's lediglich zu multiplizieren. Anschließend die Bilder einzeln interpolieren und dann zusammensetzen.
 Bei diesem Ansatz überprüfen, ob jeder der Durchläufe an sich mindestens eine gewisse zeit braucht, da der schnellste Raytrace-Prozess trotzdem nicht soo schnell ist, wie gedacht.
+
+Profiling: AMD CodeXL
