@@ -915,7 +915,7 @@ double VolumeRenderCL::getLastExecTime()
     return _lastExecTime;
 }
 
-void VolumeRenderCL::runTRIMethod(const size_t texture_width, const size_t texture_height, const int t, cl_float2 cursorPos, cl_float3 go_gm_gi, cl_float2 r2r1, double imgSamplingRate, GLuint texIdLo, GLuint texIdLm, GLuint texIdLi)
+void VolumeRenderCL::runTRIMethod(const size_t texture_width, const size_t texture_height, const int t, cl_float2 cursorPos, cl_float3 go_gm_gi, cl_float2 r2r1, double imgSamplingRate, GLuint texIdLo, GLuint texIdLm, GLuint texIdLi, GLuint texIdIpLo, GLuint texIdIpLm)
 {
 	if (!this->_volLoaded)
 		return;
@@ -934,21 +934,18 @@ void VolumeRenderCL::runTRIMethod(const size_t texture_width, const size_t textu
 
 		const size_t invocations_width_and_height_Li = 2 * ir;
 
-		// Images
-		cl::ImageGL imgLo;
+		// Images raycast
+		cl::ImageGL imgLo; 
 		cl::ImageGL imgLm;
 		cl::ImageGL imgLi;
 
+		cl::Event ndrEvtr0;
+		cl::Event ndrEvtr1;
+		cl::Event ndrEvtr2;
+		cl::Event ndrEvti0;
+		cl::Event ndrEvti1;
 
 		size_t lDim = 8;    // local work group dimension
-		cl::NDRange globalThreads_OuterLayer(invocations_width_Lo + (lDim - invocations_width_Lo % lDim), invocations_height_Lo + (lDim - invocations_height_Lo % lDim));
-		cl::NDRange localThreads_OuterLayer(lDim, lDim);
-
-		cl::NDRange globalThreads_MiddleLayer(invocations_width_and_height_Lm + (lDim - invocations_width_and_height_Lm % lDim), invocations_width_and_height_Lm + (lDim - invocations_width_and_height_Lm % lDim));
-		cl::NDRange localThreads_MiddleLayer(lDim, lDim);
-
-		cl::NDRange globalThreads_InnerLayer(invocations_width_and_height_Li + (lDim - invocations_width_and_height_Li % lDim), invocations_width_and_height_Li + (lDim - invocations_width_and_height_Li % lDim));
-		cl::NDRange localThreads_InnerLayer(lDim, lDim);
 		
 		{	// set Mem Objects and Arguments which are the same for all raycastKernel runs
 			_raycastKernel.setArg(VOLUME, _volumesMem.at(t));
@@ -972,77 +969,133 @@ void VolumeRenderCL::runTRIMethod(const size_t texture_width, const size_t textu
 		
 		{ // raycasts for outer, middle and inner layer on different images
 			{ // Lo
+				cl::NDRange globalThreads_OuterLayer(invocations_width_Lo + (lDim - invocations_width_Lo % lDim), invocations_height_Lo + (lDim - invocations_height_Lo % lDim));
+				cl::NDRange localThreads_OuterLayer(lDim, lDim);
+
 				_raycastKernel.setArg(OUTPUT, imgLo);
 				_raycastKernel.setArg(INVERT, cl_uint3{ 0, 0, 0 });
-
-				cl::Event ndrEvt;
 
 				std::vector<cl::Memory> memObj;
 				memObj.push_back(imgLo);
 				memObj.push_back(_inputMem);
 				_queueCL.enqueueAcquireGLObjects(&memObj);
 				_queueCL.enqueueNDRangeKernel(
-					_interpolationKernelForDDC, cl::NullRange, globalThreads_OuterLayer, localThreads_OuterLayer, NULL, &ndrEvt);
+					_interpolationKernelForDDC, cl::NullRange, globalThreads_OuterLayer, localThreads_OuterLayer, NULL, &ndrEvtr0);
 				_queueCL.enqueueReleaseGLObjects(&memObj);
 			}
 
 			{ // Lm
+				cl::NDRange globalThreads_MiddleLayer(invocations_width_and_height_Lm + (lDim - invocations_width_and_height_Lm % lDim), invocations_width_and_height_Lm + (lDim - invocations_width_and_height_Lm % lDim));
+				cl::NDRange localThreads_MiddleLayer(lDim, lDim);
+
 				_raycastKernel.setArg(OUTPUT, imgLm);
 				_raycastKernel.setArg(INVERT, cl_uint3{ 1, 0, 0 });
-
-				cl::Event ndrEvt;
 
 				std::vector<cl::Memory> memObj;
 				memObj.push_back(imgLm);
 				memObj.push_back(_inputMem);
 				_queueCL.enqueueAcquireGLObjects(&memObj);
 				_queueCL.enqueueNDRangeKernel(
-					_interpolationKernelForDDC, cl::NullRange, globalThreads_OuterLayer, localThreads_OuterLayer, NULL, &ndrEvt);
+					_interpolationKernelForDDC, cl::NullRange, globalThreads_MiddleLayer, localThreads_MiddleLayer, NULL, &ndrEvtr1);
 				_queueCL.enqueueReleaseGLObjects(&memObj);
 			}
 
 			{ // Li
+				cl::NDRange globalThreads_InnerLayer(invocations_width_and_height_Li + (lDim - invocations_width_and_height_Li % lDim), invocations_width_and_height_Li + (lDim - invocations_width_and_height_Li % lDim));
+				cl::NDRange localThreads_InnerLayer(lDim, lDim);
+
 				_raycastKernel.setArg(OUTPUT, imgLi);
 				_raycastKernel.setArg(INVERT, cl_uint3{ 2, 0, 0 });
-
-				cl::Event ndrEvt;
 
 				std::vector<cl::Memory> memObj;
 				memObj.push_back(imgLi);
 				memObj.push_back(_inputMem);
 				_queueCL.enqueueAcquireGLObjects(&memObj);
 				_queueCL.enqueueNDRangeKernel(
-					_interpolationKernelForDDC, cl::NullRange, globalThreads_OuterLayer, localThreads_OuterLayer, NULL, &ndrEvt);
+					_interpolationKernelForDDC, cl::NullRange, globalThreads_InnerLayer, localThreads_InnerLayer, NULL, &ndrEvtr2);
 				_queueCL.enqueueReleaseGLObjects(&memObj);
 			}
 		}
 
-		_queueCL.finish();    // global sync
+		_queueCL.finish();    // global sync after raycasts
+
+		// Images interpolation
+		cl::ImageGL imgIpLo;
+		cl::ImageGL imgIpLm;
 
 		{ // set interpolation parameters for all interpolationKernel runs
-			setInterpolationParametersForTRI(go_gm_gi, cursorPos, cl_float2{ r1_adjusted_to_sr, r2_adjusted_to_sr }, cl_float2{ ir, mr }, 0);
+			_interpolationKernelForTRI.setArg(2, go_gm_gi);
+			_interpolationKernelForTRI.setArg(3, cursorPos);
+			_interpolationKernelForTRI.setArg(4, cl_float2{ r1_adjusted_to_sr, r2_adjusted_to_sr });
+			_interpolationKernelForTRI.setArg(5, cl_float2{ ir, mr });
 		}
 
 		{ // interpolation for outer, middle and inner layer on different images
-			runInterpolationForTRI(texture_width, texture_height, _outTexId1, _outTexId0)
+			{ // Lo
+				_interpolationKernelForTRI.setArg(6, 0);
+
+				cl::NDRange globalThreads_Ip_Lo(texture_width + (lDim - texture_width % lDim), texture_height + (lDim - texture_height % lDim));
+				cl::NDRange localThreads_Ip_Lo(lDim, lDim);
+
+				{ // set Mem Lo
+					_inputMem = cl::ImageGL(_contextCL, CL_MEM_READ_ONLY, GL_TEXTURE_2D, 0, texIdLo);
+					imgIpLo = cl::ImageGL(_contextCL, CL_MEM_WRITE_ONLY, GL_TEXTURE_2D, 0, texIdIpLo);
+
+					_interpolationKernelForTRI.setArg(0, _inputMem); // in Data
+					_interpolationKernelForTRI.setArg(1, imgIpLo);	// out Data
+				}
+
+				std::vector<cl::Memory> memObj;
+				memObj.push_back(imgIpLo);
+				memObj.push_back(_inputMem);
+				_queueCL.enqueueAcquireGLObjects(&memObj);
+				_queueCL.enqueueNDRangeKernel(
+					_interpolationKernelForTRI, cl::NullRange, globalThreads_Ip_Lo, localThreads_Ip_Lo, NULL, &ndrEvti0);
+				_queueCL.enqueueReleaseGLObjects(&memObj);
+			}
+
+			{ // Lm
+				_interpolationKernelForTRI.setArg(6, 1);
+
+				const size_t invocations_ip_width_and_height_lm = 2 * mr;
+
+				cl::NDRange globalThreads_Ip_Lm(invocations_ip_width_and_height_lm + (lDim - invocations_ip_width_and_height_lm % lDim), invocations_ip_width_and_height_lm + (lDim - invocations_ip_width_and_height_lm % lDim));
+				cl::NDRange localThreads_Ip_Lm(lDim, lDim);
+
+				{ // set Mem Lm
+					_inputMem = cl::ImageGL(_contextCL, CL_MEM_READ_ONLY, GL_TEXTURE_2D, 0, texIdLm);
+					imgIpLm = cl::ImageGL(_contextCL, CL_MEM_WRITE_ONLY, GL_TEXTURE_2D, 0, texIdIpLm);
+
+					_interpolationKernelForTRI.setArg(0, _inputMem); // in Data
+					_interpolationKernelForTRI.setArg(1, imgIpLm);	// out Data
+				}
+
+				std::vector<cl::Memory> memObj;
+				memObj.push_back(imgIpLm);
+				memObj.push_back(_inputMem);
+				_queueCL.enqueueAcquireGLObjects(&memObj);
+				_queueCL.enqueueNDRangeKernel(
+					_interpolationKernelForTRI, cl::NullRange, globalThreads_Ip_Lm, localThreads_Ip_Lm, NULL, &ndrEvti1);
+				_queueCL.enqueueReleaseGLObjects(&memObj);
+			}
+			
 		}
 
-		cl::Event ndrEvt;
+		_queueCL.finish();    // global sync after interpolations
 
-		std::vector<cl::Memory> memObj;
-		memObj.push_back(_outputMem);
-		memObj.push_back(_inputMem);
-		_queueCL.enqueueAcquireGLObjects(&memObj);
-		_queueCL.enqueueNDRangeKernel(
-			_interpolationKernelForDDC, cl::NullRange, globalThreads, localThreads, NULL, &ndrEvt);
-		_queueCL.enqueueReleaseGLObjects(&memObj);
-		_queueCL.finish();    // global sync
+		/*
+		Now there are three images, imgIpLo, imgIpLm and ImgLi that have to be blended together.
+		*/
+
+		{
+			// trying in fragmentshader for now
+		}
 
 #ifdef CL_QUEUE_PROFILING_ENABLE
 		cl_ulong start = 0;
 		cl_ulong end = 0;
-		ndrEvt.getProfilingInfo(CL_PROFILING_COMMAND_START, &start);
-		ndrEvt.getProfilingInfo(CL_PROFILING_COMMAND_END, &end);
+		ndrEvtr0.getProfilingInfo(CL_PROFILING_COMMAND_START, &start);
+		ndrEvtr0.getProfilingInfo(CL_PROFILING_COMMAND_END, &end);
 		_lastExecTime = static_cast<double>(end - start)*1e-9;
 		//        std::cout << "Kernel time: " << _lastExecTime << std::endl << std::endl;
 #endif

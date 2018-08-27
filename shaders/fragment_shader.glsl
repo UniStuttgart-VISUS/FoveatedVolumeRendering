@@ -3,6 +3,9 @@ in highp vec2 texCoord;
 out highp vec4 fragColor;
 layout(binding = 0) uniform highp sampler2D outTex0;
 layout(binding = 1) uniform highp sampler2D outTex1;
+layout(binding = 5) uniform highp sampler2D texLo;
+layout(binding = 6) uniform highp sampler2D texLm;
+layout(binding = 4) uniform highp sampler2D texLi;
 uniform vec2 cursorPos;
 uniform vec2 rectExt; // also used as vec2(1.0f) / vec2(width,height) when using rm1
 uniform vec2 tex0_size;
@@ -41,7 +44,7 @@ void renderingMethod2(){ // SQUARE_DC
 }
 
 void renderingMethod3(){ // TRI
-	fragColor = texture(outTex0, texCoord);
+	fragColor = texture(texLo, texCoord);
 }
 
 void main() {

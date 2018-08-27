@@ -264,7 +264,7 @@ public:
 	*  Runs the TRI Method which create three images and interpolates all of them to the native display resolution.
 	*  Then it blends those three images together to create a smooth full resolution image
 	*/
-	void runTRIMethod(const size_t texture_width, const size_t texture_height, const int t, cl_float2 cursorPos, cl_float3 go_gm_gi, cl_float2 r2r1, double imgSamplingRate, GLuint texIdLo, GLuint texIdLm, GLuint texIdLi);
+	void runTRIMethod(const size_t texture_width, const size_t texture_height, const int t, cl_float2 cursorPos, cl_float3 go_gm_gi, cl_float2 r2r1, double imgSamplingRate, GLuint texIdLo, GLuint texIdLm, GLuint texIdLi, GLuint texIdIpLo, GLuint texIdIpLm);
 
 	/**
 	*  Run the kernel to interpolate the values from distance_dc
