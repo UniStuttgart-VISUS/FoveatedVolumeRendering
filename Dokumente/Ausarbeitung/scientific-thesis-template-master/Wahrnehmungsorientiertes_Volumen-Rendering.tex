@@ -121,29 +121,29 @@ enddate={12.\ Oktober 2018}  % English: January 5, 2014; ISO: 2014-01-05
 % \addtocontents{toc}{\protect\newpage}
 % an der passenden Stelle im Fließtext erzwungen werden.
 
-\listoffigures
-\listoftables
+%\listoffigures
+%\listoftables
 
 %Wird nur bei Verwendung von der lstlisting-Umgebung mit dem "caption"-Parameter benoetigt
 %\lstlistoflistings
 %ansonsten:
-\ifdeutsch
-  \listof{Listing}{Verzeichnis der Listings}
-\else
-  \listof{Listing}{List of Listings}
-\fi
+%\ifdeutsch
+%  \listof{Listing}{Verzeichnis der Listings}
+%\else
+%  \listof{Listing}{List of Listings}
+%\fi
 
 %mittels \newfloat wurde die Algorithmus-Gleitumgebung definiert.
 %Mit folgendem Befehl werden alle floats dieses Typs ausgegeben
-\ifdeutsch
-  \listof{Algorithmus}{Verzeichnis der Algorithmen}
-\else
-  \listof{Algorithmus}{List of Algorithms}
-\fi
+%\ifdeutsch
+%  \listof{Algorithmus}{Verzeichnis der Algorithmen}
+%\else
+%  \listof{Algorithmus}{List of Algorithms}
+%\fi
 %\listofalgorithms %Ist nur für Algorithmen, die mittels \begin{algorithm} umschlossen werden, nötig
 
 % Abkürzungsverzeichnis
-\printnoidxglossaries
+%\printnoidxglossaries
 
 \iftex4ht
 \else
@@ -207,41 +207,49 @@ enddate={12.\ Oktober 2018}  % English: January 5, 2014; ISO: 2014-01-05
 % Einleitung
 \input{chapters/introduction.tex}
 
-Bei \LaTeX\ werden Absätze durch freie Zeilen angegeben.
-Da die Arbeit über ein Versionskontrollsystem versioniert wird, ist es sinnvoll, pro \emph{Satz} eine neue Zeile im \texttt{.tex}-Dokument anzufangen.
-So kann einfacher ein Vergleich von Versionsständen vorgenommen werden.
+%Bei \LaTeX\ werden Absätze durch freie Zeilen angegeben.
+%Da die Arbeit über ein Versionskontrollsystem versioniert wird, ist es sinnvoll, pro \emph{Satz} eine neue Zeile im \texttt{.tex}-Dokument anzufangen.
+%So kann einfacher ein Vergleich von Versionsständen vorgenommen werden.
 
-Die Arbeit ist in folgender Weise gegliedert:
-In \cref{chap:k2} werden die Grundlagen dieser Arbeit beschrieben.
-Schließlich fasst \cref{chap:zusfas} die Ergebnisse der Arbeit zusammen und stellt Anknüpfungspunkte vor.
+% Die Arbeit ist in folgender Weise gegliedert:
+% In \cref{chap:k2} werden die Grundlagen dieser Arbeit beschrieben.
+% Schließlich fasst \cref{chap:zusfas} die Ergebnisse der Arbeit zusammen und stellt Anknüpfungspunkte vor.
+
+\todo{Gliederung der Arbeit kurz beschreiben.}
 
 % Grundlagen
 \input{chapters/basics.tex}
 
-Hier wird der Hauptteil stehen.
-Falls mehrere Kapitel gewünscht, entweder mehrmals \texttt{\textbackslash{}chapter} benutzen oder pro Kapitel eine eigene Datei anlegen und \texttt{ausarbeitung.tex} anpassen.
+%Hier wird der Hauptteil stehen.
+%Falls mehrere Kapitel gewünscht, entweder mehrmals \texttt{\textbackslash{}chapter} benutzen oder pro Kapitel eine eigene Datei anlegen und \texttt{ausarbeitung.tex} anpassen.
 
-LaTeX-Hinweise stehen in \cref{chap:latextipps}.
+%LaTeX-Hinweise stehen in \cref{chap:latextipps}.
 
 %noch etwas Fülltext
-\blinddocument
+%\blinddocument
 
+% Entwurf
+\input{chapters/design.tex}
 
-\chapter{Zusammenfassung und Ausblick}\label{chap:zusfas}
-Hier bitte einen kurzen Durchgang durch die Arbeit.
+% Implementation
+\input{chapters/implementation.tex}
 
-\section*{Ausblick}
-...und anschließend einen Ausblick
+% Ergebnisse
+\input{chapters/results.tex}
+
+% Zusammenfassung und Ausblick
+\input{chapters/summary.tex}
+
 
 \printbibliography
 
-Alle URLs wurden zuletzt am 17.\,03.\,2018 geprüft.
+%Alle URLs wurden zuletzt am 17.\,03.\,2018 geprüft.
 
 %\renewcommand{\appendixtocname}{Anhang}
 %\renewcommand{\appendixname}{Anhang}
 %\renewcommand{\appendixpagename}{Anhang}
 \appendix
-\input{latexhints-german}
+%\input{latexhints-german}
 
 \pagestyle{empty}
 \renewcommand*{\chapterpagestyle}{empty}
