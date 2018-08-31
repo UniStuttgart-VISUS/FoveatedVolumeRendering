@@ -77,7 +77,6 @@ Aus den Eyetracking und Volumendaten bestimmen sie mit Hilfe mehrerer Clustering
 Entsprechend dieser Ergebnisse wurden die Render Parameter angepasst, um die für den Nutzer am interessantesten Objekte hervorzuheben und anzuzeigen.
 Aidong Lu et. Al. kamen zu dem Schluss, dass die präsentierte Methode den Aufwand für den Nutzer, die Render Parameter anzupassen, signifikant reduzieren kann.
 Trotzdem kann ein solcher regelbasierter Ansatz nicht mit einer manuellen Einstellung der Render-Parameter mithalten.
-
 \todo{Related Work nochmal anschauen. Zum Bsp. ob aus der richtigen Perspektive geschrieben wurde.}
 
 \section{Sehapparat}\label{sec::eye}
@@ -85,14 +84,12 @@ Das Auge ist der visuelle Sensor des Menschen und ermöglicht ihm das Sehen.
 Wahrnehmungsorientiertes Rendering nutzt gezielt Eigenschaften der visuellen Wahrnehmung des Menschen aus.
 Dafür ist es notwendig, ein gutes Verständnis des menschlichen visuellen Wahrnehmungsapparates zu besitzen.
 In diesem Abschnitt stelle ich einige Eigenschaften des visuellen Wahrnehmungsapparates vor, wie sie in \cite{doi:10.1111/cgf.13150} vorgeführt werden.
-
 \begin{figure}
 	\centering
 	\includegraphics[width=0.5\textwidth]{../../Grafiken/HVS-model_from-star-report.png}
 	\caption{Modell des visuellen Wahrnehmungsapparates des Menschen aus \cite{doi:10.1111/cfg.13150}}
 	\label{fig::eye01}
 \end{figure}
-
 Abbildung \ref{fig::eye01} ist ein Modell des visuellen Wahrnehmungsapparates des Menschen.
 Das Modell unterteilt den Sehapparat des Menschen in Optik, Sensorik, Motorik, Verarbeitung, Speicherung und Aufmerksamkeit.
 Licht trifft auf die Augen und wird durch die Optik auf die Retina, die Sensorik, weitergeleitet.
@@ -128,14 +125,12 @@ Der Bereich von circa 5,2\textdegree{} bis 9\textdegree{} wird als Parafovea bez
 Der Bereich zwischen circa 9\textdegree{} bis 17\textdegree{} heißt Perifovea.
 Fovea, Parafovea und Perifovea sind für die zentrale Sicht verantwortlich.
 Alles außerhalb ist die periphere Sicht.
-
 \begin{figure}
 	\centering
 	\includegraphics[width=0.5\textwidth]{../../Grafiken/Retinal-photoreceptor-distr_from-star-report.PNG}
 	\caption{Verteilung der Photorezeptoren auf der Retina \cite{doi:10.1111/cfg.13150}}
 	\label{fig::eye02}
 \end{figure}
-
 Abbildung \ref{fig::eye02} zeigt die Dichteverteilung der Photorezeptoren auf der Retina.
 Die höchste Dichte der Stäbchen liegt bei circa 15\textdegree{} bis 20\textdegree{} um die Fovea herum.
 Ihre Anzahl verringert sich nach außen hin circa linear.
@@ -184,22 +179,18 @@ Die visuelle Auflösung reduziert sich circa linear für die ersten 20-30\textde
 Jedes lineare Modell für das visuelle Wahrnehmungssystem des Menschen ist aber immer nur eine Annäherung.
 Farben haben einen großen Einfluss auf die Wahrnehmung von Kontraste.
 Die Bewegungserkennung ist sowohl in der Fovea als auch im peripheren Bereich ähnlich oder genauso gut.
-
 \todo{Grundlagen zum menschlichen Sehapparat überarbeiten: Teilweise sind Sätze zusammenhangslos aneinandergereiht. Hier eine bessere Verknüpfung finden.}
 
 \section{Volumenrendering und Transferfunktion}\label{sec::voltff}
 Es ist nicht trivial, 3D Volumendaten auf einem 2D Bildschirm informativ zu präsentieren.
 In einem Volumen gibt es möglicherweise mehrere für den Betrachter interessante Objekte, welche sich durchaus gegenseitig überdecken können.
 Daher stellt sich die Frage, wie die Volumendaten auf dem Bildschirm projiziert werden und dabei für den Betrachter auch Informationen an verschiedenen Positionen innerhalb des Volumen sichtbar gemacht werden können.
-Es gibt verschiedene Ansätze um diese Projektion durchzuführen.
-Hier wird aber nur der Ansatz des Raycastings in Verbindung mit einer Transferfunktion behandelt.
+Raycasting ermöglicht in Verbindung mit einer Transferfunktion, ein Volumen auf eine 2D Ebene zu projizieren und dabei einzelne Bereiche des Volumens farbig hervorzuheben oder transparent erscheinen zu lassen.
 
 \subsection{Raycasting}\label{sec::rc}
 Raycasting ist ein Verfahren um Volumendaten abzutasten und auf eine 2D Rastergrafik zu projizieren.
 Wie beim Raytracing werden beim Raycasting auch Sichtstrahlen verfolgt.
 Die Sichtstrahlen werden dabei ausgehend von einer virtuellen Kamera im Raum verfolgt.
-
-
 \begin{figure}[]
 	\centering
 	\begin{minipage}[b]{0.49\textwidth}
@@ -216,9 +207,7 @@ Die Sichtstrahlen werden dabei ausgehend von einer virtuellen Kamera im Raum ver
 		\label{fig::rc02}
 	\end{minipage}
 \end{figure}
-
-
-Die virtuelle Kamera, sieh Abbildung \ref{fig::rc01}, ist im Raum an Position \texttt{e} positioniert, dies ist auch das Projektionszentrum, falls es keine orthogonale Projektion ist.
+Die virtuelle Kamera, siehe Abbildung \ref{fig::rc01}, ist im Raum an Position \texttt{e} positioniert, dies ist auch das Projektionszentrum, falls es keine orthogonale Projektion ist.
 Die Position \texttt{e} entspricht relativ der Position des Betrachters vor dem Bildschirm.
 Mit \texttt{u}, \texttt{v} und \texttt{w} wird die Ausrichtung der Kamera im Raum eindeutig bestimmt.
 In einer Entfernung \texttt{d} von \texttt{e} aus in Richtung \texttt{-w} ist die Bildebene \ref{fig::rc02} Positioniert.
@@ -226,24 +215,33 @@ Die Größe der Bildebene wird durch \texttt{l}, \texttt{r}, \texttt{b} und \tex
 Abhängig von der Größe des Bildschirms oder der Größe der gewünschten Rastergrafik, wird die Bildebene virtuell in die gewünschte Anzahl an Pixel in die Breite und Höhe unterteilt.
 Jeder dieser Teile entspricht nun einem Pixel der Rastergrafik.
 Nun kann für jeden Pixel ein Strahl, ausgehend von \texttt{e}, in Richtung des entsprechenden Punktes auf der Bildebene, ausgesendet und verfolgt werden.
-
 \begin{figure}
 	\centering
 	\includegraphics[width=0.5\textwidth]{../../Grafiken/Raytracing.png}
 	\caption{Illustration der Projektion von Objekten auf die Bildebene mit Hilfe von Raytracing. \cite{Dr.MichaelKrone2016/2017}}
 	\label{fig::rc03}
 \end{figure}
-
 Trifft ein Strahl Objekte in der Szene, wird dadurch ein Farbwert ermittelt, den der entsprechende Pixel annehmen kann und und die Szene dadurch auf den Bildschirm projiziert wird.
 Siehe auch Abbildung \ref{fig::rc03}.
-
 \todo{Grundlagen zu Raycasting hier. Vektoren als richtige Vektorensymbole darstellen (mit Pfeil oben drauf).}
 
 \subsection{Volumenrendering}
-\todo{Anwendung von Raycasting zum Volumenrendering.}
+Ein Volumen kann mit Hilfe von Raycasting abgetastet und auf den Bildschirm projiziert werden.
+Hier wird wie beschrieben, für jeden Pixel ein Strahl in die Szene gesendet.
+Anstelle von verschiedenen Objekten gibt es nun ein Volumen welches aus vielen kleinen Voxeln besteht.
+Das Volumen ist ein dreidimensionales Bild, wobei statt 2D Pixel es aus 3D Voxel besteht.
+Ein Voxel ist eine Box in dem Volumen, mit einer Position, einer Ausdehnung in drei Dimensionen und einer Dichte.
+Wird ein Strahl in das Volumen gesendet, so wird dieser in Intervallen abgetastet.
+Für jeden Abtastpunkt kann mit Hilfe einer Transferfunktion ein Farbwert ermittelt werden, welche zusammen einen Farbwert für den Pixel ergeben.
+\todo{Anwendung von Raycasting zum Volumenrendering. Illustration von Rayasting und Volumenrendering mit mehreren Raysamples einfügen.}
 
 \subsection{Transferfunktion}
-\todo{Funktion der Transferfrunktion im Volumenrendering erläutern.}
+Die Transferfunktion ist ein mächtiges Werkzeug für die Visualisierung von Volumendaten.
+Mit Hilfe einer Transferfunktion können bestimmte Bereiche des Volumen verschieden stark ausgeblendet, oder auch farbig dargestellt werden.
+Die Transferfunktion bestimmt für einen Voxel, abhängig von seiner Dichte, einen Farb- und Opazitätswert.
+Dadurch können zum Beispiel Strukturen innerhalb des Volumens mit einer hohen Dichte farbig und kräftig hervorgehoben werden.
+Strukturen mit einer geringeren Dichte können transparent und weniger farblich dargestellt werden.
+\todo{Funktion der Transferfrunktion im Volumenrendering erläutern. Unter Umständen ein Beispiel Bild mit einer Anwendung der Transferfunktion verwenden.}
 
 \section{Eyetracking}\label{sec::eyetr}
 \todo{Grundlagen zum Eyetracking hier.}
