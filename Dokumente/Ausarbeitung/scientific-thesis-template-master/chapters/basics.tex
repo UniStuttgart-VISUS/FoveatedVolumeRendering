@@ -90,10 +90,10 @@ In diesem Abschnitt stelle ich einige Eigenschaften des visuellen Wahrnehmungsap
 	\centering
 	\includegraphics[width=0.5\textwidth]{../../Grafiken/HVS-model_from-star-report.png}
 	\caption{Modell des visuellen Wahrnehmungsapparates des Menschen aus \cite{doi:10.1111/cfg.13150}}
-	\label{fig:eye01}
+	\label{fig::eye01}
 \end{figure}
 
-Abbildung \ref{fig:eye01} ist ein Modell des visuellen Wahrnehmungsapparates des Menschen.
+Abbildung \ref{fig::eye01} ist ein Modell des visuellen Wahrnehmungsapparates des Menschen.
 Das Modell unterteilt den Sehapparat des Menschen in Optik, Sensorik, Motorik, Verarbeitung, Speicherung und Aufmerksamkeit.
 Licht trifft auf die Augen und wird durch die Optik auf die Retina, die Sensorik, weitergeleitet.
 Hier wird der visuelle Input abgetastet und gefiltert.
@@ -133,10 +133,10 @@ Alles außerhalb ist die periphere Sicht.
 	\centering
 	\includegraphics[width=0.5\textwidth]{../../Grafiken/Retinal-photoreceptor-distr_from-star-report.PNG}
 	\caption{Verteilung der Photorezeptoren auf der Retina \cite{doi:10.1111/cfg.13150}}
-	\label{fig:eye02}
+	\label{fig::eye02}
 \end{figure}
 
-Abbildung \ref{fig:eye02} zeigt die Dichteverteilung der Photorezeptoren auf der Retina.
+Abbildung \ref{fig::eye02} zeigt die Dichteverteilung der Photorezeptoren auf der Retina.
 Die höchste Dichte der Stäbchen liegt bei circa 15\textdegree{} bis 20\textdegree{} um die Fovea herum.
 Ihre Anzahl verringert sich nach außen hin circa linear.
 Zapfen und Stäbchen sind sehr unterschiedlich auf der Reitna Verteilt.
@@ -195,7 +195,49 @@ Es gibt verschiedene Ansätze um diese Projektion durchzuführen.
 Hier wird aber nur der Ansatz des Raycastings in Verbindung mit einer Transferfunktion behandelt.
 
 \subsection{Raycasting}\label{sec::rc}
-\todo{Grundlagen zu Raycasting hier.}
+Raycasting ist ein Verfahren um Volumendaten abzutasten und auf eine 2D Rastergrafik zu projizieren.
+Wie beim Raytracing werden beim Raycasting auch Sichtstrahlen verfolgt.
+Die Sichtstrahlen werden dabei ausgehend von einer virtuellen Kamera im Raum verfolgt.
+
+
+\begin{figure}[]
+	\centering
+	\begin{minipage}[b]{0.49\textwidth}
+		\centering
+		\includegraphics[width=0.5\textwidth]{../../Grafiken/Virtuelle-Kamera.PNG}
+		\caption{Illustration einer virtuellen Kamera im Raum \cite{Dr.MichaelKrone2016/2017}}
+		\label{fig::rc01}
+	\end{minipage}
+	\hfill
+	\begin{minipage}[b]{0.49\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{../../Grafiken/Virtuelle-Kamera-und-Bildebene.PNG}
+		\caption{Illustration der virtuellen Kamera und der Bildebene \cite{Dr.MichaelKrone2016/2017}}
+		\label{fig::rc02}
+	\end{minipage}
+\end{figure}
+
+
+Die virtuelle Kamera, sieh Abbildung \ref{fig::rc01}, ist im Raum an Position \texttt{e} positioniert, dies ist auch das Projektionszentrum, falls es keine orthogonale Projektion ist.
+Die Position \texttt{e} entspricht relativ der Position des Betrachters vor dem Bildschirm.
+Mit \texttt{u}, \texttt{v} und \texttt{w} wird die Ausrichtung der Kamera im Raum eindeutig bestimmt.
+In einer Entfernung \texttt{d} von \texttt{e} aus in Richtung \texttt{-w} ist die Bildebene \ref{fig::rc02} Positioniert.
+Die Größe der Bildebene wird durch \texttt{l}, \texttt{r}, \texttt{b} und \texttt{t} bestimmt.
+Abhängig von der Größe des Bildschirms oder der Größe der gewünschten Rastergrafik, wird die Bildebene virtuell in die gewünschte Anzahl an Pixel in die Breite und Höhe unterteilt.
+Jeder dieser Teile entspricht nun einem Pixel der Rastergrafik.
+Nun kann für jeden Pixel ein Strahl, ausgehend von \texttt{e}, in Richtung des entsprechenden Punktes auf der Bildebene, ausgesendet und verfolgt werden.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.5\textwidth]{../../Grafiken/Raytracing.png}
+	\caption{Illustration der Projektion von Objekten auf die Bildebene mit Hilfe von Raytracing. \cite{Dr.MichaelKrone2016/2017}}
+	\label{fig::rc03}
+\end{figure}
+
+Trifft ein Strahl Objekte in der Szene, wird dadurch ein Farbwert ermittelt, den der entsprechende Pixel annehmen kann und und die Szene dadurch auf den Bildschirm projiziert wird.
+Siehe auch Abbildung \ref{fig::rc03}.
+
+\todo{Grundlagen zu Raycasting hier. Vektoren als richtige Vektorensymbole darstellen (mit Pfeil oben drauf).}
 
 \subsection{Volumenrendering}
 \todo{Anwendung von Raycasting zum Volumenrendering.}
