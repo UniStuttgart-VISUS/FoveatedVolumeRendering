@@ -244,10 +244,57 @@ Strukturen mit einer geringeren Dichte können transparent und weniger farblich 
 \todo{Funktion der Transferfrunktion im Volumenrendering erläutern. Unter Umständen ein Beispiel Bild mit einer Anwendung der Transferfunktion verwenden.}
 
 \section{Eyetracking}\label{sec::eyetr}
-\todo{Was ist Eyetracking?}
-\todo{Wie werden die Augen getrackt?}
-\todo{Wie sehen Messwerte aus und wie verwendet man sie richtig (Koordinatensysteme, Bildschirm und Fensteroffset.)}
-\todo{Vorherige Todos ausschreiben und ggf. mehr.}
+% \todo{Was ist Eyetracking?}
+Für einige wahrnehmungsorientierte Methoden ist es notwendig, den aktuellen Blickpunkt des Betrachters auf dem Bildschirm zu wissen und daher die Augenaktivitäten zu messen.
+In diesem Zusammenhang fällt meistens der Begriff \texttt{Eyetracking}.
+Aber was ist Eyetracking?
+Eyetracking ist das Messen von Augenaktivitäten eines Betrachters.
+In der Regel betrachtet der Betrachter dabei einen Bildschirm während seine Augenaktivität gemessen werden, wodurch Informationen über den Blickverlauf und die Fixationsdauer bestimmter Punkte auf diesem Bildschirm errechnet werden können.
+Diese Informationen ermöglichen es, Rückschlüsse über das betrachtete Bild zu ziehen, wie zum Beispiel, welche Objekte eines Bildes besonders interessant für den Betrachter sind.
+Eyetracking ermöglicht aber nicht nur das Messen von Daten um diese im Nachhinein auszuwerten, sondern auch das Nutzen solche Daten für interaktive Anwendungen in Echtzeit.
+Da in dieser Arbeit ein externer Tobii Eye Tracker verwendet wurde, beziehen sich folgende Informationen hauptsächlich aber nicht ausschließlich auf Tobii Eyetracker.
+Die Firma Tobii AB schreibt auf ihrer Webseite zum Thema: Was ist Eyetracking?, dass Eye Tracking eine Technologie ist, die es ermöglicht, ein Gerät durch die natürliche Bewegung der Augen zu steuern \cite{tobii}.
+\begin{figure}
+	\centering
+	\includegraphics[width=1\textwidth]{../../Grafiken/How-20DoesEyetrackingWork_ScreenBased.jpg}
+	\caption{Illustration der Funktionsweise von Tobii Pro Eyetracker. \cite{tobiipro}}
+	\label{fig::et01}
+\end{figure}
+Dabei werden vier grundlegende Bestandteile des Eye Tracking, wie die Firma Tobii AB es realisiert, genannt.
+In der Regel benötigt man für das Messen von Augenaktivitäten zwei grundlegende Dinge, die auch in Abbildung \ref{fig::et01} abgebildet sind: Eine Lichtquelle (2) und eine Kamera (3).
+Es gibt verschiedene Möglichkeiten, die Augenaktivitäten zu messen.
+Die am häufigsten genutzte Technik, welche auch von den Tobii Eyetrackern genutzt wird, ist \texttt{Pupil Centre Corneal Reflection (PCCR)}.
+Die Lichtquellen sind dabei auf die Augen gerichtet und erzeugen auf ihnen ein spezielles Reflektionsmuster.
+Die Kamera des Eyetrackers (3) nimmt mit einer hohen Abtastrate Bilder der Augen und ihrer Reflektionsmuster auf.
+Nun können spezielle Bildverarbeitungsalgorithmen (4) auf die erfassten Daten angewendet werden und die Reflektionspunkte auf den Bildern bestimmt werden.
+Anhand dieser Punkte und eines Modells des Auges kann die Blickrichtung der Augen, die Position der Augen im Raum und die Blickpunkte der Augen auf dem Bildschirm berechnet werden (4 + 5).
+% \todo{Wie werden die Augen getrackt?}
+% \todo{Wie sehen Messwerte aus und wie verwendet man sie richtig (Koordinatensysteme, Bildschirm und Fensteroffset.)}
+
+\begin{figure}[]
+	\centering
+	\begin{minipage}[b]{0.49\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{../../Grafiken/UCS.png}
+		\caption{Nutzer Koordinatensystem \cite{tobiisdk}}
+		\label{fig::et02}
+	\end{minipage}
+	\hfill
+	\begin{minipage}[b]{0.49\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{../../Grafiken/ADCS.png}
+		\caption{Aktives Display Koordinatensystem \cite{tobiisdk}}
+		\label{fig::et03}
+	\end{minipage}
+\end{figure}
+Die Position eines Auges im Raum wird als \texttt{Gaze origin} bezeichnet und wird bei Tobii Pro Eyetrackern im Nutzer Koordinatensystem angegeben, siehe Abbildung \ref{fig::et02}.
+Der Blickpunkt des Auges auf dem Bildschirm ist in der Regel das, was von größtem Interesse ist und wird als \texttt{Gaze point} bezeichnet.
+Der \texttt{Gaze point} wird im Aktiven Display Koordinatensystem angegeben, siehe Abbildung \ref{fig::et03}.
+Dieses Koordinatensystem hat den Ursprung an der Position oben links des aktiven Bildschirmbereichs, und der Punkt (1,1) ist an der Position rechts unten des aktiven Bildschirmbereichs.
+\todo{Umrechnung in Pixel und bei mehreren Bildschirmen.}
+\todo{Messgeschwindigkeit vs Augengeschwindigkeit}
+\todo{Validity Codes}
+% \todo{Vorherige Todos ausschreiben und ggf. mehr.}
 
 \section{GPU Architektur}\label{sec::gpuarc}
 \todo{OpenCL Abstraktion}
