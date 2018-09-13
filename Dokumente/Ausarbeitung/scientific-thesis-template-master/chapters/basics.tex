@@ -291,9 +291,42 @@ Die Position eines Auges im Raum wird als \texttt{Gaze origin} bezeichnet und wi
 Der Blickpunkt des Auges auf dem Bildschirm ist in der Regel das, was von größtem Interesse ist und wird als \texttt{Gaze point} bezeichnet.
 Der \texttt{Gaze point} wird im Aktiven Display Koordinatensystem angegeben, siehe Abbildung \ref{fig::et03}.
 Dieses Koordinatensystem hat den Ursprung an der Position oben links des aktiven Bildschirmbereichs, und der Punkt (1,1) ist an der Position rechts unten des aktiven Bildschirmbereichs.
-\todo{Umrechnung in Pixel und bei mehreren Bildschirmen.}
-\todo{Messgeschwindigkeit vs Augengeschwindigkeit}
-\todo{Validity Codes}
+Die Umrechnung in Bildschirmkoordinaten funktioniert durch die Multiplikation mit der Breite und Höhe des Bildschirms in Pixel.
+Die Koordinaten sind dann relativ zu dem aktiven Display.
+Dieses Display muss nicht unbedingt das einzige Display sein.
+Werden mehrere Bildschirme verwendet, muss möglicherweise ein Offset auf die Werte gerechnet werden, um die richtigen Bildschirmkoordinaten für den Bildschirm, auf dem die Anwendung dargestellt wird, zu erhalten.
+
+%\todo{Umrechnung in Pixel und bei mehreren Bildschirmen.}
+In Abschnitt \ref{sec::eye} wurden verschiedene Arten von Augenbewegungen angesprochen.
+Eine sehr wichtige Rolle spielen dabei Fixationen und Sakkaden.
+Bei der Analyse der visuellen Wahrnehmung des Menschen ergeben die Daten der Fixationen wichtige Informationen über Eigenschaften des visuellen Stimuli.
+Bei einer Fixation fixieren die Augen einen gewissen Punkt für eine vergleichsweise lange Zeit (100ms - 1.5s) und können dadurch viele Informationen des fixierten Objekts erfassen.
+Sakkaden hingegen sind kurze (20ms - 40ms) und schnelle Augenbewegungen zwischen zwei Fixationen.
+Für wahrnehmungsorientierte interaktive Anwendungen ist es daher wichtig, eine hohe Abtastrate und niedrige Latenz bei der Erfassung der Augenaktivitäten zu haben.
+Dies ermöglicht es, schnell zwischen einer Sakkade und Fixation zu unterscheiden und das nächste Bild, ohne eine merkbare Verzögerung und entsprechend des neuen Blickpunktes, darzustellen.
+So sollte bei der Methode des wahrnehmungsorientierten Renderings, wobei nur in dem fovealen Bereich das Bild mit hoher Auflösung dargestellt wird, ein Update ca. zwischen 5ms bis 60ms nach der Augenbewegung gestartet worden sein, um eine Bildveränderung nicht zu bemerken.
+Diese Zeit ist dabei abhängig davon, wie weit die unscharfe Fläche von der Fovea entfernt ist \cite{doi:10.1111/cgf.13150}.
+%\begin{figure}
+%	\centering
+%	\includegraphics[width=0.5\textwidth]{../../Grafiken/Sampling-20frequency-201.png}
+%	\caption{Abtastrate einer typischen Augenbewegung \cite{tobiisdk}}
+%	\label{fig::et04}
+%\end{figure}
+
+Der in dieser Arbeit verwendete Tobii Pro Eyetracker hat eine Abtastfrequenz von 600 Hz.
+Dies entspricht einem Abtastintervall von 1.67ms und ist vergleichsweise zu anderen aktuellen Eyetrackern recht hoch.
+Diese haben oft eine Abtastfrequenz von 60 Hz oder 120 Hz.
+Geräte mit Abtastraten im Frequenzbereich von 600 Hz und höher sind ausreichen schnell um Sakkaden messen zu können und haben eine entsprechend niedrige Latenz, welche es ermöglicht, eine Bildveränderung nicht wahrzunehmen.
+\todo{Genaue Technische Daten des verwendeten Tobii Pro Eyetrackers nachschauen.}
+Hohe Abtastraten heißt aber auch viele Daten pro Sekunde.
+Für die Anwendung in dieser Arbeit ist es wichtig, den aktuellsten Blickpunkt des Auges zu kennen.
+Daher wird der letzte gemessene gaze point des Eyetrackers für das Berechnen des nächsten Bildes verwendet.
+Ein weiteres Problem bei vielen Messdaten ist es auch, dass es mehr fehlerhafte Messdaten gibt.
+Die Daten, die über die Tobii Pro SDK durch den Eyetracker geliefert werden, enthalten dafür einen Validity Code.
+Dieser Wert gibt an, ob eine Messung mit hoher Wahrscheinlichkeit richtige Daten enthält, oder nicht.
+Dadurch können wahrscheinlich fehlerhafte Daten früh abgestoßen werden.
+% \todo{Messgeschwindigkeit vs Augengeschwindigkeit}
+% \todo{Validity Codes}
 % \todo{Vorherige Todos ausschreiben und ggf. mehr.}
 
 \section{GPU Architektur}\label{sec::gpuarc}
