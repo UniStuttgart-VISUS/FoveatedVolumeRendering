@@ -330,6 +330,72 @@ Dadurch können wahrscheinlich fehlerhafte Daten früh abgestoßen werden.
 % \todo{Vorherige Todos ausschreiben und ggf. mehr.}
 
 \section{GPU Architektur}\label{sec::gpuarc}
-\todo{OpenCL Abstraktion}
+Ein wichtiger Faktor, wenn es um interaktive Anwendungen geht, ist die Performanz.
+Viele Algorithmen haben essentielle Bestandteile welche ihre Komplexität nach unten beschränken.
+Die Einführung von Parallelität ist ein wichtiger Ansatz, um die Performanz von Anwendungen beziehungsweise ihrer Algorithmen weiter zu verbessern.
+Gerade Algorithmen in der Bildberechnung und -Verarbeitung eignen sich besonders um diese zu parallelisieren.
+In der Bildverarbeitung werden viele gleiche Berechnungen auf unterschiedlichen Daten ausgeführt.
+Graphics Processing Units (GPUs) oder auch Grafikkarten eignen sich für diese Art der Verwendung besonders.
+\begin{figure}
+	\centering
+	\includegraphics[width=0.5\textwidth]{../../Grafiken/CPU-GPU-Structures1.png}
+	\caption{CPU vs. GPU. \url{http://www.keremcaliskan.com/wp-content/uploads/2011/01/CPU-GPU-Structures1.png}}
+	\label{fig::ga01}
+\end{figure}
+% GPU vs CPU
+Im Vergleich zu Central Processing Units (CPUs) besitzen GPUs eine deutlich höhere Anzahl an Prozessoren, siehe Abbildung \ref{fig::ga01}.
+Aktuell besitzen Prozessoren meist vier oder acht Rechenkerne und eine Taktfrequenz von ca. 4 Ghz.
+GPUs hingegen haben mehrere tausend Berechnungseinheiten die gleichzeitig Berechnungen durchführen können, dafür aber bei ca. einem drittel der Taktfrequenz von CPUs.
+
+Fast jeder Computer besitzt heutzutage hochparallele Einheiten wie eine GPU.
+In den Anfängen waren GPUs sehr eng mit grafischen Berechnungen verbunden um die Berechnung von Farbwerten von Pixeln zu beschleunigen.
+Heute werden GPUs zur Beschleunigung von fast beliebigen Anwendungen genutzt.
+Programmierschnittstellen wie OpenCL oder CUDA ermöglichen die Nutzung von GPUs für allgemeine Berechnungen, oder auch General Purpose Computation on Graphics Processing Unit (GPGPU).
+
+\subsection*{OpenCL}
+OpenCL (Open Computing Language) ist ein Standard für das allgemeine Programmieren für parallele CPU oder GPU-Platformen.
+Dabei stellt OpenCL eine Programmierschnittstelle für das koordinieren paralleler Berechnungen auf unterschiedlichen Platformen zur Verfügung, sowie eine Programmiersprache für die eigentliche Programmierung von Programmen, die auf parallelen Platformen wie einer GPU ausgeführt werden sollen.
+
+Eine OpenCL Anwendung ist die Kombination des Codes eines Programms, das auf dem Host und den OpenCL Devices ausgeführt wird.
+Der Host ist dabei der Teil der Anwendung, der mit dem OpenCL Kontext über die OpenCL API kommuniziert.
+Ein Kontext ist die Umgebung, in der ein OpenCL Kernel ausgeführt wird und weitere Eigenschaften definiert sind.
+Der Kernel ist eine Funktion die in einem OpenCL Programm geschrieben wurde und durch ein OpenCL Device ausgeführt wird.
+Ein Device entspricht meistens eine GPU oder CPU, die OpenCL implementiert. % bzw. deren Treiber OpenCL implementieren
+
+\subsubsection*{OpenCL Platform Modell}
+\begin{figure}
+	\centering
+	\includegraphics[width=0.5\textwidth]{../../Grafiken/OpenCL_PlatformModel.png}
+	\caption{OpenCL Platform Modell ... ein Host, mehrere Compute Devices (ein Compute Device entspricht zum Beispiel einer GPU) mit je einer oder mehreren Compute Units. \url{https://www.khronos.org/registry/OpenCL/specs/opencl-2.1.pdf}}
+	\label{fig::ga02}
+\end{figure}
+Das Platform Modell von OpenCL ist eine Abstraktion davon, wie OpenCL die Hardware sieht.
+Die Beziehung zwischen seinen Einheiten und der Hardware ist dabei größtenteils von der verwendeten Hardware und ihrer Implementierung von OpenCL abhängig.
+Es besteht aus einem Host, welcher mit ein oder mehreren Devices verbunden ist.
+Diese sind unterteilt in Compute Units (CUs), welche weiter in Processing Elements (PEs) unterteilt sind.
+Berechnungen auf einem solchen Device werden in Processing Elements ausgeführt.
+Die Host-Anwendung gibt den Start des Kernel-Codes in Auftrag.
+Das OpenCL Device führt dann den Kernel Code auf den Processing Elements des Devices aus und hat dabei eine große Freiheit darüber, wie die Berechnungen auf den Processing Elements abgebildet werden.
+Falls die Processing Elements innerhalb einer Compute Unit die gleiche Folge von Befehlen ausführen, bezeichnet man ihren Befehlsfluss als konvergiert, sonst als divergiert.
+
+\subsubsection*{OpenCL Ausführungsmodell}
+Der Host kann über Funktionen der OpenCL API mit einem Device über eine Command-Queue interagieren.
+Eine Command-Queue ist mit maximal einem Device verknüpft.
+Über die Command-Queue können Befehle zum starten eines Kernels, Transferieren von Daten zwischen Host und Device und Befehle zur Synchronisation ausgeführt werden.
+Ein Befehl durchläuft dabei immer sechs Zustände: Queued (Eingereiht), Submitted (Übermittelt), Ready (Bereit), Running (Ausführend), Ended (Beendet) und Complete (Abgeschlossen).
+Wird ein Kernel für die Ausführung übermittelt, wird für diesen ein Index-Raum definiert.
+Der Kernel selbst, die zugehörigen Parameter und die Parameter, die seinen Index-Raum definieren, definieren eine Kernel Instanz.
+Wird eine Kernel Instanz auf dem Device ausgeführt, wird für jeden Punkt in seinem Index-Raum eine Ausführung des Kernels gestartet.
+Eine solche Ausführung wird Work-Item genannt.
+Work-Items, die zu einer bestimmten Kernel Instanz gehören, werden von dem Device in Gruppen gehandhabt.
+Diese Gruppen heißen Work-Groups.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.75\textwidth]{../../Grafiken/OpenCL-NDRange-Mapping.png}
+	\caption{OpenCL NDRange-Mapping. \url{https://www.khronos.org/registry/OpenCL/specs/opencl-2.1.pdf}}
+	\label{fig::ga03}
+\end{figure} 
+
 \todo{Hardwarerealisierung, NVIDIA und AMD u.U. Intel}
 \todo{Performanzoptimierung: Warp-Auslastung, Speicher-Blockierung}
