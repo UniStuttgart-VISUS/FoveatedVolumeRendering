@@ -417,16 +417,38 @@ Da die Work-Groups aus dem Work-Pool in jeglicher Reihenfolge ausgeführt werden
 	\caption{Ausführungsmodell NVIDIA GPU Arhcitektur. \url{http://www.icl.utk.edu/~luszczek/teaching/courses/fall2016/cosc462/pdf/GPU_Fundamentals.pdf}}
 	\label{fig::ga04}
 \end{figure} 
+In der GPU Architektur gibt zwei große Konzepte, globalen Speicher und Streaming Multiprozessoren (SM).
+Globaler Speicher auf der GPU ist analog zu RAM für die CPU.
+Auf diesen kann von den Recheneinheiten der GPU und auch durch die Host-Anwendung auf der CPU zugegriffen werden. 
+Eine GPU hat mehrere Streaming Multiprozessoren.
+Streaming Multiprozessoren führen die eigentlichen Berechnungen aus und haben je eigene Control Units, Register (lokaler Speicher), Ausführungs Pipelines und Caches.
+Ein Streaming Multiprozessor besitzt viele Skalare Recheneinheiten, die ähnlich zu einer ALU Berechnungen ausführen.
+
+Im GPU Ausführungsmodell werden Threads von Skalaren Prozessoren ausgeführt.
+Ein Thread Block ist eine Gruppe von Threads und wird auf einem Multiprozessor ausgeführt.
+Dabei werden Threads innerhalb eines Thread Blocks ausschließlich innerhalb eines Multiprozessors ausgeführt.
+Es könnenn aber auch mehrere Thread Blöcke gleichzeitig auf einem Multiprozessor ausgeführt werden.
+Dies ist aber durch die verfügbaren Ressourcen limitiert.
+
+Ein Thread Block besteht meistens aus 32-Threads und wird in einer NVIDIA Architektur Warp und in einer AMD Architektur Wavefront genannt.
+Ein solcher Thread Block wird physisch parallel auf einem Multiprozessor als Single Instruction Multiple Thread (SIMT) Ausführung ausgeführt.
+Die Ausführung eines Thread Blocks wird durch einen (Warp- / Thread-Block) Scheduler geregelt.
+Da Threads innerhalb eines Thread Blocks differenziert werden können, ermöglicht dies eine Single Instruction Mutlitple Data (SIMD) Ausführung.
+Ein Programm (Kernel) auf der GPU wird als Gitter aus Thread Blöcken gestartet.
 
 OpenCL sieht die Hardware aus abstrakter Sicht und die exakte Beziehung des Platform Modells zu der Hardware wird von OpenCL nicht festgelegt.
-Das Platform Modell besteht besteht aus einem Host, OpenCL Devices und Compute Units mit jeweils ein oder mehreren Processing Elements.
+Das Platform Modell besteht aus einem Host, OpenCL Devices und Compute Units mit jeweils ein oder mehreren Processing Elements.
 In der Realität entspricht der Host in der Regel dem Teil der Anwendung, der auf der CPU ausgeführt wird.
 Das OpenCL Device entspricht meist einer GPU und eine Compute Unit kann als Streaming Multiprozessor gesehen werden wobei die Processing Elements dementsprechend den Skalaren Prozessoren innerhalb eines Multiprozessors entsprechen.
 
-
-
 Nach OpenCL entspricht eine Work-Group einer Menge von verwandten Work-Items, die alle innerhalb der selben Compute Unit arbeiten.
+Ein Work-Item kann von einem oder mehreren Processing Units als Teil einer Work-Group verarbeitet werden.
 Sie führen die selbe Kernel Instanz aus und haben gemeinsamen lokalen Speicher und Work Group Funktionen.
+Daher ist es naheliegend, das Work-Groups in Thread Blöcke unterteilt werden und alle Thread-Blöcke einer Work-Group auf dem selben Streaming Multiprozessor ausgeführt werden.
+In OpenCL können Work-Groups weiter in Sub-Groups unterteilt werden.
+Eine OpenCL Sub-Group ist eine implementationsabhängige Gruppierung von Work-Items innerhalb einer Work-Group.
+Diese sind eindimensional und haben, bis auf die letzte Sub-Group einer solchen Unterteilung, alle dieselbe Größe.
+Es ist ebenfalls naheliegend, dass eine solche Sub-Group einem Thread block entspricht.
 
 \todo{Hardwarerealisierung, NVIDIA und AMD u.U. Intel}
 \todo{Performanzoptimierung: Warp-Auslastung, Speicher-Blockierung}
