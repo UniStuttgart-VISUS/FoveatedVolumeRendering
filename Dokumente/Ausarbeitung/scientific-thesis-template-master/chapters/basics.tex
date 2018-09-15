@@ -335,7 +335,7 @@ Viele Algorithmen haben essentielle Bestandteile welche ihre Komplexität nach u
 Die Einführung von Parallelität ist ein wichtiger Ansatz, um die Performanz von Anwendungen beziehungsweise ihrer Algorithmen weiter zu verbessern.
 Gerade Algorithmen in der Bildberechnung und -Verarbeitung eignen sich besonders um diese zu parallelisieren.
 In der Bildverarbeitung werden viele gleiche Berechnungen auf unterschiedlichen Daten ausgeführt.
-Graphics Processing Units (GPUs) oder auch Grafikkarten eignen sich für diese Art der Verwendung besonders.
+Graphics Processing Units (GPUs) oder auch Grafikkarten sind für diese Art von Berechnungen optimiert.
 \begin{figure}
 	\centering
 	\includegraphics[width=0.5\textwidth]{../../Grafiken/CPU-GPU-Structures1.png}
@@ -347,7 +347,7 @@ Im Vergleich zu Central Processing Units (CPUs) besitzen GPUs eine deutlich höh
 Aktuell besitzen Prozessoren meist vier oder acht Rechenkerne und eine Taktfrequenz von ca. 4 Ghz.
 GPUs hingegen haben mehrere tausend Berechnungseinheiten die gleichzeitig Berechnungen durchführen können, dafür aber bei ca. einem drittel der Taktfrequenz von CPUs.
 
-Fast jeder Computer besitzt heutzutage hochparallele Einheiten wie eine GPU.
+Fast jeder Computer besitzt heutzutage hochparallele Einheiten, meist eine GPU.
 In den Anfängen waren GPUs sehr eng mit grafischen Berechnungen verbunden um die Berechnung von Farbwerten von Pixeln zu beschleunigen.
 Heute werden GPUs zur Beschleunigung von fast beliebigen Anwendungen genutzt.
 Programmierschnittstellen wie OpenCL oder CUDA ermöglichen die Nutzung von GPUs für allgemeine Berechnungen, oder auch General Purpose Computation on Graphics Processing Unit (GPGPU).
@@ -393,9 +393,40 @@ Diese Gruppen heißen Work-Groups.
 \begin{figure}
 	\centering
 	\includegraphics[width=0.75\textwidth]{../../Grafiken/OpenCL-NDRange-Mapping.png}
-	\caption{OpenCL NDRange-Mapping. \url{https://www.khronos.org/registry/OpenCL/specs/opencl-2.1.pdf}}
+	\caption{OpenCL NDRange-Mapping mit 2 Dimensionen. \url{https://www.khronos.org/registry/OpenCL/specs/opencl-2.1.pdf}}
 	\label{fig::ga03}
 \end{figure} 
+Der Index-Raum ist durch eine NDRange definiert.
+Dies ist ein N-dimensionaler Index-Raum, wobei N die Werte 1, 2 oder 3 annehmen kann.
+Eine NDRange wird dementsprechend durch drei Integer-Arrays der Länge N definiert: Die Ausdehnung des Index-Raums, ein Offset der Indices an dem sie starten und die Größe der Work-Groups, jeweils in N Dimensionen.
+
+Jedes Work-Item hat ein N-Dimensionales Tupel, welches seine globale ID repräsentiert.
+Work-Groups erhalten ebenfalls N-Dimensionale Tupel als ID.
+Die Anzahl von Work-Groups ist abhängig von der definierten Größe von Work-Groups und der Größe des Index-Raums.
+Work-Items sind je einer Work-Group zugewiesen und haben eine loakle ID innerhalb ihrer Work-Group.
+Dadurch sind Work-Items eindeutig auf zwei verschiedene Arten definiert: Durch die globale ID beziehungsweise den globalen Index und durch die ID ihrer Work-Group zusammen mit ihrer lokalen ID in dieser Work-Group.
+
+Wird die Ausführung einer Kernel-Instanz gestartet, werden die damit assoziierten Work-Groups in einen Work-Pool platziert und sind damit ausführungsbereit.
+Das Device entnimmt aus dem Work-Pool nach und nach Work-Groups und führt ein oder mehrere gleichzeitig aus.
+Da die Work-Groups aus dem Work-Pool in jeglicher Reihenfolge ausgeführt werden können, gibt es keinen sicheren Weg, verschiedene Ausführungen von Work-Groups zu synchronisieren.
+
+\subsubsection*{Hardware Mapping}
+\begin{figure}
+	\centering
+	\includegraphics[width=0.5\textwidth]{../../Grafiken/Ausführungsmodell-GPU-Architektur.png}
+	\caption{Ausführungsmodell NVIDIA GPU Arhcitektur. \url{http://www.icl.utk.edu/~luszczek/teaching/courses/fall2016/cosc462/pdf/GPU_Fundamentals.pdf}}
+	\label{fig::ga04}
+\end{figure} 
+
+OpenCL sieht die Hardware aus abstrakter Sicht und die exakte Beziehung des Platform Modells zu der Hardware wird von OpenCL nicht festgelegt.
+Das Platform Modell besteht besteht aus einem Host, OpenCL Devices und Compute Units mit jeweils ein oder mehreren Processing Elements.
+In der Realität entspricht der Host in der Regel dem Teil der Anwendung, der auf der CPU ausgeführt wird.
+Das OpenCL Device entspricht meist einer GPU und eine Compute Unit kann als Streaming Multiprozessor gesehen werden wobei die Processing Elements dementsprechend den Skalaren Prozessoren innerhalb eines Multiprozessors entsprechen.
+
+
+
+Nach OpenCL entspricht eine Work-Group einer Menge von verwandten Work-Items, die alle innerhalb der selben Compute Unit arbeiten.
+Sie führen die selbe Kernel Instanz aus und haben gemeinsamen lokalen Speicher und Work Group Funktionen.
 
 \todo{Hardwarerealisierung, NVIDIA und AMD u.U. Intel}
 \todo{Performanzoptimierung: Warp-Auslastung, Speicher-Blockierung}
