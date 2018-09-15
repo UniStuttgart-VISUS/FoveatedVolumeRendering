@@ -411,12 +411,24 @@ Das Device entnimmt aus dem Work-Pool nach und nach Work-Groups und führt ein o
 Da die Work-Groups aus dem Work-Pool in jeglicher Reihenfolge ausgeführt werden können, gibt es keinen sicheren Weg, verschiedene Ausführungen von Work-Groups zu synchronisieren.
 
 \subsubsection*{Hardware Mapping}
-\begin{figure}
+\begin{figure}[]
 	\centering
-	\includegraphics[width=0.5\textwidth]{../../Grafiken/Ausführungsmodell-GPU-Architektur.png}
-	\caption{Ausführungsmodell NVIDIA GPU Arhcitektur. \url{http://www.icl.utk.edu/~luszczek/teaching/courses/fall2016/cosc462/pdf/GPU_Fundamentals.pdf}}
-	\label{fig::ga04}
-\end{figure} 
+	\begin{minipage}[b]{0.49\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{../../Grafiken/Ausführungsmodell-GPU-Architektur.png}
+		\caption{Ausführungsmodell NVIDIA GPU Architektur. \url{http://www.icl.utk.edu/~luszczek/teaching/courses/fall2016/cosc462/pdf/GPU_Fundamentals.pdf}}
+		\label{fig::ga04}
+	\end{minipage}
+	\hfill
+	\begin{minipage}[b]{0.49\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{../../Grafiken/GPU-Memory-Hierarchie-with-Threads.PNG}
+		\caption{CUDA Thread- und Speicher Hierarchie. \url{https://www.nvidia.com/content/PDF/fermi_white_papers/NVIDIA_Fermi_Compute_Architecture_Whitepaper.pdf}}
+		\label{fig::ga05}
+	\end{minipage}
+\end{figure}
+\todo{Ausrichtung der Bilder. Links in Fußnote oder Referenzen verschieben.}
+
 In der GPU Architektur gibt zwei große Konzepte, globalen Speicher und Streaming Multiprozessoren (SM).
 Globaler Speicher auf der GPU ist analog zu RAM für die CPU.
 Auf diesen kann von den Recheneinheiten der GPU und auch durch die Host-Anwendung auf der CPU zugegriffen werden. 
@@ -437,7 +449,7 @@ Da Threads innerhalb eines Thread Blocks differenziert werden können, ermöglic
 Ein Programm (Kernel) auf der GPU wird als Gitter aus Thread Blöcken gestartet.
 
 OpenCL sieht die Hardware aus abstrakter Sicht und die exakte Beziehung des Platform Modells zu der Hardware wird von OpenCL nicht festgelegt.
-Das Platform Modell besteht aus einem Host, OpenCL Devices und Compute Units mit jeweils ein oder mehreren Processing Elements.
+Das Platform Modell besteht aus einem Host, OpenCL Devices mit je mehreren Compute Units die jeweils ein oder mehreren Processing Elements enthalten.
 In der Realität entspricht der Host in der Regel dem Teil der Anwendung, der auf der CPU ausgeführt wird.
 Das OpenCL Device entspricht meist einer GPU und eine Compute Unit kann als Streaming Multiprozessor gesehen werden wobei die Processing Elements dementsprechend den Skalaren Prozessoren innerhalb eines Multiprozessors entsprechen.
 
@@ -450,5 +462,27 @@ Eine OpenCL Sub-Group ist eine implementationsabhängige Gruppierung von Work-It
 Diese sind eindimensional und haben, bis auf die letzte Sub-Group einer solchen Unterteilung, alle dieselbe Größe.
 Es ist ebenfalls naheliegend, dass eine solche Sub-Group einem Thread block entspricht.
 
-\todo{Hardwarerealisierung, NVIDIA und AMD u.U. Intel}
-\todo{Performanzoptimierung: Warp-Auslastung, Speicher-Blockierung}
+Threads innerhalb eines Thread Blocks können also ausschließlich die selben Instruktionen ausführen.
+Müssen einige Threads innerhalb eines Thread Blocks aufgrund ihrer ID unterschiedliche Statements ausführen, resultiert dies darin, dass unter Umständen der gesamte Block alle Statements ausführt und am Ende der Berechnung die richtigen Ergebnisse auswählt.
+\todo{Quelle dafür}
+Dies hat zur Folge, dass ein Thread Block der divergiert deutlich längere Ausführungszeiten hat, als ein konvergierender Thread Block.
+Bei der Implementierung eines OpenCL Kernels kann eine geschickte Strukturierung des Codes daher das gleiche Ergebnis mit besserer Performanz generieren.
+
+Die Wahl der Work-Group Größe ist ebenfalls wichtig.
+Da Thread Blöcke aktuell meist eine Größe von 32 Threads besitzen und unter der Annahme, dass Work-Groups in Thread Blöcke unterteilt werden, macht es Sinn, die Größe einer Work-Group als vielfaches von 32 zu wählen.
+Ansonsten kann es passieren, dass Thread Blöcke zur Ausführung gestartet werden, bei denen eine große Anzahl an Threads kein Teil der Berechnung sind und Ressourcen dadurch verschwendet werden.
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.5\textwidth]{../../Grafiken/OpenCL-Memory-Model.PNG}
+	\caption{OpenCL Speicher Modell \url{https://www.khronos.org/registry/OpenCL/specs/opencl-2.1.pdf}}
+	\label{fig::ga06}
+\end{figure} 
+Ein weiteres Problem sind Speicher Konflikte bei der Ausführung eines Kernels.
+Lokaler Speicher von Multiprozessoren ist in Speicher Bänke unterteilt.
+Versuchen Threads eines Thread Blocks auf verschiedene Adressen innerhalb der selben Speicher Bank zuzugreifen, entstehen Speicher Konflikte, da eine Speicher Bank nur eine ihrer Adressen gleichzeitig adressieren kann.
+Ausführungen eines Thread Blocks mit Speicher Konflikten müssen serialisiert werden und dauern daher deutlich länger.
+Eine Ausnahme ist es, falls die Threads eines Blocks alle auf dieselbe Adresse innerhalb einer Speicher Bank lesend zugreifen.
+In diesem Fall wird der gelesene Wert an alle Threads gleichzeitig übertragen.
+\todo{Quellen einfügen.}
+\todo{Bilder Referenzieren.}
