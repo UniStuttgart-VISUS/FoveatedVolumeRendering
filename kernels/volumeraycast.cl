@@ -464,7 +464,7 @@ __kernel void volumeRender(  __read_only image3d_t volData
                     area_offset = (float2)(0.0,0.0);
                     area_offset_needed = 0;
 
-                    // samplingRate *= 0.25f;
+                    samplingRate *= 0.25f;
                 }else{
                     if(index_1d < inverts.y){
                         // Area B
@@ -473,7 +473,7 @@ __kernel void volumeRender(  __read_only image3d_t volData
                         index_offset = inverts.x;
                         area_offset = ell2;
 
-                        // samplingRate *= 0.75f;
+                        samplingRate *= 0.75f;
                     }else{
                         if(index_1d < inverts.z){
                             // Area A
@@ -840,10 +840,10 @@ __kernel void interpolateTexelsFromDDC(   __read_only image2d_t inData  // data 
 
 	float2 globalId_f = convert_float2_rtz(globalId);
 	
-	{ // debug
+	/*{ // debug
 		write_imagef(outData, globalId, read_imagef(inData, nearestIntSmp, globalId));
 		return;
-	}
+	}*/
 
 	if(checkPointInEllipse(cursorPos, ell1_div_2.x, ell1_div_2.y, globalId_f)){	// Area A
 		write_imagef(outData, globalId, read_imagef(inData, nearestIntSmp, globalId));
