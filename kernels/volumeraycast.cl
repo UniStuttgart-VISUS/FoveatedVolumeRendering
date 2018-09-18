@@ -441,6 +441,8 @@ __kernel void volumeRender(  __read_only image3d_t volData
 
     float samplingRate = samplingRateC;
 
+	bool decreasing_sampling_rate = true;
+
     // check if imageCoord is in valid area according to cursorPos and rectangle (and invert)
     // shift rect that cursor is in its middle
     switch(mode){ // early discard here
@@ -464,7 +466,7 @@ __kernel void volumeRender(  __read_only image3d_t volData
                     area_offset = (float2)(0.0,0.0);
                     area_offset_needed = 0;
 
-                    samplingRate *= 0.25f;
+                    // samplingRate *= 0.25f;
                 }else{
                     if(index_1d < inverts.y){
                         // Area B
@@ -473,7 +475,7 @@ __kernel void volumeRender(  __read_only image3d_t volData
                         index_offset = inverts.x;
                         area_offset = ell2;
 
-                        samplingRate *= 0.75f;
+                        // samplingRate *= 0.75f;
                     }else{
                         if(index_1d < inverts.z){
                             // Area A
@@ -510,6 +512,17 @@ __kernel void volumeRender(  __read_only image3d_t volData
                 // discard if out of range
                 if(globalId.x >=img_bounds.x || globalId.y >= img_bounds.y|| globalId.x < 0 || globalId.y < 0)
                     return;
+
+
+				if(decreasing_sampling_rate){
+					float distance_to_cursor = length(convert_float2_rtz(globalId) - cursorPos);	// is between 0 and max diagonal of image bounds
+					if(distance_to_cursor < 2){
+						break;
+					}else{
+						samplingRate *= 1.0f - distance_to_cursor / length(convert_float2_rtz(img_bounds));
+					}
+
+				}
                 
                 break;
         case 2: // discard with rect
@@ -524,6 +537,7 @@ __kernel void volumeRender(  __read_only image3d_t volData
                         return;
                     }
                 }
+
                 break;
         case 3: // TRI
                 maxSize = max(img_bounds.x, img_bounds.y); // glaube ist notwendig, um die richtige aspect ratio weiter unten zu berechnen
@@ -568,7 +582,6 @@ __kernel void volumeRender(  __read_only image3d_t volData
         default: // Standard
                 break;
     }
-
     
     float2 imgCoords;
     imgCoords.x = native_divide((globalId.x + 0.5f), convert_float(maxSize)) * 2.f;
