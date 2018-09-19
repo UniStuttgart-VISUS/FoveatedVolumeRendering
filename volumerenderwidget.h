@@ -189,9 +189,12 @@ private:
 	struct ms_data {
 		// struct to hold the measured data
 		QString system_time; // the system time when the measurement of this data took place
-		int elapsed_millisecond; // the amount of milliseconds the computation of the last frame needed
+		int elapsed_millisecond_during_paintGL; // the amount of milliseconds the method paintGL() did need for computation
+		int kernel_milliseconds; // the amount of milliseconds the profiling of the kernel returned. Those are also used for the computation of the fps drawn on screen.
 		QPoint frame_coordinates; // the coordinates of the cursor for inside the opengl widget for which the frame was computed
 		bool manual_measurement; // indicates whether this measurement was triggered manually.
+		QPoint position_in_Grid; // the position in the grid which has been divided by the value of _ms_area; this value is elementwise intgerdivision of frame_coordinates by _ms_area.
+		int ms_lid; // lokal id of measurement
 	};
 
 	std::vector<ms_data> _measured_data; // vector to store the data of the last measurement. it's data will be cleared when a new measurement is started or its data has been written to a file
@@ -201,7 +204,9 @@ private:
 	const Qt::Key _ms_trigger_key = Qt::Key_M; // the key to be pressed to trigger the value of: _measurement_is_active
 	const Qt::Key _single_measurement_key = Qt::Key_K; // the key to be pressed to trigger a single measurement when _measurement_is_active == true.
 	const Qt::Key _save_measurements_key = Qt::Key_P; // pressing this key will save the measurements by calling save_measurements() and cleans the to this moment collected data. also disables all vlaues indicating, that a measurement has to be taken.
-	
+	const int _ms_area = 10; // the extends of one measured area; no measurements are taken if they are in the same area as the measurement taken before
+	int _curr_ms_id = 0; // the current lid of the measurement. used to find the right one.
+
 	bool save_measurements(std::string file_name = std::string("ms_data.txt")); // will save the current data in _measured_data to a text file named ms_data.txt if not else specified.
 
 

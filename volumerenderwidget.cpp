@@ -63,7 +63,6 @@ VolumeRenderWidget::VolumeRenderWidget(QWidget *parent)
 	, _circle_radiuses({ 100.0f, 400.0f })
 	, _eyetracker(nullptr)
 	, _useEyetracking(false)
-	, _time(QTime::currentTime())
 	, _measurement_is_active(false)
 	, _single_measurement(false)
 {
@@ -347,6 +346,11 @@ void VolumeRenderWidget::paintGL()
 {
 	// sets an uniform for the fragment shader to distinguish the rendering methods
 	
+	{	// measurements
+		_time = QTime::currentTime();
+		_tmp_ms.system_time = _time.toString();
+	}
+
 	{
 		_spScreenQuad.bind();
 		_spScreenQuad.setUniformValue(_spScreenQuad.uniformLocation("mode"), static_cast<GLint>(_renderingMethod));
@@ -374,6 +378,17 @@ void VolumeRenderWidget::paintGL()
 	}
 
 	// std::cout << "paintGL got called.\n";
+
+	{
+		// measurments
+		_tmp_ms.elapsed_millisecond_during_paintGL = _time.elapsed();
+		if (_take_measurement) {
+			_measured_data.push_back(_tmp_ms);
+		}
+
+		_take_measurement = false;
+	}
+	
 
 	if (_useEyetracking) {
 		// permanently update the screen
@@ -491,6 +506,18 @@ void VolumeRenderWidget::paintGL_standard()
 				_volumerender.updateOutputImg(static_cast<size_t>(width()),
 					static_cast<size_t>(height()), _outTexId0);
 			}
+
+			{
+				// measurements
+				_tmp_ms.frame_coordinates = { -1, -1 };
+				_tmp_ms.position_in_Grid = { -1, -1 };
+				_tmp_ms.kernel_milliseconds = static_cast<int>(_volumerender.getLastExecTime() * 1000);
+				if (_single_measurement) {
+					_tmp_ms.manual_measurement = true;
+					_take_measurement = true;
+				}
+			}
+			
 		}
 		catch (std::runtime_error e)
 		{
@@ -658,6 +685,26 @@ void VolumeRenderWidget::paintGL_distance_dc()
 					_volumerender.runInterpolationForDDC(texture_width, texture_height, _outTexId1, _outTexId0);
 					// don't need to add last exec time because of the construction of calcFPS()
 				}
+
+				{
+					// measurements
+					_tmp_ms.kernel_milliseconds = static_cast<int>((execution_time + _volumerender.getLastExecTime) * 1000);
+					_tmp_ms.frame_coordinates = _lastLocalCursorPos;
+					_tmp_ms.position_in_Grid = _tmp_ms.frame_coordinates / _ms_area;
+					if (_measurement_is_active && (_measured_data.size() == 0 || _measured_data.back().position_in_Grid != _tmp_ms.position_in_Grid)) {
+						_take_measurement = true;
+					}
+					else {
+						if (_single_measurement) {
+							_single_measurement = false;
+							_take_measurement = true;
+						}
+						else {
+							_take_measurement = false;
+						}
+					}
+				}
+
 			}
 			else
 			{
@@ -827,6 +874,25 @@ void VolumeRenderWidget::paintGL_square_dc()
 
 					_volumerender.runRaycast(floor(this->size().width() * _imgSamplingRate),
 						floor(this->size().height() * _imgSamplingRate), _timestep);
+
+					{
+						// measurements
+						_tmp_ms.kernel_milliseconds = static_cast<int>((firstExecTime + _volumerender.getLastExecTime) * 1000);
+						_tmp_ms.frame_coordinates = _lastLocalCursorPos;
+						_tmp_ms.position_in_Grid = _tmp_ms.frame_coordinates / _ms_area;
+						if (_measurement_is_active && (_measured_data.size() == 0 || _measured_data.back().position_in_Grid != _tmp_ms.position_in_Grid)) {
+							_take_measurement = true;
+						}
+						else {
+							if (_single_measurement) {
+								_single_measurement = false;
+								_take_measurement = true;
+							}
+							else {
+								_take_measurement = false;
+							}
+						}
+					}
 
 					fps = calcFPS(firstExecTime);
 				}
@@ -2027,10 +2093,20 @@ bool VolumeRenderWidget::save_measurements(std::string file_name)
 	QFile file(file_name.c_str());
 	if (file.open(QFile::WriteOnly | QFile::Append)) {
 		QTextStream out(&file);
-		out << "System_Time; Elapsed_Time; Frame_Coordinates; Manual_Measurement\n";
+		out << "BOM\n";
+		out << "Frame extends: " << size().width() << ", " << size().height() << "\n";
+		out << "_ms_area: " << _ms_area << "\n";
+		out << "measurements taken: " << _measured_data.size() << "\n";
+		out << "System_Time; Elapsed_Time_PaintGL; Elapsed_Kernel_Time; Frame_Coordinates; Grid_Position; Manual_Measurement\n";
 		for (auto it = _measured_data.begin(); it != _measured_data.end(); ++it) {
-			out << it->system_time << ";" << it->elapsed_millisecond << ";" << "(" << it->frame_coordinates.x << ", " << it->frame_coordinates.y << ")"  << ";" << it->manual_measurement << "\n";
+			out << it->system_time << "; " << it->elapsed_millisecond_during_paintGL << "; " 
+				<< it->kernel_milliseconds << "; " << "(" << it->frame_coordinates.x << ", " 
+				<< it->frame_coordinates.y << ")"  << "; " << "(" << it->position_in_Grid.x 
+				<< ", " << it->position_in_Grid.y << ")" << "; " << it->manual_measurement 
+				// << "; " << it->ms_lid 
+				<< "\n";
 		}
+		out << "EOM\n\n";
 		out.flush();
 	}
 	else {
@@ -2054,6 +2130,7 @@ void VolumeRenderWidget::keyPressEvent(QKeyEvent *event) {
 	}
 
 	if (event->key() == _save_measurements_key) {
+		_take_measurement = false;
 		_single_measurement = false;
 		_measurement_is_active = false;
 		save_measurements();
