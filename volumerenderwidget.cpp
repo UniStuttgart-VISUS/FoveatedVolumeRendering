@@ -511,7 +511,7 @@ void VolumeRenderWidget::paintGL_standard()
 				// measurements
 				_tmp_ms.frame_coordinates = { -1, -1 };
 				_tmp_ms.position_in_Grid = { -1, -1 };
-				_tmp_ms.kernel_milliseconds = static_cast<int>(_volumerender.getLastExecTime() * 1000);
+				_tmp_ms.kernel_milliseconds = _volumerender.getLastExecTime() * 1000.0;
 				if (_single_measurement) {
 					_tmp_ms.manual_measurement = true;
 					_take_measurement = true;
@@ -688,7 +688,7 @@ void VolumeRenderWidget::paintGL_distance_dc()
 
 				{
 					// measurements
-					_tmp_ms.kernel_milliseconds = static_cast<int>((execution_time + _volumerender.getLastExecTime()) * 1000);
+					_tmp_ms.kernel_milliseconds = (execution_time + _volumerender.getLastExecTime()) * 1000.0;
 					_tmp_ms.frame_coordinates = _lastLocalCursorPos;
 					_tmp_ms.position_in_Grid = _tmp_ms.frame_coordinates / _ms_area;
 					if (_measurement_is_active && (_measured_data.size() == 0 || _measured_data.back().position_in_Grid != _tmp_ms.position_in_Grid)) {
@@ -877,7 +877,7 @@ void VolumeRenderWidget::paintGL_square_dc()
 
 					{
 						// measurements
-						_tmp_ms.kernel_milliseconds = static_cast<int>((firstExecTime + _volumerender.getLastExecTime()) * 1000);
+						_tmp_ms.kernel_milliseconds = (firstExecTime + _volumerender.getLastExecTime()) * 1000.0;
 						_tmp_ms.frame_coordinates = _lastLocalCursorPos;
 						_tmp_ms.position_in_Grid = _tmp_ms.frame_coordinates / _ms_area;
 						if (_measurement_is_active && (_measured_data.size() == 0 || _measured_data.back().position_in_Grid != _tmp_ms.position_in_Grid)) {

@@ -190,7 +190,7 @@ private:
 		// struct to hold the measured data
 		QString system_time; // the system time when the measurement of this data begin i.e. the paint method related to this measurement was triggered.
 		int elapsed_millisecond_during_paintGL; // the amount of milliseconds the method paintGL() did need for computation
-		int kernel_milliseconds; // the amount of milliseconds the profiling of the kernel returned. Those are also used for the computation of the fps drawn on screen.
+		double kernel_milliseconds; // the amount of milliseconds the profiling of the kernel returned. Those are also used for the computation of the fps drawn on screen. They are stored as double because on good hardware they can have small values which are not good to be represented in int.
 		QPoint frame_coordinates; // the coordinates of the cursor for inside the opengl widget for which the frame was computed
 		bool manual_measurement; // indicates whether this measurement was triggered manually.
 		QPoint position_in_Grid; // the position in the grid which has been divided by the value of _ms_area; this value is elementwise intgerdivision of frame_coordinates by _ms_area.
@@ -212,6 +212,26 @@ private:
 
 	bool save_measurements(std::string file_name = std::string("ms_data.txt")); // will save the current data in _measured_data to a text file named ms_data.txt if not else specified.
 
+	/*
+	* Mouse Movement replaying:
+	* if _collect_mouse_movement == true, the frame will not be updated and the user can use the mouse to follow a path on the screen or the currently set image.
+	* Therefore, the mouse_movement events have to be disabled during this time.
+	* if _collect_mouse_movement is set to false (after it was true), the screen will be updated normally.
+	* If _measure_with_collected_mouse_movement_data is true and collected mouse movement data exists, each frame that will be drawn next will have new values for the current mouse_position.
+	* during this time, the mouse_event handling method has to be deactivated as well.
+	*/
+
+	struct mouse_position {
+		// struct to store the mouse position and the grid it is in
+		QPoint mouse_pos;
+		QPoint grid_location; // position in grid according to _ms_area;
+	};
+
+	std::vector<mouse_position> mouse_mv_data; // Data structure to collect multiple mouse_position structs.
+
+	bool _collect_mouse_movement = false; // tells whether mouse movement data is to be collected
+	bool _measure_with_collected_mouse_movement_data = false; // tells whether the next measurements are done with the collected mouse data
+	const Qt::Key _trigger_collect_mouse_movement;
 
     // -------Members--------
     //
