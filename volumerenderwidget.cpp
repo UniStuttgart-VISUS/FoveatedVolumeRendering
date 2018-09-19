@@ -421,7 +421,7 @@ void VolumeRenderWidget::paintGL()
 	{
 		// mouse replay
 		if (_measure_with_collected_mouse_movement_data) {
-			if (_mouse_mv_data.size() > _mouse_mv_data_index) {
+			if (_mouse_mv_data.size() >= _mouse_mv_data_index) { // >= because after the last one it still needs to do one more update to set the values back for normal rendering
 				update();
 				return;
 			}
@@ -2223,8 +2223,8 @@ bool VolumeRenderWidget::load_mouse_movement(std::string file_name)
 			in >> mg_y;
 
 			mouse_position tmp_mp;
-			tmp_mp.grid_location = QPoint(mp_x, mp_y);
-			tmp_mp.mouse_pos = QPoint(mg_x, mg_y);
+			tmp_mp.mouse_pos = QPoint(mp_x, mp_y);
+			tmp_mp.grid_location = QPoint(mg_x, mg_y);
 			_mouse_mv_data.push_back(tmp_mp);
 		}
 
