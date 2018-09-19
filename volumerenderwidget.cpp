@@ -2277,6 +2277,7 @@ void VolumeRenderWidget::keyPressEvent(QKeyEvent *event) {
 			// abort the current measurement by resetting the _mouse_mv_data_index to 0 and setting the _measure_with_collected_mouse_movement_data to false
 			_measure_with_collected_mouse_movement_data = false;
 			_mouse_mv_data_index = 0;
+			_measured_data.clear();
 		}
 		else {
 			// start the measurement. only possible if no mouse data is collected during this time but already collected mouse data exists
