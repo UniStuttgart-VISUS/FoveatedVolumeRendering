@@ -63,6 +63,9 @@ VolumeRenderWidget::VolumeRenderWidget(QWidget *parent)
 	, _circle_radiuses({ 100.0f, 400.0f })
 	, _eyetracker(nullptr)
 	, _useEyetracking(false)
+	, _time(QTime::currentTime())
+	, _measurement_is_active(false)
+	, _single_measurement(false)
 {
 	this->grabKeyboard();
     this->setMouseTracking(true);
@@ -2019,8 +2022,42 @@ std::string VolumeRenderWidget::ReadFile(const char * path)
 	return std::string(std::istreambuf_iterator<char>(file_stream), std::istreambuf_iterator<char>());
 }
 
+bool VolumeRenderWidget::save_measurements(std::string file_name)
+{
+	QFile file(file_name.c_str());
+	if (file.open(QFile::WriteOnly | QFile::Append)) {
+		QTextStream out(&file);
+		out << "System_Time; Elapsed_Time; Frame_Coordinates; Manual_Measurement\n";
+		for (auto it = _measured_data.begin(); it != _measured_data.end(); ++it) {
+			out << it->system_time << ";" << it->elapsed_millisecond << ";" << "(" << it->frame_coordinates.x << ", " << it->frame_coordinates.y << ")"  << ";" << it->manual_measurement << "\n";
+		}
+		out.flush();
+	}
+	else {
+		return false;
+	}
+
+	return true;
+}
+
 
 void VolumeRenderWidget::keyPressEvent(QKeyEvent *event) {
+	// std::cout << "Key pressed: " << event->key() << std::endl;
+	if (event->key() == _ms_trigger_key) {
+		_measurement_is_active = !_measurement_is_active;
+	}
+
+	if (event->key() == _single_measurement_key) {
+		// set _single_measurement to true to indicate that the next frame is measured independent to the rest of the measurements. also triggers a repaint so that the measurement can take place immediately.
+		_single_measurement = true;
+		repaint();
+	}
+
+	if (event->key() == _save_measurements_key) {
+		_single_measurement = false;
+		_measurement_is_active = false;
+		save_measurements();
+	}
 	event->accept();
 }
 

@@ -42,6 +42,7 @@
 #include <qopenglfunctions_4_3_core.h>
 #include <QPainter>
 #include <qnumeric.h>
+#include <QTime>
 
 
 #include <TOBIIRESEARCH\tobii_research.h>
@@ -183,6 +184,25 @@ private:
 
 	// file loading helper function
 	static std::string ReadFile(const char *path); // returns the content of a file
+
+	// Functions and Datastructures to mesure performance
+	struct ms_data {
+		// struct to hold the measured data
+		QString system_time; // the system time when the measurement of this data took place
+		int elapsed_millisecond; // the amount of milliseconds the computation of the last frame needed
+		QPoint frame_coordinates; // the coordinates of the cursor for inside the opengl widget for which the frame was computed
+		bool manual_measurement; // indicates whether this measurement was triggered manually.
+	};
+
+	std::vector<ms_data> _measured_data; // vector to store the data of the last measurement. it's data will be cleared when a new measurement is started or its data has been written to a file
+	QTime _time; // a QTime object which will be set to QTime::currentTime() at construction and can be used to measure elapsed times.
+	bool _measurement_is_active; // holds the state whether measurements are to be taken or not. true <=> yes, false otherwise. it is set false to begin of the application.
+	bool _single_measurement; // tells that the next frame will be measured as single measurement and will not count as frame that has been measured inside a specific grid.
+	const Qt::Key _ms_trigger_key = Qt::Key_M; // the key to be pressed to trigger the value of: _measurement_is_active
+	const Qt::Key _single_measurement_key = Qt::Key_K; // the key to be pressed to trigger a single measurement when _measurement_is_active == true.
+	const Qt::Key _save_measurements_key = Qt::Key_P; // pressing this key will save the measurements by calling save_measurements() and cleans the to this moment collected data. also disables all vlaues indicating, that a measurement has to be taken.
+	
+	bool save_measurements(std::string file_name = std::string("ms_data.txt")); // will save the current data in _measured_data to a text file named ms_data.txt if not else specified.
 
 
     // -------Members--------
