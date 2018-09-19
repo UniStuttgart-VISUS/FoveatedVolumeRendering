@@ -688,7 +688,7 @@ void VolumeRenderWidget::paintGL_distance_dc()
 
 				{
 					// measurements
-					_tmp_ms.kernel_milliseconds = static_cast<int>((execution_time + _volumerender.getLastExecTime) * 1000);
+					_tmp_ms.kernel_milliseconds = static_cast<int>((execution_time + _volumerender.getLastExecTime()) * 1000);
 					_tmp_ms.frame_coordinates = _lastLocalCursorPos;
 					_tmp_ms.position_in_Grid = _tmp_ms.frame_coordinates / _ms_area;
 					if (_measurement_is_active && (_measured_data.size() == 0 || _measured_data.back().position_in_Grid != _tmp_ms.position_in_Grid)) {
@@ -877,7 +877,7 @@ void VolumeRenderWidget::paintGL_square_dc()
 
 					{
 						// measurements
-						_tmp_ms.kernel_milliseconds = static_cast<int>((firstExecTime + _volumerender.getLastExecTime) * 1000);
+						_tmp_ms.kernel_milliseconds = static_cast<int>((firstExecTime + _volumerender.getLastExecTime()) * 1000);
 						_tmp_ms.frame_coordinates = _lastLocalCursorPos;
 						_tmp_ms.position_in_Grid = _tmp_ms.frame_coordinates / _ms_area;
 						if (_measurement_is_active && (_measured_data.size() == 0 || _measured_data.back().position_in_Grid != _tmp_ms.position_in_Grid)) {
@@ -2100,9 +2100,9 @@ bool VolumeRenderWidget::save_measurements(std::string file_name)
 		out << "System_Time; Elapsed_Time_PaintGL; Elapsed_Kernel_Time; Frame_Coordinates; Grid_Position; Manual_Measurement\n";
 		for (auto it = _measured_data.begin(); it != _measured_data.end(); ++it) {
 			out << it->system_time << "; " << it->elapsed_millisecond_during_paintGL << "; " 
-				<< it->kernel_milliseconds << "; " << "(" << it->frame_coordinates.x << ", " 
-				<< it->frame_coordinates.y << ")"  << "; " << "(" << it->position_in_Grid.x 
-				<< ", " << it->position_in_Grid.y << ")" << "; " << it->manual_measurement 
+				<< it->kernel_milliseconds << "; " << "(" << it->frame_coordinates.x() << ", " 
+				<< it->frame_coordinates.y() << ")"  << "; " << "(" << it->position_in_Grid.x()
+				<< ", " << it->position_in_Grid.y() << ")" << "; " << it->manual_measurement 
 				// << "; " << it->ms_lid 
 				<< "\n";
 		}
