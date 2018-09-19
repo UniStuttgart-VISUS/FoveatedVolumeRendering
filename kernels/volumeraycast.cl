@@ -521,11 +521,7 @@ __kernel void volumeRender(  __read_only image3d_t volData
 					}else{
 						float sr_factor = 1.0f - (distance_to_cursor) / length(convert_float2_rtz(img_bounds));
 						const float sr_boundary = 0.25f;
-						if(sr_factor > sr_boundary){
-							samplingRate *= sr_factor;
-						}else{
-							samplingRate *= sr_boundary;
-						}
+						samplingRate *= max(sr_boundary, sr_factor);
 					}
 
 				}

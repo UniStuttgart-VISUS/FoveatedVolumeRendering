@@ -346,6 +346,35 @@ void VolumeRenderWidget::paintGL()
 {
 	// sets an uniform for the fragment shader to distinguish the rendering methods
 	
+	{
+		// collect mouse data
+		if (_collect_mouse_movement) {
+			// don't update
+			return;
+		}
+	}
+
+	{
+		// replay mouse data
+		if (_measure_with_collected_mouse_movement_data) {
+			if (_mouse_mv_data.size() > _mouse_mv_data_index) {
+				_lastLocalCursorPos = _mouse_mv_data.at(_mouse_mv_data_index).mouse_pos;
+				_mouse_mv_data_index++;	// increase the index so that the next frame is computed with the location of the next measurment
+				_take_measurement = true; // take a measurement for this frame
+				// std::cout << "currently replaying." << std::endl;
+			}
+			else {
+				// all measurments were taken, stop updating
+				save_measurements(); // save measurements
+				_measured_data.clear();
+				_mouse_mv_data_index = 0; // reset index
+				_measure_with_collected_mouse_movement_data = false; // stops the loop and enables mouse and other key events. has to be after save_measurements() because its value is used there.
+				std::cout << "mouse replay finished." << std::endl;
+			}
+			
+		}
+	}
+
 	{	// measurements
 		_time = QTime::currentTime();
 		_tmp_ms.system_time = _time.toString(Qt::ISODateWithMs);
@@ -389,6 +418,16 @@ void VolumeRenderWidget::paintGL()
 		_take_measurement = false;
 	}
 	
+	{
+		// mouse replay
+		if (_measure_with_collected_mouse_movement_data) {
+			if (_mouse_mv_data.size() > _mouse_mv_data_index) {
+				update();
+				return;
+			}
+		}
+	}
+
 
 	if (_useEyetracking) {
 		// permanently update the screen
@@ -691,7 +730,7 @@ void VolumeRenderWidget::paintGL_distance_dc()
 					_tmp_ms.kernel_milliseconds = (execution_time + _volumerender.getLastExecTime()) * 1000.0;
 					_tmp_ms.frame_coordinates = _lastLocalCursorPos;
 					_tmp_ms.position_in_Grid = _tmp_ms.frame_coordinates / _ms_area;
-					if (_measurement_is_active && (_measured_data.size() == 0 || _measured_data.back().position_in_Grid != _tmp_ms.position_in_Grid)) {
+					if (_measure_with_collected_mouse_movement_data || _measurement_is_active && (_measured_data.size() == 0 || _measured_data.back().position_in_Grid != _tmp_ms.position_in_Grid)) {
 						_take_measurement = true;
 					}
 					else {
@@ -880,7 +919,7 @@ void VolumeRenderWidget::paintGL_square_dc()
 						_tmp_ms.kernel_milliseconds = (firstExecTime + _volumerender.getLastExecTime()) * 1000.0;
 						_tmp_ms.frame_coordinates = _lastLocalCursorPos;
 						_tmp_ms.position_in_Grid = _tmp_ms.frame_coordinates / _ms_area;
-						if (_measurement_is_active && (_measured_data.size() == 0 || _measured_data.back().position_in_Grid != _tmp_ms.position_in_Grid)) {
+						if (_measure_with_collected_mouse_movement_data || _measurement_is_active && (_measured_data.size() == 0 || _measured_data.back().position_in_Grid != _tmp_ms.position_in_Grid)) {
 							_take_measurement = true;
 						}
 						else {
@@ -1915,6 +1954,26 @@ void VolumeRenderWidget::updateView(float dx, float dy)
  */
 void VolumeRenderWidget::mouseMoveEvent(QMouseEvent *event)
 {
+	if (_measure_with_collected_mouse_movement_data) {
+		// if data is currently measured, don't handle mouse movement events at all.
+		event->accept();
+		return;
+	}
+
+	if (_collect_mouse_movement) {
+		// only collect mouse movement data but do not anything else with the mouse event especially not updating the screen.
+		_tmp_mp.mouse_pos = event->pos();
+		
+		_tmp_mp.grid_location = _tmp_mp.mouse_pos / _ms_area;
+
+		if (_mouse_mv_data.size() == 0 || _mouse_mv_data.back().grid_location != _tmp_mp.grid_location) {
+			_mouse_mv_data.push_back(_tmp_mp);
+		}
+
+		event->accept();
+		return;
+	}
+
     float dx = (float)(event->pos().x() - _lastLocalCursorPos.x()) / width();
     float dy = (float)(event->pos().y() - _lastLocalCursorPos.y()) / height();
 
@@ -2090,6 +2149,8 @@ std::string VolumeRenderWidget::ReadFile(const char * path)
 
 bool VolumeRenderWidget::save_measurements(std::string file_name)
 {
+	std::cout << "Trying to save_measurements to: " << file_name << std::endl;
+
 	QFile file(file_name.c_str());
 	if (file.open(QFile::WriteOnly | QFile::Append)) {
 		QTextStream out(&file);
@@ -2097,7 +2158,8 @@ bool VolumeRenderWidget::save_measurements(std::string file_name)
 		out << "Frame extends: " << size().width() << ", " << size().height() << "\n";
 		out << "_ms_area: " << _ms_area << "\n";
 		out << "measurements taken: " << _measured_data.size() << "\n";
-		out << "current renderin method: " << _renderingMethod << "\n";
+		out << "current rendering method: " << _renderingMethod << "\n";
+		out << "is mouse replay: " << _measure_with_collected_mouse_movement_data << "\n";
 		out << "System_Time\tElapsed_Time_PaintGL\tElapsed_Kernel_Time\tFrame_Coordinates\tGrid_Position\tManual_Measurement\n";
 		for (auto it = _measured_data.begin(); it != _measured_data.end(); ++it) {
 			out << it->system_time << "\t" << it->elapsed_millisecond_during_paintGL << "\t" 
@@ -2117,26 +2179,134 @@ bool VolumeRenderWidget::save_measurements(std::string file_name)
 	return true;
 }
 
+bool VolumeRenderWidget::save_mouse_movements(std::string file_name)
+{
+	std::cout << "Trying to save_mouse_movements to: " << file_name << std::endl;
+	QFile file(file_name.c_str());
+	if (file.open(QFile::WriteOnly)) {
+		QTextStream out(&file);
+		out << "Frame extends: " << size().width() << ", " << size().height() << "\n";
+		out << "_ms_area: " << _ms_area << "\n";
+		out << "mouse movement measurements taken: " << _mouse_mv_data.size() << "\n";
+		out << "mouse_pos_x\tmouse_pos_y\tgrid_location_x\tgrid_location_y\n";
+		out << "Begin\n";
+		for (auto it = _mouse_mv_data.begin(); it != _mouse_mv_data.end(); ++it) {
+				out << it->mouse_pos.x() << " " << it->mouse_pos.y() << " " << it->grid_location.x() << " " << it->grid_location.y() << "\n";
+		}
+		out.flush();
+	}
+	else {
+		return false;
+	}
+
+	return true;
+}
+
+bool VolumeRenderWidget::load_mouse_movement(std::string file_name)
+{
+	std::cout << "Trying to load_mouse_movement from: " << file_name << std::endl;
+	_mouse_mv_data.clear();
+	
+	QFile file(file_name.c_str());
+	if (file.open(QFile::ReadOnly)) {
+		QTextStream in(&file);
+		in.setIntegerBase(10);
+		while (!in.atEnd() && in.readLine() != QString("Begin")) {
+			// skip to after "Begin" in File.
+		}
+		
+		while (!in.atEnd()) {
+			int mp_x, mp_y, mg_x, mg_y;
+			in >> mp_x;
+			in >> mp_y;
+			in >> mg_x;
+			in >> mg_y;
+
+			mouse_position tmp_mp;
+			tmp_mp.grid_location = QPoint(mp_x, mp_y);
+			tmp_mp.mouse_pos = QPoint(mg_x, mg_y);
+			_mouse_mv_data.push_back(tmp_mp);
+		}
+
+	}
+	else {
+		return false;
+	}
+
+	return true;
+}
+
 
 void VolumeRenderWidget::keyPressEvent(QKeyEvent *event) {
 	// std::cout << "Key pressed: " << event->key() << std::endl;
-	if (event->key() == _ms_trigger_key) {
+	if (event->key() == _ms_trigger_key && !_measure_with_collected_mouse_movement_data) {
 		_measurement_is_active = !_measurement_is_active;
 	}
 
-	if (event->key() == _single_measurement_key) {
+	if (event->key() == _single_measurement_key && !_measure_with_collected_mouse_movement_data) {
 		// set _single_measurement to true to indicate that the next frame is measured independent to the rest of the measurements. also triggers a repaint so that the measurement can take place immediately.
 		_single_measurement = true;
-		repaint();
+		update();
 	}
 
-	if (event->key() == _save_measurements_key) {
+	if (event->key() == _save_measurements_key && !_measure_with_collected_mouse_movement_data) {
 		_take_measurement = false;
 		_single_measurement = false;
 		_measurement_is_active = false;
 		save_measurements();
 		_measured_data.clear();
 	}
+
+	if (event->key() == _save_mouse_movements_key && !_measure_with_collected_mouse_movement_data) {
+		_collect_mouse_movement = false;
+		save_mouse_movements();
+	}
+
+	if (event->key() == _trigger_collect_mouse_movement && !_measure_with_collected_mouse_movement_data) {
+		if (_collect_mouse_movement) {
+			_collect_mouse_movement = false;
+			update();
+		}
+		else {
+			_collect_mouse_movement = true;
+		}
+	}
+
+	if (event->key() == _trigger_mouse_replay) {
+		if (_measure_with_collected_mouse_movement_data) {
+			// abort the current measurement by resetting the _mouse_mv_data_index to 0 and setting the _measure_with_collected_mouse_movement_data to false
+			_measure_with_collected_mouse_movement_data = false;
+			_mouse_mv_data_index = 0;
+		}
+		else {
+			// start the measurement. only possible if no mouse data is collected during this time but already collected mouse data exists
+			if (!_collect_mouse_movement && _mouse_mv_data.size() > 0) {
+				_measure_with_collected_mouse_movement_data = true;
+				_mouse_mv_data_index = 0;
+				
+			}
+		}
+		update();
+	}
+
+	if (event->key() == _load_mouse_movement_data_key && !_measure_with_collected_mouse_movement_data && !_collect_mouse_movement) {
+		if (load_mouse_movement()) {
+			std::cout << "loaded mouse movement data." << std::endl;
+		}
+		else {
+			std::cout << "loading of mouse movement data failed!" << std::endl;
+		}
+	}
+
+	std::cout << "Variables:" << std::endl;
+	std::cout << "_measurement_is_active: " << _measurement_is_active << " key should be T." << std::endl;
+	std::cout << "_single_measurement: " << _single_measurement << " key should be O." << std::endl;
+	std::cout << "_collect_mouse_movement: " << _collect_mouse_movement << " key should be M." << std::endl;
+	std::cout << "save_measurments key should be S." << std::endl;
+	std::cout << "save_mouse_movements key should be P." << std::endl;
+	std::cout << "load_mouse_movement key should be L." << std::endl;
+	std::cout << "_measure_with_collected_mouse_movement_data: " << _measure_with_collected_mouse_movement_data << " key should be R." << "\n\n" << std::endl;
+
 	event->accept();
 }
 

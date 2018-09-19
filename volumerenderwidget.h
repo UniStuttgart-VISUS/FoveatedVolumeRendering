@@ -196,6 +196,7 @@ private:
 		QPoint position_in_Grid; // the position in the grid which has been divided by the value of _ms_area; this value is elementwise intgerdivision of frame_coordinates by _ms_area.
 		// int ms_lid; // lokal id of measurement
 	};
+
 	std::vector<ms_data> _measured_data; // vector to store the data of the last measurement. it's data will be cleared when a new measurement is started or its data has been written to a file
 	
 	ms_data _tmp_ms; // A temporary measurement to store temporary data of a measurement.
@@ -203,9 +204,9 @@ private:
 	QTime _time; // a QTime object which will be set to QTime::currentTime() at construction and can be used to measure elapsed times.
 	bool _measurement_is_active; // holds the state whether measurements are to be taken or not. true <=> yes, false otherwise. it is set false to begin of the application.
 	bool _single_measurement; // tells that the next frame will be measured as single measurement and will not count as frame that has been measured inside a specific grid.
-	const Qt::Key _ms_trigger_key = Qt::Key_M; // the key to be pressed to trigger the value of: _measurement_is_active
-	const Qt::Key _single_measurement_key = Qt::Key_K; // the key to be pressed to trigger a single measurement.
-	const Qt::Key _save_measurements_key = Qt::Key_P; // pressing this key will save the measurements by calling save_measurements() and cleans the to this moment collected data. also disables all vlaues indicating, that a measurement has to be taken.
+	const Qt::Key _ms_trigger_key = Qt::Key_T; // the key to be pressed to trigger the value of: _measurement_is_active
+	const Qt::Key _single_measurement_key = Qt::Key_O; // the key to be pressed to trigger a single measurement.
+	const Qt::Key _save_measurements_key = Qt::Key_S; // pressing this key will save the measurements by calling save_measurements() and cleans the to this moment collected data. also disables all vlaues indicating, that a measurement has to be taken.
 	const int _ms_area = 10; // the extends of one measured area; no measurements are taken if they are in the same area as the measurement taken before
 	// int _curr_ms_id = 0; // the current lid of the measurement. used to find the right one.
 	bool _take_measurement = false; // is used to indicate between different functions whether to add data to the last object in the measurement or not.
@@ -227,11 +228,20 @@ private:
 		QPoint grid_location; // position in grid according to _ms_area;
 	};
 
-	std::vector<mouse_position> mouse_mv_data; // Data structure to collect multiple mouse_position structs.
+	std::vector<mouse_position> _mouse_mv_data; // Data structure to collect multiple mouse_position structs.
+	
+	mouse_position _tmp_mp; // temporary variable to store mouse movement data.
 
 	bool _collect_mouse_movement = false; // tells whether mouse movement data is to be collected
 	bool _measure_with_collected_mouse_movement_data = false; // tells whether the next measurements are done with the collected mouse data
-	const Qt::Key _trigger_collect_mouse_movement;
+	const Qt::Key _trigger_collect_mouse_movement = Qt::Key_M;
+	const Qt::Key _trigger_mouse_replay = Qt::Key_R;
+	const Qt::Key _save_mouse_movements_key = Qt::Key_P;
+	const Qt::Key _load_mouse_movement_data_key = Qt::Key_L;
+	int _mouse_mv_data_index = 0; // tells paintGL() which mouse data is to be used next. paintGL() wil increase this value before it exits.
+
+	bool save_mouse_movements(std::string file_name = std::string("mouse_movement_data.txt")); // always overrides a file. is called when mouse movement collection is done. Does not clear the measured data until now.
+	bool load_mouse_movement(std::string file_name = std::string("mouse_movement_data.txt")); // reads in a file produced with save_mouse_movements() and clears _mouse_mv_data then stores the values in it.
 
     // -------Members--------
     //
