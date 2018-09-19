@@ -348,7 +348,7 @@ void VolumeRenderWidget::paintGL()
 	
 	{	// measurements
 		_time = QTime::currentTime();
-		_tmp_ms.system_time = _time.toString();
+		_tmp_ms.system_time = _time.toString(Qt::ISODateWithMs);
 	}
 
 	{
@@ -2097,12 +2097,12 @@ bool VolumeRenderWidget::save_measurements(std::string file_name)
 		out << "Frame extends: " << size().width() << ", " << size().height() << "\n";
 		out << "_ms_area: " << _ms_area << "\n";
 		out << "measurements taken: " << _measured_data.size() << "\n";
-		out << "System_Time; Elapsed_Time_PaintGL; Elapsed_Kernel_Time; Frame_Coordinates; Grid_Position; Manual_Measurement\n";
+		out << "System_Time\tElapsed_Time_PaintGL\tElapsed_Kernel_Time\tFrame_Coordinates\tGrid_Position\tManual_Measurement\n";
 		for (auto it = _measured_data.begin(); it != _measured_data.end(); ++it) {
-			out << it->system_time << "; " << it->elapsed_millisecond_during_paintGL << "; " 
-				<< it->kernel_milliseconds << "; " << "(" << it->frame_coordinates.x() << ", " 
-				<< it->frame_coordinates.y() << ")"  << "; " << "(" << it->position_in_Grid.x()
-				<< ", " << it->position_in_Grid.y() << ")" << "; " << it->manual_measurement 
+			out << it->system_time << "\t" << it->elapsed_millisecond_during_paintGL << "\t" 
+				<< it->kernel_milliseconds << "\t" << "(" << it->frame_coordinates.x() << ", " 
+				<< it->frame_coordinates.y() << ")"  << "\t" << "(" << it->position_in_Grid.x()
+				<< ", " << it->position_in_Grid.y() << ")" << "\t" << it->manual_measurement 
 				// << "; " << it->ms_lid 
 				<< "\n";
 		}
@@ -2134,6 +2134,7 @@ void VolumeRenderWidget::keyPressEvent(QKeyEvent *event) {
 		_single_measurement = false;
 		_measurement_is_active = false;
 		save_measurements();
+		_measured_data.clear();
 	}
 	event->accept();
 }

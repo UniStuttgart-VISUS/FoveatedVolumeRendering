@@ -516,10 +516,10 @@ __kernel void volumeRender(  __read_only image3d_t volData
 
 				if(decreasing_sampling_rate){
 					float distance_to_cursor = length(convert_float2_rtz(globalId) - cursorPos);	// is between 0 and max diagonal of image bounds
-					if(distance_to_cursor < 2){
+					if(distance_to_cursor < 10){ // in a circle of 10 pixels there is no decrease in the sampling rate
 						break;
 					}else{
-						samplingRate *= 1.0f - distance_to_cursor / length(convert_float2_rtz(img_bounds));
+						samplingRate *= 1.0f - (distance_to_cursor - 1) / length(convert_float2_rtz(img_bounds)); // the minus one is offset
 					}
 
 				}

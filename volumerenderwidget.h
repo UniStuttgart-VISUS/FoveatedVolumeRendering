@@ -204,7 +204,7 @@ private:
 	bool _measurement_is_active; // holds the state whether measurements are to be taken or not. true <=> yes, false otherwise. it is set false to begin of the application.
 	bool _single_measurement; // tells that the next frame will be measured as single measurement and will not count as frame that has been measured inside a specific grid.
 	const Qt::Key _ms_trigger_key = Qt::Key_M; // the key to be pressed to trigger the value of: _measurement_is_active
-	const Qt::Key _single_measurement_key = Qt::Key_K; // the key to be pressed to trigger a single measurement when _measurement_is_active == true.
+	const Qt::Key _single_measurement_key = Qt::Key_K; // the key to be pressed to trigger a single measurement.
 	const Qt::Key _save_measurements_key = Qt::Key_P; // pressing this key will save the measurements by calling save_measurements() and cleans the to this moment collected data. also disables all vlaues indicating, that a measurement has to be taken.
 	const int _ms_area = 10; // the extends of one measured area; no measurements are taken if they are in the same area as the measurement taken before
 	// int _curr_ms_id = 0; // the current lid of the measurement. used to find the right one.
