@@ -2097,6 +2097,7 @@ bool VolumeRenderWidget::save_measurements(std::string file_name)
 		out << "Frame extends: " << size().width() << ", " << size().height() << "\n";
 		out << "_ms_area: " << _ms_area << "\n";
 		out << "measurements taken: " << _measured_data.size() << "\n";
+		out << "current renderin method: " << _renderingMethod << "\n";
 		out << "System_Time\tElapsed_Time_PaintGL\tElapsed_Kernel_Time\tFrame_Coordinates\tGrid_Position\tManual_Measurement\n";
 		for (auto it = _measured_data.begin(); it != _measured_data.end(); ++it) {
 			out << it->system_time << "\t" << it->elapsed_millisecond_during_paintGL << "\t" 
