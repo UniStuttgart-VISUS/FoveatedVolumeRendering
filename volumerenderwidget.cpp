@@ -406,6 +406,16 @@ void VolumeRenderWidget::paintGL()
 		break;
 	}
 
+	{
+		// draw mouse position on screen if mouse replay is active
+		if (_measure_with_collected_mouse_movement_data) {
+			QPainter p(this);
+			p.drawEllipse(_lastLocalCursorPos, 4, 4);
+			p.end();
+		}
+		
+	}
+
 	// std::cout << "paintGL got called.\n";
 
 	{
