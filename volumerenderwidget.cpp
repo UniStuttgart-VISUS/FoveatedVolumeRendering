@@ -57,9 +57,9 @@ VolumeRenderWidget::VolumeRenderWidget(QWidget *parent)
 	, _showOverlay(true)
 	, _renderingMethod(STANDARD)
 	, _rect_extends({ 350, 350 })
-	, _g_values({ 4.0f, 2.0f, 1.0f })
-	, _innerEllipse({ 0.3, 0.2 })
-	, _outerEllipse({ 0.5, 0.4 })
+	, _g_values({ 7.0f, 2.0f, 1.0f })
+	, _innerEllipse({ 0.2, 0.2 })
+	, _outerEllipse({ 0.4, 0.4 })
 	, _circle_radiuses({ 100.0f, 400.0f })
 	, _eyetracker(nullptr)
 	, _useEyetracking(false)
@@ -2159,6 +2159,20 @@ std::string VolumeRenderWidget::ReadFile(const char * path)
 
 bool VolumeRenderWidget::save_measurements(std::string file_name)
 {
+	if (_renderingMethod == RenderingMethod::STANDARD) { // nur für die messungen.
+		file_name = "ms_data_st.txt";
+	}
+	else {
+		if (_renderingMethod == RenderingMethod::DISTANCE_DC) {
+			file_name = "ms_data_ddc.txt";
+		}
+		else {
+			if (_renderingMethod == RenderingMethod::SQUARE_DC) {
+				file_name = "ms_data_mdc.txt";
+			}
+		}
+	}
+
 	std::cout << "Trying to save_measurements to: " << file_name << std::endl;
 
 	QFile file(file_name.c_str());
