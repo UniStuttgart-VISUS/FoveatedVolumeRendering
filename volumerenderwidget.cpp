@@ -2160,6 +2160,9 @@ bool VolumeRenderWidget::save_measurements(std::string file_name)
 		out << "measurements taken: " << _measured_data.size() << "\n";
 		out << "current rendering method: " << _renderingMethod << "\n";
 		out << "is mouse replay: " << _measure_with_collected_mouse_movement_data << "\n";
+		out << "Camera settings: Roation Quaternion: ( " << _rotQuat.toVector4D().x() << ", " << _rotQuat.toVector4D().y() << ", " 
+			<< _rotQuat.toVector4D().z() << ", " << _rotQuat.toVector4D().w() << "), Translationsvektor: ( " << _translation.x() 
+			<< ", " << _translation.y() << ", " << _translation.z() << ").\n";
 		out << "System_Time\tElapsed_Time_PaintGL\tElapsed_Kernel_Time\tFrame_Coordinates\tGrid_Position\tManual_Measurement\n";
 		for (auto it = _measured_data.begin(); it != _measured_data.end(); ++it) {
 			out << it->system_time << "\t" << it->elapsed_millisecond_during_paintGL << "\t" 
