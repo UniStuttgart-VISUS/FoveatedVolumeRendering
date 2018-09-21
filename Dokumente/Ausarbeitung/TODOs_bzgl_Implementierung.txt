@@ -2,25 +2,15 @@ Implementierung auf eine Textur umbasteln!
 Profiler Werte der Warps messen!
 ddc: compute optimum for kernel call dimension in x and y according to the gap size.
 
-Transferfunktion dynamisch anpassen!!!!!!!!!!
-Zoom und Rotation ggf. dynamisch anpassen.
 G-Values ggf. dynamisch anpassen. (z.B. innerhalb einer saccade reicht es vielleicht nur area c zu rendern).
 
 Testen, wie ob es sich bessert, wenn die gaze-position nur geupdatet wird, wenn der neue eine bestimmte differenz zum alten wert hat (es fokussiert wird)
 
-Nochmal lieber den Ansatz über drei Bilder, die zusammengesetzt werden.
+pp: Wenn das Bild sich nicht verändert (auch keine dynamische Transferfunktion aktiv ist), dann sollte sich der scharfe Bereich auf das gesamte Bild ausweiten. 
+pp: Dafür könnte man zum Beispiel für jeden Pixel einen Zustand halten, der Besagt, in welchem Bereich der Pixel ist und nur überschrieben wird, 
+pp: wenn der neue Bereich besser ist, als der aktuelle oder wenn das Bild sich seit dem letzten Draw call verändert hat.
 
-Schauen, ob es möglich ist, die globalId's einmal zu berechnen und per Tabelle dann einen look-up zu machen, solange sich die Auflösung nicht ändert.
-
-Sampling Rate der Strahlen auch anpassen!
-
-Wenn das Bild sich nicht verändert (auch keine dynamische Transferfunktion aktiv ist), dann sollte sich der scharfe Bereich auf das gesamte Bild ausweiten. 
-Dafür könnte man zum Beispiel für jeden Pixel einen Zustand halten, der Besagt, in welchem Bereich der Pixel ist und nur überschrieben wird, 
-wenn der neue Bereich besser ist, als der aktuelle oder wenn das Bild sich seit dem letzten Draw call verändert hat.
-
-Zuerst versuchen, statt Punkte bei der interpolation zu verwerfen, den weiter äußeren Punkt aus Area C zu verwenden.
-
-Anstelle der GlobalId's aufwenig umzurechnen, einfach drei durchläufe machen und jeweils die id's lediglich zu multiplizieren. Anschließend die Bilder einzeln interpolieren und dann zusammensetzen.
-Bei diesem Ansatz überprüfen, ob jeder der Durchläufe an sich mindestens eine gewisse zeit braucht, da der schnellste Raytrace-Prozess trotzdem nicht soo schnell ist, wie gedacht.
+pp: Anstelle der GlobalId's aufwenig umzurechnen, einfach drei durchläufe machen und jeweils die id's lediglich zu multiplizieren. Anschließend die Bilder einzeln interpolieren und dann zusammensetzen.
+pp: Bei diesem Ansatz überprüfen, ob jeder der Durchläufe an sich mindestens eine gewisse zeit braucht, da der schnellste Raytrace-Prozess trotzdem nicht soo schnell ist, wie gedacht.
 
 Profiling: AMD CodeXL
