@@ -45,7 +45,7 @@ def axes_from_data(ms_data):
 
 # plots the picture as background and the data read from a ms data file on top of it as a colormap
 # saves the plot the clears it
-def plot_and_save(picture_path, data_path):
+def plot_and_save(picture_path, data_path, min_sc, max_sc):
     print 'plot_and_save: ', picture_path, data_path
 
     image = mpimg.imread(picture_path)  # read image_data
@@ -58,7 +58,10 @@ def plot_and_save(picture_path, data_path):
     # normalize = mplib.colors.Normalize(vmin=min(z), vmax=max(z))  # create a normalization function for z
     # colors = [cmap(normalize(value)) for value in z]  # use normalize function to normalize and map z values to color
 
-    sc = plt.scatter(x=x, y=y, c=z, s=10, vmin=0, vmax=max(z), cmap=cmap)
+    # sc = plt.scatter(x=x, y=y, c=z, s=10, vmin=min(z), vmax=max(z), cmap=cmap)
+
+    # use min max for better comparison
+    sc = plt.scatter(x=x, y=y, c=z, s=10, vmin=min_sc, vmax=max_sc, cmap=cmap)
     plt.colorbar(sc)
 
     '''fig, ax = plt.subplot(figsize=(10,10))
@@ -90,8 +93,14 @@ def main():
             for mmst in mmsts:
                 print 'current m-type:', mmst
                 path = msr_path + dir + '/' + mmst + '/'  # path to the folder the measurements are in
-                plot_and_save(path + 'image_st.png', path + 'ms_data_ddc.txt')
-                plot_and_save(path + 'image_st.png', path + 'ms_data_mdc.txt')
+                values1 = axes_from_data(read_data(path + 'ms_data_ddc.txt'))  # first
+                values2 = axes_from_data(read_data(path + 'ms_data_mdc.txt'))  # second
+
+                min_v = min(min(values1[2]), min(values2[2]))
+                max_v = max(max(values1[2]), max(values2[2]))
+
+                plot_and_save(path + 'image_st.png', path + 'ms_data_ddc.txt', min_v, max_v)
+                plot_and_save(path + 'image_st.png', path + 'ms_data_mdc.txt', min_v, max_v)
 
         if dir == 'hoatzin':
             for mmst in mmsts:
@@ -99,8 +108,14 @@ def main():
                 if mmst == mmsts[0]:
                     continue  # skip first one because there is nothing measured
                 path = msr_path + '/' + dir + '/' + mmst + '/'  # path to the folder the measurements are in
-                plot_and_save(path + 'image_st.png', path + 'ms_data_ddc.txt')
-                plot_and_save(path + 'image_st.png', path + 'ms_data_mdc.txt')
+                values1 = axes_from_data(read_data(path + 'ms_data_ddc.txt'))  # first
+                values2 = axes_from_data(read_data(path + 'ms_data_mdc.txt'))  # second
+
+                min_v = min(min(values1[2]), min(values2[2]))
+                max_v = max(max(values1[2]), max(values2[2]))
+
+                plot_and_save(path + 'image_st.png', path + 'ms_data_ddc.txt', min_v, max_v)
+                plot_and_save(path + 'image_st.png', path + 'ms_data_mdc.txt', min_v, max_v)
 
     print 'End'
     return
