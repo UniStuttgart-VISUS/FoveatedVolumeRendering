@@ -1,12 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
+import matplotlib as mplib
 from ast import literal_eval
-
-msr_path = 'C:/Users/bauer/Desktop/bvrc_rbn/Dokumente/Messungen/'
-img_path = msr_path + 'bonsai/Messung_mit_Standard_Transferfunktion/image_st.png'
-ms_bonsai_st_path = msr_path + 'bonsai/Messung_mit_Standard_Transferfunktion/ms_data_st.txt'
-
 
 # Data Object to hold measured data
 class MsData():
@@ -41,17 +37,73 @@ def read_data(ms_data_path):
     return ms_data
 
 
-# return three arrays, one for x_pos, one for y_pos and one for kernel time
+# return three arrays, one for x_pos, one for y_pos and one for kernel time and takes in an array of MsData objects
 def axes_from_data(ms_data):
     return [ms_obj.mouse_position[0] for ms_obj in ms_data], [ms_obj.mouse_position[1] for ms_obj in ms_data], \
     [ms_obj.kernel_time for ms_obj in ms_data]
 
 
+# plots the picture as background and the data read from a ms data file on top of it as a colormap
+# saves the plot the clears it
+def plot_and_save(picture_path, data_path):
+    print 'plot_and_save: ', picture_path, data_path
+
+    image = mpimg.imread(picture_path)  # read image_data
+    plt.imshow(image)  # plot the image
+
+    # plot the data
+    x, y, z = axes_from_data(read_data(data_path))  # get data
+
+    cmap = mplib.cm.get_cmap('viridis')  # get cmap viridis
+    # normalize = mplib.colors.Normalize(vmin=min(z), vmax=max(z))  # create a normalization function for z
+    # colors = [cmap(normalize(value)) for value in z]  # use normalize function to normalize and map z values to color
+
+    sc = plt.scatter(x=x, y=y, c=z, s=10, vmin=0, vmax=max(z), cmap=cmap)
+    plt.colorbar(sc)
+
+    '''fig, ax = plt.subplot(figsize=(10,10))
+    ax.scatter(x, y, color=colors)
+
+    cax, _ = mplib.colorbar.make_axes(ax)
+    cbar = mplib.colorbar.ColorBase(cax, cmap=cmap, norm=normalize)'''
+
+    save_path_name = data_path.split('.')[0] + '_heatmap'
+    plt.savefig(save_path_name, dpi=300)  # save the figure
+
+    print 'fig saved to:', save_path_name
+
+    plt.clf()  # clear figure so the method can be called again.
+
+
 def main():
-    # img = mpimg.imread(img_path)
-    # imgplot = plt.imshow(img)
-    print axes_from_data(read_data(ms_bonsai_st_path))
-    pass
+    msr_path = 'C:/Users/bauer/Desktop/bvrc_rbn/Dokumente/Messungen/'
+    dirs = ['bonsai', 'hoatzin', 'E_1353', 'chameleon']
+    mmsts = ['Messung_mit_Standard_Transferfunktion', 'Messungen_mit_Transferfunktion_1',
+             'Messungen_mit_Transferfunktion_2']
+
+    print 'Begin'
+
+    # bonsai
+    for dir in dirs:
+        print 'current dir:', dir
+        if dir == 'bonsai' or dir == 'E_1353' or dir == 'chameleon':
+            for mmst in mmsts:
+                print 'current m-type:', mmst
+                path = msr_path + dir + '/' + mmst + '/'  # path to the folder the measurements are in
+                plot_and_save(path + 'image_st.png', path + 'ms_data_ddc.txt')
+                plot_and_save(path + 'image_st.png', path + 'ms_data_mdc.txt')
+
+        if dir == 'hoatzin':
+            for mmst in mmsts:
+                print 'current m-type:', mmst
+                if mmst == mmsts[0]:
+                    continue  # skip first one because there is nothing measured
+                path = msr_path + '/' + dir + '/' + mmst + '/'  # path to the folder the measurements are in
+                plot_and_save(path + 'image_st.png', path + 'ms_data_ddc.txt')
+                plot_and_save(path + 'image_st.png', path + 'ms_data_mdc.txt')
+
+    print 'End'
+    return
 
 
 if __name__ == '__main__':
