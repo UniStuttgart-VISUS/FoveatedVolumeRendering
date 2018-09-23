@@ -7,9 +7,44 @@ Dies umfasst die allgemeine Architektur der Anwendung und die Umsetzung des Volu
 Der zweite Abschnitt des Kapitels umfasst Überlegungen für die Erweiterung des Projektes, bezüglich des Ausgangspunktes wie er im ersten Abschnitt beschrieben wurde und dem Ziel dieser Arbeit, sowie die daraus entstandenen Arbeitspakete und die Ansätze für ihre Integration in das bestehende Projekt.
 
 \section{Projekt}\label{sec::proj}
-\todo{Allgemeine Visual Studio Projektbeschreibung. Architektur und Funktionsweise des Projekts.}
+% QT
+Das Visual Studio Projekt, welches als Ausgangspunkt dient, ist eine auf QT basierende Anwendung.
+QT ist ein vollständiges Cross-Platform Softaware Development Framework, welches in c++ entwickelt wurde, und ermöglicht die einfache Erstellung von Anwendungen mit Benutzeroberflächen und bietet außerdem eine Vielzahl von Bibliotheken, die für eine leichtere und schnellere Entwicklung von Programmen genutzt werden können.
 
+% Struktur von QT
+Die Hauptelemente für die QT Benutzeroberfläche sind QT Widgets.
+Widgets können Daten darstellen und Nutzereingaben erkennen.
+Außerdem stellt ein Widget selbst ein Container für weitere Widgets dar, welche in diesem gruppiert werden.
+Innerhalb eines Widgets können Elemente platziert werden, welche Informationen, mögliche Operationen oder Nutzereingaben repräsentieren.
+Für die bequeme Erstellung der grafischen Oberfläche bietet QT die Anwendung QT Designer.
+Der QT Designer ermöglicht es, Widgets und andere Bausteine der grafischen Oberfläche per Drag und Drop anzuordnen.
+Die durch den QT Designer definierte Oberfläche kann abgespeichert werden und wird von QT verwendet, um eine c++ Header File zu erstellen.
+Dies ermöglicht es die verschiedenen Elemente der grafischen Oberfläche an die Logik der Anwendung zu binden.
+
+% Struktur des Projekts (verschiedene Widgets)
+Das Projekt ist dementsprechend in c++ geschrieben und die grafische Oberfläche wurde mit Hilfe des QT Designers erstellt.
+Die Oberfläche selbst hat eine Menüleiste, die es unter Anderem ermöglicht, Volumendaten oder Transferfunktionen zu laden oder auch aktive Transferfunktionen zu speichern sowie das Erstellen eines Screenshots des zuletzt berechneten Bildes.
+Den Großteil der grafischen Oberfläche wird durch das Volumenrenderwidget ausgefüllt.
+Das Volumenrenderwidget ist ein QT OpenGL Widget und kann für das Darstellen von OpenGL Grafiken verwendet werden.
+Die berechneten Grafiken werden mit Hilfe des Volumenrenderwidgets dargestellt.
+Neben dem Volumenrenderwidget gibt es noch ein Widget, welches in drei weitere Widgets unterteilt ist, mit denen Parameter für das Volumenrendering gesetzt werden können.
+Das erste von ihnen ermöglicht das variieren der Abtastrate im Bildraum, also die Anzahl der Strahlen, die ausgesendet werden, sowie das Setzen der allgemeinen Abtastrate der ausgesendeten Strahlen.
+Außerdem können hier weitere Rendering Parameter festgelegt werden, wie die Hintergrundfarbe oder ob Voxel beim Abtasten interpoliert werden.
+Das zweite Widget ist ein Farbenrad, welches für die einfache Auswahl der Farben einzelner Kontrollpunkte der Transferfunktion verwendet werden kann.
+Das dritte Widget ermöglicht schließlich das Setzen von Kontrollpunkten der Transferfunktion innerhalb eines Diagramms.
+Die x-Richtung gibt die Dichte, auf die sich ein Kontrollpunkt bezieht an.
+Die y-Richtung gibt seinen Opazitätswert an.
+Die Werte zwischen zwei Kontrollpunkten werden entweder linear oder quadratisch interpoliert.
+Daher gibt es immer mindestens einen Kontrollpunkt für den Dichtewert null und einen Kontrollpunkt für den Dichtewert eins.
+\todo{Bitte auf Richtigkeit von diesem Teil prüfen, wie: Interpolation von Voxel und Einstellen der Transferfunkton.}
+
+% Speziell VolumeRenderWidget: OpenCL, OpenGL Host Code
+
+% Raycaster
 \subsection*{Raycaster}
+% volumerenderer: Unterteilung in Work Groups, Starten des Kernels, Setzten der Parameter des Kernels
+% OpenCL Kernel: Eigenschaften wie EES, AO, usw.
+
 \todo{Beschreibung der Funktionsweise des Raycasters für das Volumenrendering in dem Projekt.}
 
 \section{Arbeitspakete und Integration}\label{sec::workpacks}
