@@ -39,12 +39,25 @@ Daher gibt es immer mindestens einen Kontrollpunkt für den Dichtewert null und 
 \todo{Bitte auf Richtigkeit von diesem Teil prüfen, wie: Interpolation von Voxel und Einstellen der Transferfunkton.}
 
 % Speziell VolumeRenderWidget: OpenCL, OpenGL Host Code
+Das Volumenrenderwidget ist ein OpenGL Widget und für die Darstellung der berechneten Bilder zuständig.
+Das QT Framework erlaubt es, das Widget in c++ Code mit Logik zu verknüpfen.
+Dafür existiert in dem Projekt eine Klasse VolumeRenderWidget, welche von QOpenGLWidget erbt.
+Die grundsätzliche Funktionalität zum Rendern in diesem Widget wird durch die Methode \texttt{paintGL()} ausgeführt.
+Innerhalb dieser Methode wird der Code geschrieben, der für die Darstellung des Bildes nötig ist.
+Das Darstellen auf dem Bildschirm beziehungsweise in dem Widget wird durch OpenGL realisiert.
+OpenGL zeichnet dabei aber lediglich eine durch einen OpenCL Kernel zuvor generierte Textur auf ein Fullscreen Quad.
+Das Management von OpenCL wird hier durch ein Objekt der Klasse \texttt{volumerendercl} geregelt.
+Innerhalb der \texttt{paintGL()} Methode wird eine Methode dieses Objekts zum Starten des OpenCL Kernels für den Raycast des Volumenrenderings aufgerufen.
+Das \texttt{volumerendercl} Objekt regelt die Handhabung der verschiedenen Parameter für den Kernel und die Unterteilung der übergebenen Anzahl an Strahlen in x- und y-Richtung, welche der Anzahl zu startenden Work-Items entspricht, in Work-Groups.
+Außerdem startet es den Kernel, synchronisiert einen gemeinsamen Stopp und speichert die benötigte Zeit der letzten Ausführung des Kernels.
+Die berechneten Werte der einzelnen Work-Items können bei der Ausführung des Kernels direkt in die OpenGL Textur geschrieben werden.
+Daher kann nach der Ausführung der aufgerufenen Methode des \texttt{volumerendercl} Objekts die Textur direkt gezeichnet werden.
+Mit Hilfe von QT Funktionen und der Information über die Ausführungszeit des Kernels werden anschließend noch ein paar Overlays gezeichnet.
+Unter Anderem eine Anzeige der ungefähren möglichen Anzahl an Bildern pro Sekunde der letzten Ausführungen, um die Ausführungsdauer des Kernels abschätzen zu können.
 
-% Raycaster
+% Raycaster: Raycastkernel
 \subsection*{Raycaster}
-% volumerenderer: Unterteilung in Work Groups, Starten des Kernels, Setzten der Parameter des Kernels
-% OpenCL Kernel: Eigenschaften wie EES, AO, usw.
-
+% Raycaster: wichtige Parameter: in, out; Ungefährerer Aufbau: Sampling Loop durch das Volumen; Spezielle Eigenschaften, die aktiviert und deaktiviert werden können: ESS, Interpolation, AO
 \todo{Beschreibung der Funktionsweise des Raycasters für das Volumenrendering in dem Projekt.}
 
 \section{Arbeitspakete und Integration}\label{sec::workpacks}
