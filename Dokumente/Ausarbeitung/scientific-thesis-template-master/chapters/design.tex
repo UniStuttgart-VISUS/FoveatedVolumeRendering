@@ -72,9 +72,15 @@ Dabei wird für jeden Schritt die aktuelle Position bestimmt, welche normiert un
 Mit dem Dichtewert und den Daten der Transferfunktion wird anschließend ein Farbwert berechnet.
 Dieser Farbwert wird mit den bisherigen gesammelten Farbwerten des Strahls verrechnet, so dass am Ende der Abtastschleife ein einziger Farbwert für den Strahl existiert.
 Der Farbwert wird zum Schluss an die entsprechende Texturkoordinate in der Ausgabetextur gespeichert.
+\todo{Bild für das Abtasten des Strahls einfügen. Entweder hier oder bei Basics mit Volumenrendering und dann dorthin verweisen.}
 
 %  Raycaster: Spezielle Eigenschaften, die aktiviert und deaktiviert werden können: ESS, Interpolation, AO
-
+Der Raycast Kernel hat außer der grundlegenden Raycast Funktion noch weitere Eigenschaften, die die Performanz der Ausführung und die Qualität des Bildes verbessern.
+So kann \emph{Empty Space Skipping} aktiviert werden, um größere Bereiche mit rein transparenten Voxeln zu überspringen.
+Dies wird mit Hilfe eines zuvor gröber Berechneten Volumen ermöglicht.
+Da das Volumen nur eine begrenzte Auflösung hat aber an einer beliebigen Position ein Wert aus dieser 3D-Textur abgerufen werden kann, muss angegeben werden, wie dieser Wert abhängig von den umliegenden Voxel bestimmt wird.
+Daher kann hier gewählt werden, dass beim Auslesen des Dichtewerts an einer bestimmten Position des Volumens, dieser interpoliert wird.
+Außerdem kann eine Orthografische Sicht des Volumens aktiviert werden, indem die Strahlen parallel ausgesendet werden und für solide Oberflächen gibt es die Möglichkeit, den Effekt der \emph{Ambient Occlusion} darzustellen.
 
 \todo{Beschreibung der Funktionsweise des Raycasters für das Volumenrendering in dem Projekt.}
 
