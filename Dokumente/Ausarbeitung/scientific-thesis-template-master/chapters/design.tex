@@ -81,8 +81,71 @@ Dies wird mit Hilfe eines zuvor gröber Berechneten Volumen ermöglicht.
 Da das Volumen nur eine begrenzte Auflösung hat aber an einer beliebigen Position ein Wert aus dieser 3D-Textur abgerufen werden kann, muss angegeben werden, wie dieser Wert abhängig von den umliegenden Voxel bestimmt wird.
 Daher kann hier gewählt werden, dass beim Auslesen des Dichtewerts an einer bestimmten Position des Volumens, dieser interpoliert wird.
 Außerdem kann eine Orthografische Sicht des Volumens aktiviert werden, indem die Strahlen parallel ausgesendet werden und für solide Oberflächen gibt es die Möglichkeit, den Effekt der \emph{Ambient Occlusion} darzustellen.
-
 \todo{Beschreibung der Funktionsweise des Raycasters für das Volumenrendering in dem Projekt.}
 
 \section{Arbeitspakete und Integration}\label{sec::workpacks}
+Ausgehend von der in Abschnitt \ref{sec::proj} beschriebenen Ausgangslage des Projekts, wurden einige Vorüberlegungen und Arbeitspakete erstellt, welche das Ziel hatten, das Projekt so zu erweitern, dass die Aspekte des wahrnehmungsorientierten Volumenrendering veranschaulicht und umgesetzt werden können.
+Im folgenden werden die für dieses Ziel entstandenen Vorüberlegungen und daraus erstellte Arbeitspakete aufgeführt und die dazugehörigen Ansätze zur Integration in das bestehende Projekt skizziert.
+Genauere Angaben zur Implementierung bestimmter Arbeitspakete werden im Kapitel \ref{chap::impl} vorgestellt.
+
+\subsection*{Einarbeitung in das Projekt}
+Das erste Arbeitspaket, welches nicht zu vernachlässigen ist, war die Einarbeitung in das Projekt beziehungsweise in die bestehende Implementierung.
+Dies erforderte das Einarbeiten in einige Grundlagen der c++ Programmierung sowie das Einarbeiten in den grundlegenden Umgang mit dem QT Framework.
+Da das Projekt ein Visual Studio Projekt ist und Programmierschnittstellen wie OpenCL oder auch QT verwendet, war eine kleine Einarbeitung in das richtige Verlinken der Bibliotheken mit dem Projekt auch Teil von diesem Arbeitspaket.
+
+\subsection*{Simulieren der Blickposition}
+% Eyetracker ersetzt durch Maus
+% Widget kann auf Mausbewegungsevents reagieren
+% -> Arbeitspaket: Abspeichern der Mausposition in globaler Variable
+% -> Übergabe der Mausposition an den Kernel
+
+\subsection*{Reduzierung der Strahlabtastrate im fovealen Bereich}
+% Performanz erhöhen da Kernelzeit in äußeren Bereichen reduziert wird
+% Reduzierung der Strahlabtastrate sollte im äußeren Bereich kaum auffallen
+% -> Arbeitspaket: Verwenden der übergebenen Mausposition um im äußeren Bereich die Abtastrate des Strahls zu reduzieren
+% -> Mausposition in Bildkoordinaten; Radial abhängig zur Distanz eines Work-Items zur Mausposition Samples reduzieren
+
+\subsection*{Reduzierung der Strahldichte im fovealen Bereich}
+% Immernoch gleiche Anzahl an gestarteten Work-Items
+% Diese Anzahl reduzieren, da bei weniger Work-Groups die Ausführungszeit des Kernels auch schneller beendet sein sollte
+% Erste Idee: Einabuen einer Linse. Diese wird entsprechend vor die Kamera platziert, so dass bei weniger ausgesendeten Strahlen die Strahlen so gebrochen werden, dass trotzdem an der entsprechenden Position mehr Strahlsamples berechnet werden und an den äußeren eher weniger.
+% Problem: Interpolation und Berechnen der Linse beziehungsweise die richtige neue Richtung (und Texturkoordinate) des Strahls, der bisher ganz normal ausgesendet wird (Immernoch je Texel ein Strahl / Work-Item).
+% Neue Idee: Zwei verschiedene Kernelaufrufe. Der erste berechnet das Bild mit einem viertel der Auflösung über den gesamten Texturbereich, der zweite berechnet das Bild mit der normalen Auflösung aber nur in einem kleinen Bereich um die Mausposition.
+% Danach werden beide übereinander platziert.
+% Problem: Bilder in verschiedenen Auflösung. Daher Mausposition normieren auf [0,1]^2. Reduzieren der Strahlsamples wurde bei diesem Ansatz nicht verwendet.
+% -> Arbeitspaket: Berechnen des Bildes in zwei verschiedenen Auflösungen und Zusammenfügen beider für ein Bild in gesamter Auflösung. 
+
+\subsection*{Indize-Mapping}
+% Ziel: Drei unterschiedliche Auflösungen, die übereinander gelegt werden.
+% Mit normierten Koordinaten zu rechnen war aufwändig
+% -> drei Berechnungen auf dem gesamten Bild aber je nach Auflösung werden Work-Items schon früh discarded.
+% -> erster Test hat gezeigt, dass 1. Drei Kernel Enqueues nacheinander, die jeweils den Raycast machen, aufwändig sind und 2. das discarden von Work-Items keinerlei Performance bringt. Lag daran, dass Work-Items in verschiedenen Work-Groups sind und auch wenn alle bis auf eines früh discarded, muss der gesamte Thread-Block (auf den eine Work-Group vermutlich gemappt ist) weiterarbeiten.
+% -> Daher: Zwei oder mehr Raycast Kernel Aufrufe wollte vermeiden, wegen möglichen Overhead und neuer Ansatz: Drei unterschiedlich aufgelöste Bildbereiche bei einem Renderdurchlauf durch das Mapping von Indizes.
+% -> Arbeitspaket: Mapping von Indizes um bei einem einzigen Raycast Kernel Aufruf trotzdem drei verschieden aufgelöste Bereiche zu erreichen.
+% Da einheitliche Koordinaten: Einfache Wiederaufnahme der Reduzierung der Strahlabtastrate (radial)
+% -> Anschließende Interpolation um das gesamte Bild in voller Auflösung zu erhalten.
+
+\subsection*{Auswahl des Eyetrackers}
+% Da Renderoptionen existieren: 
+% -> Arbeitspaket: Auswahl des Eyetracker um Mausposition schließlich mit Blickposition zu ersetzen
+% -> HMD vs. Statisches am Bildschirm
+% -> Integration der Tobii Pro SDK
+% -> Umrechnung der Koordinaten des Eyetrackers in VolumeRenderWidget-Koordinaten
+
+\subsection*{Erstellen von Messwerten}
+% Idee: Messung von Kernelzeiten um verschiedene Verfahren besser vergleichen zu können und Messung der gesamten Ausführung um Gefühl für den Overhead der Kernel-Enqueues und der paintGL() Methode zu erhalten und die "echte" Performanz, die der Nutzer erfährt, zu bestimmen.
+% -> Arbeitspaket: Integrieren von Möglichkeiten um Messwerte zu nehmen.
+% -> Kernelzeiten durch volumerendercl-Objekt
+% -> paintGL() Ausführungszeit mit QTime-Objekt
+% -> Erstellen einer Mausbewegung über den Bildschirm. Dafür Unterteilung in 10x10 Grid
+% -> Einrichten der Möglichkeit, diese zu reproduzieren, um die gleiche Mausbewegung mit den drei verschiedenen Verfahren zu testen (Standard, DDC, MDC)
+% -> Erstellen von Messwerten für verschiedene Volumendaten, Transferfunktionen und Renderoptionen
+
+\subsection*{Darstellen der Messwerte}
+% Darstellung von Mausposition auf dem Bild und der gemessenenen Ausführungszeit.
+% Kernelzeiten sind am wichtigsten, da diese die eigentliche Ausführungszeit der unterschiedlichen Methoden repräsentieren.
+% Overhead muss nicht extra dargestellt werden, da relativ Konstant.
+% -> Arbeitspaket: Darstellen der Messwerte durch Heatmaps
+% -> Messen der Auslastung der GPU, wie Warps und Speicherbanks, mit CodeXL (gab aber Probleme und hat schließlich nicht funktioniert.)
+
 \todo{Vorüberlegungen zur Umsetzung und daraus entstandene Arbeitspakete beschreiben.}
