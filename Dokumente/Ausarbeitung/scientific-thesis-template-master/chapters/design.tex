@@ -165,8 +165,9 @@ Das Umsetzen des oben genannten Ziels, indem nur so viele Work-Items, wie benöt
 Mit der Motivation, dass so wenige Work-Items wie möglich innerhalb einer Work-Group auf die Ausführung anderer Work-Items warten müssen und die Thread-Blöcke möglichst konvergieren.
 Zusätzlich gehörte dazu, dass ein weiterer Kernel geschrieben wird, der die anschließende Interpolation der Bildpunkte ausführt.
 
-% Da einheitliche Koordinaten: Einfache Wiederaufnahme der Reduzierung der Strahlabtastrate (radial)
-% -> Anschließende Interpolation um das gesamte Bild in voller Auflösung zu erhalten.
+Die Integration von diesem Arbeitspaket erfordert die Berechnung der mindestens benötigten Anzahl an Work-Items, das Unterteilen in einen x- und y-Wert für die Dimensionen der Work-Items, zur Ausführung durch den Kernel.
+Anschließend muss der Raycast-Kernel mit der zuvor berechneten Anzahl an Work-Items in x- und y-Richtung gestartet werden sowie danach der Kernel für die Interpolation.
+Der Interpolation Kernel wird aber mit den Dimensionen des zu berechnenden Bildes für die Dimension der Work-Items gestartet. 
 
 \subsection*{Auswahl des Eyetrackers}
 % Da Renderoptionen existieren: 
