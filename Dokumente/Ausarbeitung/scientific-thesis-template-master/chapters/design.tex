@@ -120,8 +120,8 @@ Erste Tests der Implementierung haben eine Erhöhung der im Volumerenderwidget d
 Die Verminderung der Abtastrate machte sich nur bei dünnen Volumen visuell bemerkbar, da hier die einige Strahlen einen Teil des Volumen teilweise gar nicht abgetastet haben.
 
 \subsection*{Reduzierung der Strahldichte im fovealen Bereich}
-Trotz der Reduzierung der Abtastrate der Strahlen, wird immer noch die gleiche Anzahl an Work-Items gestartet.
-Dies ermöglicht einen weitere Möglichkeit die Ausführungszeit des Kernels zu reduzieren, indem die Anzahl der Strahlen und somit auch die Auflösung des berechneten Bildes variiert wird.
+Trotz der Reduzierung der Abtastrate der Strahlen, wird weiterhin die gleiche Anzahl an Work-Items gestartet.
+Dies ermöglicht eine weitere Möglichkeit, die Ausführungszeit des Kernels zu reduzieren, indem die Anzahl der Strahlen und somit auch die Auflösung des berechneten Bildes variiert wird.
 Weniger zu berechnenden Strahlen bedeutet hier auch weniger benötigte Work-Items und Work-Groups, die ausgeführt werden müssen.
 Weniger Work-Groups bedeutet dann auch eine geringere Ausführungszeit des Raycast Kernels.
 
@@ -130,18 +130,41 @@ So könnte bei einer geringeren Anzahl an Strahlen, an der Mausposition, die den
 Die Bildpunkte die dann nicht direkt von einem Strahl abgedeckt werden, müssten interpoliert werden.
 Dieser Ansatz wurde aber verworfen, da die Implementierung der virtuellen Linse und der anschließenden Interpolation sich als zu aufwändig erwies und es deutlich einfacher umzusetzende Alternativen gibt.
 
-% Neue Idee: Zwei verschiedene Kernelaufrufe. Der erste berechnet das Bild mit einem viertel der Auflösung über den gesamten Texturbereich, der zweite berechnet das Bild mit der normalen Auflösung aber nur in einem kleinen Bereich um die Mausposition.
-% Danach werden beide übereinander platziert.
-% Problem: Bilder in verschiedenen Auflösung. Daher Mausposition normieren auf [0,1]^2. Reduzieren der Strahlsamples wurde bei diesem Ansatz nicht verwendet.
-% -> Arbeitspaket: Berechnen des Bildes in zwei verschiedenen Auflösungen und Zusammenfügen beider für ein Bild in gesamter Auflösung. 
+Eine Alternative ist es, zwei Mal den Raycast Kernel hintereinander, mit jeweils unterschiedlichen Auflösungen, also einer unterschiedlichen Anzahl an Work-Items, zu starten.
+Dies wurde das nächste Arbeitspaket: Das Berechnen des Bildes in zwei verschiedenen Auflösungen und die anschließende Zusammenfügung beider Bilder zu einem.
+Für die Integration wurde wie in dem Arbeitspaket gefordert, das Bild in zwei verschiedenen Auflösungen nacheinander berechnet.
+Dafür konnte die bisherigen Funktionen des \texttt{volumerendercl} Objektes weiter verwendet werden.
+Es wurden aber zwei unterschiedliche OpenGL Texturen für die Ausgabe des Kernels verwendet.
+Zuerst mit nur einem viertel der Auflösung und anschließend mit der normalen Auflösung.
+Innerhalb eines festgelegten Quadrats um den Mauszeiger herum ist die Auflösung des Bildes normal und außerhalb davon hat diese nur ein viertel der normalen Auflösung.
+Bei der ersten Berechnung wird der Teil innerhalb von diesem Quadrat nicht berechnet und entsprechend wird bei der zweiten Berechnung der Teil des Bildes außerhalb des Quadrats nicht berechnet.
+Dadurch werden so wenige Bildpunkte wie möglich doppelt berechnet.
+Da das erste Bild nur mit einem viertel der Auflösung berechnet wurde und die ID der Work-Items nicht mehr mit den Bildkoordinaten übereinstimmte, wurde die Mausposition und die Ausmaße des Quadrates sowohl bei der Berechnung des Bildes, als auch bei der Zusammenfügung beider Bilder normalisiert.
 
 \subsection*{Indize-Mapping}
-% Ziel: Drei unterschiedliche Auflösungen, die übereinander gelegt werden.
-% Mit normierten Koordinaten zu rechnen war aufwändig
-% -> drei Berechnungen auf dem gesamten Bild aber je nach Auflösung werden Work-Items schon früh discarded.
-% -> erster Test hat gezeigt, dass 1. Drei Kernel Enqueues nacheinander, die jeweils den Raycast machen, aufwändig sind und 2. das discarden von Work-Items keinerlei Performance bringt. Lag daran, dass Work-Items in verschiedenen Work-Groups sind und auch wenn alle bis auf eines früh discarded, muss der gesamte Thread-Block (auf den eine Work-Group vermutlich gemappt ist) weiterarbeiten.
-% -> Daher: Zwei oder mehr Raycast Kernel Aufrufe wollte vermeiden, wegen möglichen Overhead und neuer Ansatz: Drei unterschiedlich aufgelöste Bildbereiche bei einem Renderdurchlauf durch das Mapping von Indizes.
-% -> Arbeitspaket: Mapping von Indizes um bei einem einzigen Raycast Kernel Aufruf trotzdem drei verschieden aufgelöste Bereiche zu erreichen.
+Das Ziel eines weiteren Ansatzes war es, statt nur zwei verschiedene Auflösungen zu verwenden, welche in Form eines Quadrats übereinander gelegt werden, nun drei verschiedene Bereiche des Bildes mit je unterschiedlichen Auflösungen zu berechnen.
+Ein äußerer Bereich und zwei innere Bereiche, die die Form von Ellipsen haben.
+Die drei Bereiche ergeben dann das gesamte Bild.
+
+Die erste Überlegung für diesen Ansatz war es, wie bei der Umsetzung des vorherigen Arbeitspaketes, auch hier drei Mal eine Berechnung für das gesamte Bild zu starten, aber jeweils die Teile, die außerhalb des Bereichs der aktuellen Berechnung liegen, zu discarden also diese nicht zu berechnen.
+Ein früher erster Test von diesem Ansatz hat gezeigt, dass die Performanz deutlich schlechter war, als bei der vorherigen Methode.
+Trotzdem zeigten die aufaddierten Ausführungszeiten der Kernels gute Werte.
+Ein mögliches Problem dafür ist, dass der Overhead für das Starten der Kernels bei drei verschiedenen Ausführungen doch einen Einfluss auf die Performanz nimmt.
+
+Da bis zu drei Ausführungen des Raycast Kernels hintereinander nicht die gewünschte Performanz erbrachten, wurde dies verworfen und eine weitere Möglichkeit, das oben genannte Ziel zu erreichen, überlegt.
+In der zweiten Überlegung ging es nun darum, mit nur einem Raycast Kernel Aufruf eine Berechnung für das ganze Bild zu starten.
+Jedoch werden in den äußeren zwei Bereichen nur in x- und y-Richtung nur jede dritte beziehungsweise jede zweite Berechnung eines Work-Items ausgeführt.
+Die anderen Work-Items werden entsprechend früh discarded.
+Ein zweiter Kernel soll die fehlenden Bildpunkte durch bipolare Interpolation der umliegenden Bildpunkte ausfüllen, so dass ein einzelnes Bild mit normaler Auflösung entsteht.
+Hier hat ein erster Test, bei dem lediglich ein Raycast Kernel aufgerufen wurde aber in x- und y-Richtung jedes zweite Work-Item discarded wurde gezeigt, dass dies keinerlei Performanz bringt.
+Dies liegt daran, dass durch die Anordnung der Work-Groups keine Work-Group existierte, die nur aus Work-Items bestand, die discarded wurden.
+Da vermutlich eine Work-Group auf einen Thread-Block abgebildet wird und ein Thread-Block so lange ausführt, bis alle seine Thread terminiert sind, wurde bei diesem Ansatz zwar nur ein viertel der Berechnungen ausgeführt aber trotzdem konnte kein Thread-Block schneller seine Arbeit verrichten, wodurch die Ausführungszeit des Kernels gleich blieb.
+
+Dies motivierte das nächste Arbeitspaket.
+Das Umsetzen des oben genannten Ziels, indem nur so viele Work-Items, wie benötigt, gestartet werden und das Abbilden dieser Work-Items auf die entsprechenden Bildpunkte.
+Mit der Motivation, dass so wenige Work-Items wie möglich innerhalb einer Work-Group auf die Ausführung anderer Work-Items warten müssen und die Thread-Blöcke möglichst konvergieren.
+Zusätzlich gehörte dazu, dass ein weiterer Kernel geschrieben wird, der die anschließende Interpolation der Bildpunkte ausführt.
+
 % Da einheitliche Koordinaten: Einfache Wiederaufnahme der Reduzierung der Strahlabtastrate (radial)
 % -> Anschließende Interpolation um das gesamte Bild in voller Auflösung zu erhalten.
 
