@@ -20,6 +20,7 @@ Für die bequeme Erstellung der grafischen Oberfläche bietet QT die Anwendung Q
 Der QT Designer ermöglicht es, Widgets und andere Bausteine der grafischen Oberfläche per Drag und Drop anzuordnen.
 Die durch den QT Designer definierte Oberfläche kann abgespeichert werden und wird von QT verwendet, um eine c++ Header File zu erstellen.
 Dies ermöglicht es die verschiedenen Elemente der grafischen Oberfläche an die Logik der Anwendung zu binden.
+\todo{Quelle zu QT einfügen.}
 
 % Struktur des Projekts (verschiedene Widgets)
 Das Projekt ist dementsprechend in c++ geschrieben und die grafische Oberfläche wurde mit Hilfe des QT Designers erstellt.
@@ -57,7 +58,24 @@ Unter Anderem eine Anzeige der ungefähren möglichen Anzahl an Bildern pro Seku
 
 % Raycaster: Raycastkernel
 \subsection*{Raycaster}
-% Raycaster: wichtige Parameter: in, out; Ungefährerer Aufbau: Sampling Loop durch das Volumen; Spezielle Eigenschaften, die aktiviert und deaktiviert werden können: ESS, Interpolation, AO
+% Raycaster: wichtige Parameter: in, out; Ungefährerer Aufbau: Sampling Loop durch das Volumen;
+Der eigentliche Raycast passiert in einem OpenCL Kernel.
+Die OpenCL Objekte werden von dem \texttt{volumerendercl} Objekt gehandhabt, dessen Methoden innerhalb der \texttt{paintGL()} Methode aufgerufen werden.
+Das \texttt{volumerendercl} Objekt regelt auch die Übergabe der Parameter an den Raycast Kernel.
+Dies sind Parameter wie Volumendaten, Transferfunktionswerte und Strahlabtastrate zum lesen, sowie eine 2D-Textur zum schreiben für die berechneten Farbwerte der einzelnen Work-Items.
+Jedes Work-Item besitzt eine 2D-ID, die einer Position in der Ausgabetextur zugewiesen bekommt.
+Ein Work-Item ist für das Abtasten eines Strahls verantwortlich.
+Ein Strahl hat als Ursprung die Position der Kamera und entsprechend seiner ID, beziehungsweise Texturkoordinaten, wird seine Richtung bestimmt.
+Abhängig von der Abtastrate des Strahls, berechnet sich die Schrittgröße für das Abtasten. 
+Ausgehend von dem Schnittpunkt des Strahls mit der Bildebene wird nun in einer Schleife der Strahl schrittweise abgetastet.
+Dabei wird für jeden Schritt die aktuelle Position bestimmt, welche normiert und dann dafür genutzt wird, um in dem 3D-Volumen Objekt den Dichtewert für diese Position zu bestimmen.
+Mit dem Dichtewert und den Daten der Transferfunktion wird anschließend ein Farbwert berechnet.
+Dieser Farbwert wird mit den bisherigen gesammelten Farbwerten des Strahls verrechnet, so dass am Ende der Abtastschleife ein einziger Farbwert für den Strahl existiert.
+Der Farbwert wird zum Schluss an die entsprechende Texturkoordinate in der Ausgabetextur gespeichert.
+
+%  Raycaster: Spezielle Eigenschaften, die aktiviert und deaktiviert werden können: ESS, Interpolation, AO
+
+
 \todo{Beschreibung der Funktionsweise des Raycasters für das Volumenrendering in dem Projekt.}
 
 \section{Arbeitspakete und Integration}\label{sec::workpacks}
