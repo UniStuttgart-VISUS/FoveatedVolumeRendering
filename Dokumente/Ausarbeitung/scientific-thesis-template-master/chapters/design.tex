@@ -120,10 +120,16 @@ Erste Tests der Implementierung haben eine Erhöhung der im Volumerenderwidget d
 Die Verminderung der Abtastrate machte sich nur bei dünnen Volumen visuell bemerkbar, da hier die einige Strahlen einen Teil des Volumen teilweise gar nicht abgetastet haben.
 
 \subsection*{Reduzierung der Strahldichte im fovealen Bereich}
-% Immernoch gleiche Anzahl an gestarteten Work-Items
-% Diese Anzahl reduzieren, da bei weniger Work-Groups die Ausführungszeit des Kernels auch schneller beendet sein sollte
-% Erste Idee: Einabuen einer Linse. Diese wird entsprechend vor die Kamera platziert, so dass bei weniger ausgesendeten Strahlen die Strahlen so gebrochen werden, dass trotzdem an der entsprechenden Position mehr Strahlsamples berechnet werden und an den äußeren eher weniger.
-% Problem: Interpolation und Berechnen der Linse beziehungsweise die richtige neue Richtung (und Texturkoordinate) des Strahls, der bisher ganz normal ausgesendet wird (Immernoch je Texel ein Strahl / Work-Item).
+Trotz der Reduzierung der Abtastrate der Strahlen, wird immer noch die gleiche Anzahl an Work-Items gestartet.
+Dies ermöglicht einen weitere Möglichkeit die Ausführungszeit des Kernels zu reduzieren, indem die Anzahl der Strahlen und somit auch die Auflösung des berechneten Bildes variiert wird.
+Weniger zu berechnenden Strahlen bedeutet hier auch weniger benötigte Work-Items und Work-Groups, die ausgeführt werden müssen.
+Weniger Work-Groups bedeutet dann auch eine geringere Ausführungszeit des Raycast Kernels.
+
+Die erste Überlegung diesbezüglich war es, eine Art virtuelle Linse vor die Bildebene zu setzen, die die Strahlen so auf der Bildebene verteilt, dass an der Mausposition eine höhere Strahldichte existiert und diese mit größerem Abstand zur Mausposition abnimmt.
+So könnte bei einer geringeren Anzahl an Strahlen, an der Mausposition, die den Blickpunkt simuliert, trotzdem die maximale Auflösung erreicht werden.
+Die Bildpunkte die dann nicht direkt von einem Strahl abgedeckt werden, müssten interpoliert werden.
+Dieser Ansatz wurde aber verworfen, da die Implementierung der virtuellen Linse und der anschließenden Interpolation sich als zu aufwändig erwies und es deutlich einfacher umzusetzende Alternativen gibt.
+
 % Neue Idee: Zwei verschiedene Kernelaufrufe. Der erste berechnet das Bild mit einem viertel der Auflösung über den gesamten Texturbereich, der zweite berechnet das Bild mit der normalen Auflösung aber nur in einem kleinen Bereich um die Mausposition.
 % Danach werden beide übereinander platziert.
 % Problem: Bilder in verschiedenen Auflösung. Daher Mausposition normieren auf [0,1]^2. Reduzieren der Strahlsamples wurde bei diesem Ansatz nicht verwendet.
