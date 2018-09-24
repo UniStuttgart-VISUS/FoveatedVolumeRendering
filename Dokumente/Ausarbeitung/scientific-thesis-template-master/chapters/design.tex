@@ -57,7 +57,7 @@ Mit Hilfe von QT Funktionen und der Information über die Ausführungszeit des K
 Unter Anderem eine Anzeige der ungefähren möglichen Anzahl an Bildern pro Sekunde der letzten Ausführungen, um die Ausführungsdauer des Kernels abschätzen zu können.
 
 % Raycaster: Raycastkernel
-\subsection*{Raycaster}
+\subsection*{Raycaster}\label{ss::rc}
 % Raycaster: wichtige Parameter: in, out; Ungefährerer Aufbau: Sampling Loop durch das Volumen;
 Der eigentliche Raycast passiert in einem OpenCL Kernel.
 Die OpenCL Objekte werden von dem \texttt{volumerendercl} Objekt gehandhabt, dessen Methoden innerhalb der \texttt{paintGL()} Methode aufgerufen werden.
@@ -94,16 +94,30 @@ Dies erforderte das Einarbeiten in einige Grundlagen der c++ Programmierung sowi
 Da das Projekt ein Visual Studio Projekt ist und Programmierschnittstellen wie OpenCL oder auch QT verwendet, war eine kleine Einarbeitung in das richtige Verlinken der Bibliotheken mit dem Projekt auch Teil von diesem Arbeitspaket.
 
 \subsection*{Simulieren der Blickposition}
-% Eyetracker ersetzt durch Maus
-% Widget kann auf Mausbewegungsevents reagieren
-% -> Arbeitspaket: Abspeichern der Mausposition in globaler Variable
-% -> Übergabe der Mausposition an den Kernel
+Um die Eigenschaften des visuellen Wahrnehmungssystems des Menschen auszunutzen, dass die Genauigkeit des Auges außerhalb des zentralen Bereichs stark abnimmt, ist es notwendig, die Blickposition beziehungsweise den fokussierten Punkt auf dem Bildschirm zu kennen.
+Ein Eyetracker kann dies messen und die Daten der Anwendung zur Verfügung stellen.
+Da die Einbindung eines Eyetrackers für die ersten Arbeitsschritte, wie das Implementieren erster Versuche, den Raycast Kernel wahrnehmungsorientiert umzuschreiben, nicht notwendig ist, sondern zum Teil auch erschwert, kann der Blickpunkt vorerst sehr gut mit der Maus simuliert werden.
+QT Widgets können auf Maus und Tastatureingaben reagieren.
+Daher war das erste Arbeitspaket das Erkennen von Mausbewegungen innerhalb des Volumerenderwidgets und das Abspeichern der letzten erkannten Mausposition in einer globalen Variable.
+Zusätzlich musste diese dem OpenCL Kernel, der den Raycast ausführt, zur Verfügung gestellt werden.
+Daher wurde die Mausposition dem OpenCL Kernel als Parameter übergeben.
 
 \subsection*{Reduzierung der Strahlabtastrate im fovealen Bereich}
-% Performanz erhöhen da Kernelzeit in äußeren Bereichen reduziert wird
-% Reduzierung der Strahlabtastrate sollte im äußeren Bereich kaum auffallen
-% -> Arbeitspaket: Verwenden der übergebenen Mausposition um im äußeren Bereich die Abtastrate des Strahls zu reduzieren
-% -> Mausposition in Bildkoordinaten; Radial abhängig zur Distanz eines Work-Items zur Mausposition Samples reduzieren
+Da die Mausposition dem Kernel nun zur Verfügung steht, können erste Implementierungsversuche für einen wahrnehmungsorientierten Raycast unternommen werden.
+Das ursprüngliche Projekt stellt zwei Parameter zur Verfügung, welche auf zwei verschiedene Arten die Ausführungszeit des Kernels beeinflussen.
+Die Abtastrate der jeweiligen Strahlen und die Anzahl der Strahlen in x- und y-Richtung.
+Da das Verändern der Anzahl an Strahlen in x- und y- Richtung das gesamte Bild betrifft und dies nicht einfach abhängig von dem Abstand zur Mausposition verändert werden kann, ist die Anpassung der Abtastrate einzelner Strahlen für den Anfang einfacher zu gestalten.
+Aus diesem Grund heraus entstand das nächste Arbeitspaket.
+Dieses umfasst die Verwendung der an den Raycast Kernel übergebenen Mausposition, um die Abtastrate der jeweiligen Strahlen, abhängig von der Distanz der Bildposition des Strahls zu der Position des Mauszeigers, zu reduzieren.
+Die Anpassung des Kernels hat zur Folge, dass für jeden Strahl abhängig seiner Distanz zum Mauszeiger eine eigene Abtastrate berechnet wird.
+Aufgrund dessen, dass wie im Abschnitt \ref{ss::rc} die Work-Items den Texel zugeordnet sind und die Work-Groups quadratisch angeordnet sind, sollte dies bewirken, dass die Work-Items innerhalb der selben Work-Group eine ähnliche Abtastrate für ihren Strahl berechnen und die gesamte Work-Group früher terminieren kann.
+Da der Kernel erst beendet wird, wenn alle Work-Groups ihre Arbeit abgeschlossen haben, bewirkt eine schnellere Ausführung einzelner Work-Groups eine insgesamt schnellere Ausführung des Kernels.
+Dementsprechend bewirkt dies auch eine bessere Performanz beim Berechnen des Bildes.
+Die Mausposition wurde in Bildkoordinaten, bezüglich des Volumerenderwidgets dem Kernel übergeben.
+Da die Anzahl der gestarteten Work-Items den Ausmaßen des Volumerenderwidgets entspricht, entspricht auch die ID eines Work-Items einer Bildkoordinate.
+Daher konnte die Entfernung der Work-Items zum Mauszeiger einfach berechnet werden und die Abtastrate abhängig von dieser Distanz angepasst.
+Erste Tests der Implementierung haben eine Erhöhung der im Volumerenderwidget durchschnittlichen angezeigten Bilder pro Sekunde ergeben.
+Die Verminderung der Abtastrate machte sich nur bei dünnen Volumen visuell bemerkbar, da hier die einige Strahlen einen Teil des Volumen teilweise gar nicht abgetastet haben.
 
 \subsection*{Reduzierung der Strahldichte im fovealen Bereich}
 % Immernoch gleiche Anzahl an gestarteten Work-Items
