@@ -88,12 +88,12 @@ Ausgehend von der in Abschnitt \ref{sec::proj} beschriebenen Ausgangslage des Pr
 Im folgenden werden die für dieses Ziel entstandenen Vorüberlegungen und daraus erstellte Arbeitspakete aufgeführt und die dazugehörigen Ansätze zur Integration in das bestehende Projekt skizziert.
 Genauere Angaben zur Implementierung bestimmter Arbeitspakete werden im Kapitel \ref{chap::impl} vorgestellt.
 
-\subsection*{Einarbeitung in das Projekt}
+\subsection{Einarbeitung in das Projekt}
 Das erste Arbeitspaket, welches nicht zu vernachlässigen ist, war die Einarbeitung in das Projekt beziehungsweise in die bestehende Implementierung.
 Dies erforderte das Einarbeiten in einige Grundlagen der c++ Programmierung sowie das Einarbeiten in den grundlegenden Umgang mit dem QT Framework.
 Da das Projekt ein Visual Studio Projekt ist und Programmierschnittstellen wie OpenCL oder auch QT verwendet, war eine kleine Einarbeitung in das richtige Verlinken der Bibliotheken mit dem Projekt auch Teil von diesem Arbeitspaket.
 
-\subsection*{Simulieren der Blickposition}
+\subsection{Simulieren der Blickposition}
 Um die Eigenschaften des visuellen Wahrnehmungssystems des Menschen auszunutzen, dass die Genauigkeit des Auges außerhalb des zentralen Bereichs stark abnimmt, ist es notwendig, die Blickposition beziehungsweise den fokussierten Punkt auf dem Bildschirm zu kennen.
 Ein Eyetracker kann dies messen und die Daten der Anwendung zur Verfügung stellen.
 Da die Einbindung eines Eyetrackers für die ersten Arbeitsschritte, wie das Implementieren erster Versuche, den Raycast Kernel wahrnehmungsorientiert umzuschreiben, nicht notwendig ist, sondern zum Teil auch erschwert, kann der Blickpunkt vorerst sehr gut mit der Maus simuliert werden.
@@ -102,7 +102,7 @@ Daher war das erste Arbeitspaket das Erkennen von Mausbewegungen innerhalb des V
 Zusätzlich musste diese dem OpenCL Kernel, der den Raycast ausführt, zur Verfügung gestellt werden.
 Daher wurde die Mausposition dem OpenCL Kernel als Parameter übergeben.
 
-\subsection*{Reduzierung der Strahlabtastrate im fovealen Bereich}
+\subsection{Reduzierung der Strahlabtastrate im fovealen Bereich}
 Da die Mausposition dem Kernel nun zur Verfügung steht, können erste Implementierungsversuche für einen wahrnehmungsorientierten Raycast unternommen werden.
 Das ursprüngliche Projekt stellt zwei Parameter zur Verfügung, welche auf zwei verschiedene Arten die Ausführungszeit des Kernels beeinflussen.
 Die Abtastrate der jeweiligen Strahlen und die Anzahl der Strahlen in x- und y-Richtung.
@@ -119,7 +119,7 @@ Daher konnte die Entfernung der Work-Items zum Mauszeiger einfach berechnet werd
 Erste Tests der Implementierung haben eine Erhöhung der im Volumerenderwidget durchschnittlichen angezeigten Bilder pro Sekunde ergeben.
 Die Verminderung der Abtastrate machte sich nur bei dünnen Volumen visuell bemerkbar, da hier die einige Strahlen einen Teil des Volumen teilweise gar nicht abgetastet haben.
 
-\subsection*{Reduzierung der Strahldichte im fovealen Bereich}
+\subsection{Reduzierung der Strahldichte im fovealen Bereich}\label{ss::MDC}
 Trotz der Reduzierung der Abtastrate der Strahlen, wird weiterhin die gleiche Anzahl an Work-Items gestartet.
 Dies ermöglicht eine weitere Möglichkeit, die Ausführungszeit des Kernels zu reduzieren, indem die Anzahl der Strahlen und somit auch die Auflösung des berechneten Bildes variiert wird.
 Weniger zu berechnenden Strahlen bedeutet hier auch weniger benötigte Work-Items und Work-Groups, die ausgeführt werden müssen.
@@ -141,7 +141,7 @@ Bei der ersten Berechnung wird der Teil innerhalb von diesem Quadrat nicht berec
 Dadurch werden so wenige Bildpunkte wie möglich doppelt berechnet.
 Da das erste Bild nur mit einem viertel der Auflösung berechnet wurde und die ID der Work-Items nicht mehr mit den Bildkoordinaten übereinstimmte, wurde die Mausposition und die Ausmaße des Quadrates sowohl bei der Berechnung des Bildes, als auch bei der Zusammenfügung beider Bilder normalisiert.
 
-\subsection*{Indize-Mapping}
+\subsection{Indize-Mapping}\label{ss::DDC}
 Das Ziel eines weiteren Ansatzes war es, statt nur zwei verschiedene Auflösungen zu verwenden, welche in Form eines Quadrats übereinander gelegt werden, nun drei verschiedene Bereiche des Bildes mit je unterschiedlichen Auflösungen zu berechnen.
 Ein äußerer Bereich und zwei innere Bereiche, die die Form von Ellipsen haben.
 Die drei Bereiche ergeben dann das gesamte Bild.
@@ -169,14 +169,39 @@ Die Integration von diesem Arbeitspaket erfordert die Berechnung der mindestens 
 Anschließend muss der Raycast-Kernel mit der zuvor berechneten Anzahl an Work-Items in x- und y-Richtung gestartet werden sowie danach der Kernel für die Interpolation.
 Der Interpolation Kernel wird aber mit den Dimensionen des zu berechnenden Bildes für die Dimension der Work-Items gestartet. 
 
-\subsection*{Auswahl des Eyetrackers}
-% Da Renderoptionen existieren: 
-% -> Arbeitspaket: Auswahl des Eyetracker um Mausposition schließlich mit Blickposition zu ersetzen
-% -> HMD vs. Statisches am Bildschirm
-% -> Integration der Tobii Pro SDK
-% -> Umrechnung der Koordinaten des Eyetrackers in VolumeRenderWidget-Koordinaten
+\subsection{Auswahl des Eyetrackers}
+Da nun drei verschiedene Ansätze für die Implementierung des wahrnehmungsorientierten Raycast existieren, war es an der Zeit, die Mausposition mit der richtigen Blickposition zu ersetzen.
+Dies war die Grundlage für das nächste Arbeitspaket.
+Dieses umfasste die Auswahl eines geeigneten Eyetrackers aus den verfügbaren, sowie die Einbindung der Programmierschnittstelle des Eyetrackers in das Projekt, um die Eyetrackingdaten verwenden zu können und schließlich die Mausposition mit dem zuletzt gemessenen Blickpunkt zu ersetzen.
 
-\subsection*{Erstellen von Messwerten}
+Die Auswahl lag in diesem Fall zwischen einer Eyetracking-Brille und dem an einem Monitor angebrachten Tobii Pro Spectrum Eyetracker.
+Da die Eyetracking-Brille eine deutlich geringere Abtastrate und Präzision als der Tobii Pro Spectrum, welcher mit bis zu 1200\,Hz und hoher Qualität Blickbewegungen erfassen kann, fiel die Entscheidung hier auf den monitorbasierten Eyetracker Tobii Pro Spectrum.
+Die Tobii Pro SDK erlaubte eine einfache Integration des Eyetrackers in das Projekt.
+Die Daten des Eyetrackers wurden dem Volumerenderwidget über eine Callback-Funktion zur Verfügung gestellt, welches immer die zuletzt erhaltene gültige Blickposition für die Berechnung des nächsten Bildes verwendet hat.
+Die Blickposition wird von dem Eyetracker normiert in $[0,1]^2$ angegeben und musste daher zuvor in die Bildkoordinaten des Volumerenderwidgets umgerechnet werden.
+Nun kann aktiviert werden, dass Eyetracking verwendet wird.
+Ist dies aktiviert, wird bei der Berechnung eines Bildes statt der letzten Mausposition nun die letzte Blickposition verwendet.
+
+\subsection{Testen der Implementierungen und verschiedener Parameter}
+Zu diesem Zeitpunkt existierte der standardmäßige Raycast und zwei verschiedene Variationen, die aus vorhergegangen Arbeitspaketen entstanden sind.
+Die erste Variation entstand aus dem Arbeitspaket im Teilabschnitt \ref{ss::MDC}, wobei das Bild einmal mit einem viertel der Auflösung und einmal nur in einem variablen rechteckigen Bereich um den Mauszeiger herum in normaler Auflösung berechnet wurde.
+Die beiden Bilder wurden anschließend zu einem Bild zusammengefügt.
+Die zweite Variation entstand aus dem Arbeitspaket im Teilabschnitt \ref{ss::DDC}.
+Hier wird der Raycast Kernel nur einmal gestartet und sich von der Idee, dass die ID eines Work-Items der Bildposition seines Ergebnisses entspricht, komplett gelöst.
+Die IDs der Work-Items werden auf verschiedene Bildpunkte abgebildet und das Bild besteht letztendlich aus drei Bereichen.
+Der äußerste Bereich hat die schlechteste Auflösung und umrahmt die inneren Bereiche.
+Die inneren Bereiche haben die Form von Ellipsen und sind um den Mauszeiger als ihren Mittelpunkt herum positioniert.
+Der innerste Bereich ist dabei kleiner als der mittlere und hat die normale Auflösung.
+Der mittlere Bereich hat eine eine Auflösung, die zwischen dem innersten und dem äußersten Bereich liegt, so dass die gesamte Auflösung des Bildes von der Blickposition her nach außen hin in zwei Stufen abnimmt.
+
+Das nächste Arbeitspaket bestand nun daraus, mit der Implementierung aus Teilabschnitt \ref{ss::MDC}, abgekürzt mit \emph{MDC}, und der Implementierung aus Teilabschnitt \ref{ss::DDC}, abgekürzt mit \emph{DDC}, verschiedene Renderingparameter und Transferfunktionen zu testen.
+Für die erste Variation (\emph{MDC}) kann dabei die Größe des Rechtecks verändert werden.
+Für die zweite Variation (\emph{DDC}) kann die Auflösung der verschiedenen Bereiche sowie jeweils die Größe der inneren Ellipse, die den innersten Bereichs begrenzt und der äußeren Ellipse, die den mittleren Bereich begrenzt, angepasst werden.
+
+\todo{Sollen die verschiedenen Parameter hier schon angegeben werden oder erst im Abschnitt \ref{chap::results} bei den Ergebnissen?}
+
+\subsection{Erstellen von Messwerten}
+
 % Idee: Messung von Kernelzeiten um verschiedene Verfahren besser vergleichen zu können und Messung der gesamten Ausführung um Gefühl für den Overhead der Kernel-Enqueues und der paintGL() Methode zu erhalten und die "echte" Performanz, die der Nutzer erfährt, zu bestimmen.
 % -> Arbeitspaket: Integrieren von Möglichkeiten um Messwerte zu nehmen.
 % -> Kernelzeiten durch volumerendercl-Objekt
@@ -185,7 +210,7 @@ Der Interpolation Kernel wird aber mit den Dimensionen des zu berechnenden Bilde
 % -> Einrichten der Möglichkeit, diese zu reproduzieren, um die gleiche Mausbewegung mit den drei verschiedenen Verfahren zu testen (Standard, DDC, MDC)
 % -> Erstellen von Messwerten für verschiedene Volumendaten, Transferfunktionen und Renderoptionen
 
-\subsection*{Darstellen der Messwerte}
+\subsection{Darstellen der Messwerte}
 % Darstellung von Mausposition auf dem Bild und der gemessenenen Ausführungszeit.
 % Kernelzeiten sind am wichtigsten, da diese die eigentliche Ausführungszeit der unterschiedlichen Methoden repräsentieren.
 % Overhead muss nicht extra dargestellt werden, da relativ Konstant.
