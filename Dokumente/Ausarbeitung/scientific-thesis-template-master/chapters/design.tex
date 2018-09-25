@@ -201,20 +201,29 @@ Für die zweite Variation (\emph{DDC}) kann die Auflösung der verschiedenen Ber
 \todo{Sollen die verschiedenen Parameter hier schon angegeben werden oder erst im Abschnitt \ref{chap::results} bei den Ergebnissen?}
 
 \subsection{Erstellen von Messwerten}
+Mit den Implementierungen \emph{MDC} und \emph{DDC} sowie ihren bestimmten Parametern ist nun das Ziel, ihre Performanz möglichst reproduzierbar zu messen. Da die Veränderungen selbst hauptsächlich im Kernel existierten, sollten die Ausführungszeiten des Kernels von \emph{MDC} und \emph{DDC} gemessen werden, um die beiden Verfahren untereinander und mit der Standardimplementierung besser vergleichen zu können.
+Trotzdem beeinflusst der Overhead der Verfahren bei der Ausführung der \texttt{paintGL()} Methode die reale Performanz, daher sollte diese auch gemessen werden.
 
-% Idee: Messung von Kernelzeiten um verschiedene Verfahren besser vergleichen zu können und Messung der gesamten Ausführung um Gefühl für den Overhead der Kernel-Enqueues und der paintGL() Methode zu erhalten und die "echte" Performanz, die der Nutzer erfährt, zu bestimmen.
-% -> Arbeitspaket: Integrieren von Möglichkeiten um Messwerte zu nehmen.
-% -> Kernelzeiten durch volumerendercl-Objekt
-% -> paintGL() Ausführungszeit mit QTime-Objekt
-% -> Erstellen einer Mausbewegung über den Bildschirm. Dafür Unterteilung in 10x10 Grid
-% -> Einrichten der Möglichkeit, diese zu reproduzieren, um die gleiche Mausbewegung mit den drei verschiedenen Verfahren zu testen (Standard, DDC, MDC)
-% -> Erstellen von Messwerten für verschiedene Volumendaten, Transferfunktionen und Renderoptionen
+Dies ist der Hintergrund für das nächste Arbeitspaket, welches die Integration von Möglichkeiten, um reproduzierbare Messwerte der unterschiedlichen Verfahren \emph{MDC}, \emph{DDC} und des Standard Raycasts zu erstellen, beinhaltet.
 
-\subsection{Darstellen der Messwerte}
-% Darstellung von Mausposition auf dem Bild und der gemessenenen Ausführungszeit.
-% Kernelzeiten sind am wichtigsten, da diese die eigentliche Ausführungszeit der unterschiedlichen Methoden repräsentieren.
-% Overhead muss nicht extra dargestellt werden, da relativ Konstant.
-% -> Arbeitspaket: Darstellen der Messwerte durch Heatmaps
+Für die Umsetzung des Arbeitspaket wurde eine Klasse erstellt, welche für eine Berechnung eines Bildes verschiedene Messwerte speichert.
+Für jeden Aufruf der \texttt{paintGL()} Methode wurde ein solches Objekt erstellt und gespeichert.
+Ein solches Objekt hält unter Anderem die gesamte Ausführungszeit der Kernels einer Bildberechung, welche mit Hilfe des \texttt{volumerendercl} Objektes berechnet werden kann, die ungefähre Ausführungszeit der \texttt{paintGL()} Methode selbst, welche mit Hilfe eines \texttt{QT QTime} Objektes ausgegeben werden kann und bei der Berechnung durch die \emph{MDC} oder \emph{DDC} Variante, wird auch die verwendete Position für den Blickpunkt gespeichert.
+Für die Erstellung der Messwerte wurde eine Mausbewegung über das aktuell angezeigte Bild aufgenommen und diese für die unterschiedlichen Varianten mit jeweils unterschiedlichen Volumen und Transferfunktionen wieder abgespielt.
+Dabei wurde für jede aufgenommene Mausposition eine Messung vorgenommen und gespeichert.
+Um nicht unnötig viele Messwerte zu erstellen, wurde das Bild in $10\times10$ Felder unterteilt und immer nur dann eine Mausposition für die Messung verwendet, falls diese in einem anderen Feld war, als die vorhergegangene.
 % -> Messen der Auslastung der GPU, wie Warps und Speicherbanks, mit CodeXL (gab aber Probleme und hat schließlich nicht funktioniert.)
 
-\todo{Vorüberlegungen zur Umsetzung und daraus entstandene Arbeitspakete beschreiben.}
+\subsection{Darstellen der Messwerte}
+Für die gemessenen Messwerte ist es nun notwendig, diese in eine geeignete Darstellung zu bringen.
+Das Ziel war es hier, die Mauspositionen und die jeweils gemessene Ausführungszeit in einem Diagramm darzustellen.
+Hier wurde sich für eine Repräsentation mittels einer Heatmap entschieden.
+Das letzte Arbeitspaket umfasste daher die Aufgabe, die Messwerte je Volumen, verwendeter Transferfunktion und verwendetem Verfahren für die Bildberechnung, in Form einer Heatmap darzustellen.
+
+Für die Erstellung der Heatmaps wurde \emph{pyplot} aus der Python Bibliothek \emph{matplotlib} verwendet.
+Dabei wurde das unterliegende Bild, welches mit der Standardvariante und einer bestimmten Transferfunktion erstellt wurde, als Hintergrund des Plots verwendet.
+Anschließend wurde an den entsprechenden Mausposition auf dem Bild Punkte mit bestimmten Farben eingezeichnet.
+Die Farbe eines Punktes bezieht sich auf die gesamte Ausführungszeit des Kernels für die jeweilige Mausposition.
+Für ein Volumen und einer bestimmten Transferfunktion wurde ein solcher Plot jeweils für die Messwerte von \emph{MDC} und \emph{DDC} erstellt.
+% Kernelzeiten sind am wichtigsten, da diese die eigentliche Ausführungszeit der unterschiedlichen Methoden repräsentieren.
+% Overhead muss nicht extra dargestellt werden, da relativ Konstant.
