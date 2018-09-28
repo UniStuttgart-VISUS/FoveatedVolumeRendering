@@ -182,20 +182,22 @@ Hier werden nun die IDs der Work-Items auf von ihrer ID her sehr unterschiedlich
 % Der Interpolation Kernel wird aber mit den Dimensionen des zu berechnenden Bildes für die Dimension der Work-Items gestartet. - Impl.
 
 \subsection{Auswahl des Eyetrackers}
-Da nun drei verschiedene Ansätze für die Implementierung des wahrnehmungsorientierten Raycast existieren, war es an der Zeit, die Mausposition mit der richtigen Blickposition zu ersetzen.
-Dies war die Grundlage für das nächste Arbeitspaket.
-Dieses umfasste die Auswahl eines geeigneten Eyetrackers aus den verfügbaren, sowie die Einbindung der Programmierschnittstelle des Eyetrackers in das Projekt, um die Eyetrackingdaten verwenden zu können und schließlich die Mausposition mit dem zuletzt gemessenen Blickpunkt zu ersetzen.
+Für das Ersetzen der Mausposition durch Blickpositionen auf dem Bildschirm, ist es notwendig, diese zu messen und die Daten der Anwendung zur Verfügung zu stellen.
+Dies ist die Grundlage des nächsten Arbeitspakets.
+Es umfasst die Auswahl eines geeigneten Eyetrackers, sowie die Einbindung der Programmierschnittstelle des Eyetrackers in das Projekt.
+Anschließend sollen die erhaltenen Eyetrackingdaten in Blickpositionen innerhalb des Volumerenderwidgets umgerechnet werden, um schließlich die Mausposition mit dem zuletzt gemessenen Blickpunkt zu ersetzen zu können.
 
 Die Auswahl lag in diesem Fall zwischen einer Eyetracking-Brille und dem an einem Monitor angebrachten Tobii Pro Spectrum Eyetracker.
 Da die Eyetracking-Brille eine deutlich geringere Abtastrate und Präzision als der Tobii Pro Spectrum, welcher mit bis zu 1200\,Hz und hoher Qualität Blickbewegungen erfassen kann, fiel die Entscheidung hier auf den monitorbasierten Eyetracker Tobii Pro Spectrum.
 Die Tobii Pro SDK erlaubte eine einfache Integration des Eyetrackers in das Projekt.
-Die Daten des Eyetrackers wurden dem Volumerenderwidget über eine Callback-Funktion zur Verfügung gestellt, welches immer die zuletzt erhaltene gültige Blickposition für die Berechnung des nächsten Bildes verwendet hat.
+% Die Daten des Eyetrackers wurden dem Volumerenderwidget über eine Callback-Funktion zur Verfügung gestellt, welches immer die zuletzt erhaltene gültige Blickposition für die Berechnung des nächsten Bildes verwendet hat. - Impl.
 Die Blickposition wird von dem Eyetracker normiert in $[0,1]^2$ angegeben und musste daher zuvor in die Bildkoordinaten des Volumerenderwidgets umgerechnet werden.
-Nun kann aktiviert werden, dass Eyetracking verwendet wird.
-Ist dies aktiviert, wird bei der Berechnung eines Bildes statt der letzten Mausposition nun die letzte Blickposition verwendet.
+% Nun kann aktiviert werden, dass Eyetracking verwendet wird. - Impl.
+Wird nun der Eyetracker verwendet, wird bei der Berechnung eines Bildes statt der letzten Mausposition die letzte Blickposition verwendet.
 
 \subsection{Testen der Implementierungen und verschiedener Parameter}
-Zu diesem Zeitpunkt existierte der standardmäßige Raycast und zwei verschiedene Variationen, die aus vorhergegangen Arbeitspaketen entstanden sind.
+Nachdem die zuvor genannten Arbeitspakete umgesetzt wurden, existierten drei verschiedene Möglichkeiten, den Raycast für das Volumenrendering durchzuführen.
+Der standardmäßige Raycast und zwei Variationen, die aus vorhergegangen Arbeitspaketen entstanden sind.
 Die erste Variation entstand aus dem Arbeitspaket im Teilabschnitt \ref{ss::MDC}, wobei das Bild einmal mit einem viertel der Auflösung und einmal nur in einem variablen rechteckigen Bereich um den Mauszeiger herum in normaler Auflösung berechnet wurde.
 Die beiden Bilder wurden anschließend zu einem Bild zusammengefügt.
 Die zweite Variation entstand aus dem Arbeitspaket im Teilabschnitt \ref{ss::DDC}.
@@ -206,10 +208,10 @@ Die inneren Bereiche haben die Form von Ellipsen und sind um den Mauszeiger als 
 Der innerste Bereich ist dabei kleiner als der mittlere und hat die normale Auflösung.
 Der mittlere Bereich hat eine eine Auflösung, die zwischen dem innersten und dem äußersten Bereich liegt, so dass die gesamte Auflösung des Bildes von der Blickposition her nach außen hin in zwei Stufen abnimmt.
 
-Das nächste Arbeitspaket bestand nun daraus, mit der Implementierung aus Teilabschnitt \ref{ss::MDC}, abgekürzt mit \emph{MDC}, und der Implementierung aus Teilabschnitt \ref{ss::DDC}, abgekürzt mit \emph{DDC}, verschiedene Renderingparameter und Transferfunktionen zu testen.
-Für die erste Variation (\emph{MDC}) kann dabei die Größe des Rechtecks verändert werden.
-Für die zweite Variation (\emph{DDC}) kann die Auflösung der verschiedenen Bereiche sowie jeweils die Größe der inneren Ellipse, die den innersten Bereichs begrenzt und der äußeren Ellipse, die den mittleren Bereich begrenzt, angepasst werden.
-
+Das nächste Arbeitspaket bestand aus dem Testen der Implementierungen.
+Dabei sollte mit der Implementierung aus Teilabschnitt \ref{ss::MDC}, abgekürzt mit \emph{MDC}, und der Implementierung aus Teilabschnitt \ref{ss::DDC}, abgekürzt mit \emph{DDC}, verschiedene Renderingparameter und Transferfunktionen getestet werden.
+Die erste Variation (\emph{MDC}) erlaubte es dafür, die Größe des normal aufgelösten Bereiches, welcher die Form eines Quadrates hat, zu verändern.
+Bei der zweiten Variation (\emph{DDC}), kann die Auflösung der verschiedenen Bereiche sowie jeweils die Größe der inneren Ellipse, die den innersten Bereichs begrenzt und der äußeren Ellipse, die den mittleren Bereich begrenzt, angepasst werden.
 \todo{Sollen die verschiedenen Parameter hier schon angegeben werden oder erst im Abschnitt \ref{chap::results} bei den Ergebnissen?}
 
 \subsection{Erstellen von Messwerten}
@@ -218,12 +220,13 @@ Trotzdem beeinflusst der Overhead der Verfahren bei der Ausführung der \texttt{
 
 Dies ist der Hintergrund für das nächste Arbeitspaket, welches die Integration von Möglichkeiten, um reproduzierbare Messwerte der unterschiedlichen Verfahren \emph{MDC}, \emph{DDC} und des Standard Raycasts zu erstellen, beinhaltet.
 
-Für die Umsetzung des Arbeitspaket wurde eine Klasse erstellt, welche für eine Berechnung eines Bildes verschiedene Messwerte speichert.
-Für jeden Aufruf der \texttt{paintGL()} Methode wurde ein solches Objekt erstellt und gespeichert.
-Ein solches Objekt hält unter Anderem die gesamte Ausführungszeit der Kernels einer Bildberechung, welche mit Hilfe des \texttt{volumerendercl} Objektes berechnet werden kann, die ungefähre Ausführungszeit der \texttt{paintGL()} Methode selbst, welche mit Hilfe eines \texttt{Qt Qtime} Objektes ausgegeben werden kann und bei der Berechnung durch die \emph{MDC} oder \emph{DDC} Variante, wird auch die verwendete Position für den Blickpunkt gespeichert.
+% Für die Umsetzung des Arbeitspaket wurde eine Klasse erstellt, welche für eine Berechnung eines Bildes verschiedene Messwerte speichert. - Impl.
+% Für jeden Aufruf der \texttt{paintGL()} Methode wurde ein solches Objekt erstellt und gespeichert. - Impl.
+% Ein solches Objekt hält unter Anderem die gesamte Ausführungszeit der Kernels einer Bildberechung, welche mit Hilfe des \texttt{volumerendercl} Objektes berechnet werden kann, die ungefähre Ausführungszeit der \texttt{paintGL()} Methode selbst, welche mit Hilfe eines \texttt{Qt Qtime} Objektes ausgegeben werden kann und bei der Berechnung durch die \emph{MDC} oder \emph{DDC} Variante, wird auch die verwendete Position für den Blickpunkt gespeichert. - Impl.
 Für die Erstellung der Messwerte wurde eine Mausbewegung über das aktuell angezeigte Bild aufgenommen und diese für die unterschiedlichen Varianten mit jeweils unterschiedlichen Volumen und Transferfunktionen wieder abgespielt.
 Dabei wurde für jede aufgenommene Mausposition eine Messung vorgenommen und gespeichert.
 Um nicht unnötig viele Messwerte zu erstellen, wurde das Bild in $10\times10$ Felder unterteilt und immer nur dann eine Mausposition für die Messung verwendet, falls diese in einem anderen Feld war, als die vorhergegangene.
+Die Speicherung aller relevanten Parameter einer Messung, inklusive der Mausbewegungen, soll möglichst reproduzierbare Messungen ermöglichen.
 % -> Messen der Auslastung der GPU, wie Warps und Speicherbanks, mit CodeXL (gab aber Probleme und hat schließlich nicht funktioniert.)
 
 \subsection{Darstellen der Messwerte}
@@ -231,11 +234,10 @@ Für die gemessenen Messwerte ist es nun notwendig, diese in eine geeignete Dars
 Das Ziel war es hier, die Mauspositionen und die jeweils gemessene Ausführungszeit in einem Diagramm darzustellen.
 Hier wurde sich für eine Repräsentation mittels einer Heatmap entschieden.
 Das letzte Arbeitspaket umfasste daher die Aufgabe, die Messwerte je Volumen, verwendeter Transferfunktion und verwendetem Verfahren für die Bildberechnung, in Form einer Heatmap darzustellen.
-
-Für die Erstellung der Heatmaps wurde \emph{pyplot} aus der Python Bibliothek \emph{matplotlib} verwendet.
-Dabei wurde das unterliegende Bild, welches mit der Standardvariante und einer bestimmten Transferfunktion erstellt wurde, als Hintergrund des Plots verwendet.
-Anschließend wurde an den entsprechenden Mausposition auf dem Bild Punkte mit bestimmten Farben eingezeichnet.
-Die Farbe eines Punktes bezieht sich auf die gesamte Ausführungszeit des Kernels für die jeweilige Mausposition.
-Für ein Volumen und einer bestimmten Transferfunktion wurde ein solcher Plot jeweils für die Messwerte von \emph{MDC} und \emph{DDC} erstellt.
+% Für die Erstellung der Heatmaps wurde \emph{pyplot} aus der Python Bibliothek \emph{matplotlib} verwendet. - Impl.
+Dabei soll das Bild, welches mit der Standardvariante und einer bestimmten Transferfunktion erstellt wurde, als Hintergrund des Plots dienen.
+Die entsprechenden Mausposition sollen über das Bild als Punkte mit bestimmten Farben eingezeichnet werden.
+Die Farbe eines Punktes soll angeben, wie lange der Kernel ausgeführt wurde, um das Bild mit der Mausposition an dieser Stelle zu berechnen.
+Für ein Volumen und einer bestimmten Transferfunktion soll ein solcher Plot jeweils für die Messwerte von \emph{MDC} und \emph{DDC} erstellt werden.
 % Kernelzeiten sind am wichtigsten, da diese die eigentliche Ausführungszeit der unterschiedlichen Methoden repräsentieren.
 % Overhead muss nicht extra dargestellt werden, da relativ Konstant.
