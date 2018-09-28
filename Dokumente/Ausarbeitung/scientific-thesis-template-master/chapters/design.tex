@@ -7,26 +7,26 @@ Dies umfasst die allgemeine Architektur der Anwendung und die Umsetzung des Volu
 Der zweite Abschnitt des Kapitels umfasst Überlegungen für die Erweiterung des Projektes, bezüglich des Ausgangspunktes wie er im ersten Abschnitt beschrieben wurde und dem Ziel dieser Arbeit, sowie die daraus entstandenen Arbeitspakete und die Ansätze für ihre Integration in das bestehende Projekt.
 
 \section{Projekt}\label{sec::proj}
-% QT
-Das Visual Studio Projekt, welches als Ausgangspunkt dient, ist eine auf QT basierende Anwendung.
-QT ist ein vollständiges Cross-Platform Softaware Development Framework, welches in c++ entwickelt wurde, und ermöglicht die einfache Erstellung von Anwendungen mit Benutzeroberflächen und bietet außerdem eine Vielzahl von Bibliotheken, die für eine leichtere und schnellere Entwicklung von Programmen genutzt werden können.
+% Qt
+Das Visual Studio Projekt, welches als Ausgangspunkt dient, ist eine auf Qt basierende Anwendung.
+Qt ist ein vollständiges Cross-Platform Softaware Development Framework, welches in c++ entwickelt wurde, und ermöglicht die einfache Erstellung von Anwendungen mit Benutzeroberflächen und bietet außerdem eine Vielzahl von Bibliotheken, die für eine leichtere und schnellere Entwicklung von Programmen genutzt werden können.
 
-% Struktur von QT
-Die Hauptelemente für die QT Benutzeroberfläche sind QT Widgets.
+% Struktur von Qt
+Die Hauptelemente für die Qt Benutzeroberfläche sind Qt Widgets.
 Widgets können Daten darstellen und Nutzereingaben erkennen.
 Außerdem stellt ein Widget selbst ein Container für weitere Widgets dar, welche in diesem gruppiert werden.
 Innerhalb eines Widgets können Elemente platziert werden, welche Informationen, mögliche Operationen oder Nutzereingaben repräsentieren.
-Für die bequeme Erstellung der grafischen Oberfläche bietet QT die Anwendung QT Designer.
-Der QT Designer ermöglicht es, Widgets und andere Bausteine der grafischen Oberfläche per Drag und Drop anzuordnen.
-Die durch den QT Designer definierte Oberfläche kann abgespeichert werden und wird von QT verwendet, um eine c++ Header File zu erstellen.
+Für die bequeme Erstellung der grafischen Oberfläche bietet Qt die Anwendung Qt Designer.
+Der Qt Designer ermöglicht es, Widgets und andere Bausteine der grafischen Oberfläche per Drag und Drop anzuordnen.
+Die durch den Qt Designer definierte Oberfläche kann abgespeichert werden und wird von Qt verwendet, um eine c++ Header File zu erstellen.
 Dies ermöglicht es die verschiedenen Elemente der grafischen Oberfläche an die Logik der Anwendung zu binden.
-\todo{Quelle zu QT einfügen.}
+\todo{Quelle zu Qt einfügen.}
 
 % Struktur des Projekts (verschiedene Widgets)
-Das Projekt ist dementsprechend in c++ geschrieben und die grafische Oberfläche wurde mit Hilfe des QT Designers erstellt.
+Das Projekt ist dementsprechend in c++ geschrieben und die grafische Oberfläche wurde mit Hilfe des Qt Designers erstellt.
 Die Oberfläche selbst hat eine Menüleiste, die es unter Anderem ermöglicht, Volumendaten oder Transferfunktionen zu laden oder auch aktive Transferfunktionen zu speichern sowie das Erstellen eines Screenshots des zuletzt berechneten Bildes.
 Den Großteil der grafischen Oberfläche wird durch das Volumenrenderwidget ausgefüllt.
-Das Volumenrenderwidget ist ein QT OpenGL Widget und kann für das Darstellen von OpenGL Grafiken verwendet werden.
+Das Volumenrenderwidget ist ein Qt OpenGL Widget und kann für das Darstellen von OpenGL Grafiken verwendet werden.
 Die berechneten Grafiken werden mit Hilfe des Volumenrenderwidgets dargestellt.
 Neben dem Volumenrenderwidget gibt es noch ein Widget, welches in drei weitere Widgets unterteilt ist, mit denen Parameter für das Volumenrendering gesetzt werden können.
 Das erste von ihnen ermöglicht das variieren der Abtastrate im Bildraum, also die Anzahl der Strahlen, die ausgesendet werden, sowie das Setzen der allgemeinen Abtastrate der ausgesendeten Strahlen.
@@ -41,7 +41,7 @@ Daher gibt es immer mindestens einen Kontrollpunkt für den Dichtewert null und 
 
 % Speziell VolumeRenderWidget: OpenCL, OpenGL Host Code
 Das Volumenrenderwidget ist ein OpenGL Widget und für die Darstellung der berechneten Bilder zuständig.
-Das QT Framework erlaubt es, das Widget in c++ Code mit Logik zu verknüpfen.
+Das Qt Framework erlaubt es, das Widget in c++ Code mit Logik zu verknüpfen.
 Dafür existiert in dem Projekt eine Klasse VolumeRenderWidget, welche von QOpenGLWidget erbt.
 Die grundsätzliche Funktionalität zum Rendern in diesem Widget wird durch die Methode \texttt{paintGL()} ausgeführt.
 Innerhalb dieser Methode wird der Code geschrieben, der für die Darstellung des Bildes nötig ist.
@@ -53,7 +53,7 @@ Das \texttt{volumerendercl} Objekt regelt die Handhabung der verschiedenen Param
 Außerdem startet es den Kernel, synchronisiert einen gemeinsamen Stopp und speichert die benötigte Zeit der letzten Ausführung des Kernels.
 Die berechneten Werte der einzelnen Work-Items können bei der Ausführung des Kernels direkt in die OpenGL Textur geschrieben werden.
 Daher kann nach der Ausführung der aufgerufenen Methode des \texttt{volumerendercl} Objekts die Textur direkt gezeichnet werden.
-Mit Hilfe von QT Funktionen und der Information über die Ausführungszeit des Kernels werden anschließend noch ein paar Overlays gezeichnet.
+Mit Hilfe von Qt Funktionen und der Information über die Ausführungszeit des Kernels werden anschließend noch ein paar Overlays gezeichnet.
 Unter Anderem eine Anzeige der ungefähren möglichen Anzahl an Bildern pro Sekunde der letzten Ausführungen, um die Ausführungsdauer des Kernels abschätzen zu können.
 
 % Raycaster: Raycastkernel
@@ -89,35 +89,36 @@ Im folgenden werden die für dieses Ziel entstandenen Vorüberlegungen und darau
 Genauere Angaben zur Implementierung bestimmter Arbeitspakete werden im Kapitel \ref{chap::impl} vorgestellt.
 
 \subsection{Einarbeitung in das Projekt}
-Das erste Arbeitspaket, welches nicht zu vernachlässigen ist, war die Einarbeitung in das Projekt beziehungsweise in die bestehende Implementierung.
-Dies erforderte das Einarbeiten in einige Grundlagen der c++ Programmierung sowie das Einarbeiten in den grundlegenden Umgang mit dem QT Framework.
-Da das Projekt ein Visual Studio Projekt ist und Programmierschnittstellen wie OpenCL oder auch QT verwendet, war eine kleine Einarbeitung in das richtige Verlinken der Bibliotheken mit dem Projekt auch Teil von diesem Arbeitspaket.
+Das erste Arbeitspaket, welches nicht zu vernachlässigen ist, ist die Einarbeitung in das Projekt beziehungsweise in die bestehende Implementierung.
+Dies erfordert das Einarbeiten in einige Grundlagen der c++ Programmierung sowie in den grundlegenden Umgang mit dem Qt Framework.
+Da das Projekt ein Visual Studio Projekt ist und Programmierschnittstellen wie OpenCL oder auch Qt verwendet, ist das Erlangen einer Kenntnisse für das richtige Verlinken der Bibliotheken mit dem Projekt auch Teil dieses Arbeitspakets.
 
 \subsection{Simulieren der Blickposition}
 Um die Eigenschaften des visuellen Wahrnehmungssystems des Menschen auszunutzen, dass die Genauigkeit des Auges außerhalb des zentralen Bereichs stark abnimmt, ist es notwendig, die Blickposition beziehungsweise den fokussierten Punkt auf dem Bildschirm zu kennen.
 Ein Eyetracker kann dies messen und die Daten der Anwendung zur Verfügung stellen.
-Da die Einbindung eines Eyetrackers für die ersten Arbeitsschritte, wie das Implementieren erster Versuche, den Raycast Kernel wahrnehmungsorientiert umzuschreiben, nicht notwendig ist, sondern zum Teil auch erschwert, kann der Blickpunkt vorerst sehr gut mit der Maus simuliert werden.
-QT Widgets können auf Maus und Tastatureingaben reagieren.
-Daher war das erste Arbeitspaket das Erkennen von Mausbewegungen innerhalb des Volumerenderwidgets und das Abspeichern der letzten erkannten Mausposition in einer globalen Variable.
-Zusätzlich musste diese dem OpenCL Kernel, der den Raycast ausführt, zur Verfügung gestellt werden.
-Daher wurde die Mausposition dem OpenCL Kernel als Parameter übergeben.
+Die Einbindung eines Eyetrackers ist für die ersten Arbeitsschritte, wie das Implementieren erster Versuche und den Raycast Kernel wahrnehmungsorientiert umzuschreiben, nicht notwendig und kann dies sogar behindern.
+Das Projekt bietet aber einfache Möglichkeiten auf Maus- oder Tastatureingaben zu reagieren.
+Daher ist das zweite Arbeitspaket, das Erkennen von Mausbewegungen innerhalb des Volumerenderwidgets und das Abspeichern der letzten erkannten Mausposition in einer globalen Variable, um die Blickposition mit der Maus simulieren zu können.
+% Zusätzlich muss diese auch dem OpenCL Kernel, der den Raycast ausführt, zur Verfügung gestellt werden. -Impl.
+% Daher wurde die Mausposition dem OpenCL Kernel als Parameter übergeben. - Impl.
 
 \subsection{Reduzierung der Strahlabtastrate im fovealen Bereich}
-Da die Mausposition dem Kernel nun zur Verfügung steht, können erste Implementierungsversuche für einen wahrnehmungsorientierten Raycast unternommen werden.
+Nun ist es möglich, die Mausposition zu verwenden, um den Blickpunkt auf dem Bildschirm zu simulieren.
+Dies erlaubt das Erstellen und Testen von wahrnehmungsorientierten Implementierung. 
 Das ursprüngliche Projekt stellt zwei Parameter zur Verfügung, welche auf zwei verschiedene Arten die Ausführungszeit des Kernels beeinflussen.
 Die Abtastrate der jeweiligen Strahlen und die Anzahl der Strahlen in x- und y-Richtung.
 Da das Verändern der Anzahl an Strahlen in x- und y- Richtung das gesamte Bild betrifft und dies nicht einfach abhängig von dem Abstand zur Mausposition verändert werden kann, ist die Anpassung der Abtastrate einzelner Strahlen für den Anfang einfacher zu gestalten.
-Aus diesem Grund heraus entstand das nächste Arbeitspaket.
-Dieses umfasst die Verwendung der an den Raycast Kernel übergebenen Mausposition, um die Abtastrate der jeweiligen Strahlen, abhängig von der Distanz der Bildposition des Strahls zu der Position des Mauszeigers, zu reduzieren.
+
+Das dritte Arbeitspaket umfasst die Verwendung der an den Raycast Kernel übergebenen Mausposition, um die Abtastrate der jeweiligen Strahlen, abhängig von der Distanz der Bildposition des Strahls zu der Position des Mauszeigers, zu reduzieren.
 Die Anpassung des Kernels hat zur Folge, dass für jeden Strahl abhängig seiner Distanz zum Mauszeiger eine eigene Abtastrate berechnet wird.
-Aufgrund dessen, dass wie im Abschnitt \ref{ss::rc} die Work-Items den Texel zugeordnet sind und die Work-Groups quadratisch angeordnet sind, sollte dies bewirken, dass die Work-Items innerhalb der selben Work-Group eine ähnliche Abtastrate für ihren Strahl berechnen und die gesamte Work-Group früher terminieren kann.
-Da der Kernel erst beendet wird, wenn alle Work-Groups ihre Arbeit abgeschlossen haben, bewirkt eine schnellere Ausführung einzelner Work-Groups eine insgesamt schnellere Ausführung des Kernels.
-Dementsprechend bewirkt dies auch eine bessere Performanz beim Berechnen des Bildes.
-Die Mausposition wurde in Bildkoordinaten, bezüglich des Volumerenderwidgets dem Kernel übergeben.
-Da die Anzahl der gestarteten Work-Items den Ausmaßen des Volumerenderwidgets entspricht, entspricht auch die ID eines Work-Items einer Bildkoordinate.
-Daher konnte die Entfernung der Work-Items zum Mauszeiger einfach berechnet werden und die Abtastrate abhängig von dieser Distanz angepasst.
-Erste Tests der Implementierung haben eine Erhöhung der im Volumerenderwidget durchschnittlichen angezeigten Bilder pro Sekunde ergeben.
-Die Verminderung der Abtastrate machte sich nur bei dünnen Volumen visuell bemerkbar, da hier die einige Strahlen einen Teil des Volumen teilweise gar nicht abgetastet haben.
+Aufgrund dessen, dass wie im Abschnitt \ref{ss::rc} die Work-Items den Texel zugeordnet sind und die Work-Groups quadratisch angeordnet sind, soll dies bewirken, dass die Work-Items innerhalb der selben Work-Group eine ähnliche Abtastrate für ihren Strahl berechnen und die gesamte Work-Group früher terminieren kann.
+Da der Kernel erst beendet wird, wenn alle Work-Groups ihre Arbeit abgeschlossen haben, würde eine schnellere Ausführung einzelner Work-Groups eine insgesamt schnellere Ausführung des Kernels und auch eine bessere Performanz beim Berechnen des Bildes bewirken.
+% Die Mausposition wurde in Bildkoordinaten, bezüglich des Volumerenderwidgets dem Kernel übergeben. - Impl.
+% Da die Anzahl der gestarteten Work-Items den Ausmaßen des Volumerenderwidgets entspricht, entspricht auch die ID eines Work-Items einer Bildkoordinate. - Impl.
+% Daher konnte die Entfernung der Work-Items zum Mauszeiger einfach berechnet werden und die Abtastrate abhängig von dieser Distanz angepasst. - Impl.
+% Erste Tests der Implementierung haben eine Erhöhung der im Volumerenderwidget durchschnittlichen angezeigten Bilder pro Sekunde ergeben. - Res.
+% Die Verminderung der Abtastrate machte sich nur bei dünnen Volumen visuell bemerkbar. - Res.
+% Bei dünnen Volumen kam es vor, dass einige Strahlen Teile des Volumen gar nicht abgetastet haben, da die Distanz der abgetasteten Punkte außerhalb des Volumenabschnitts lag. - Res.
 
 \subsection{Reduzierung der Strahldichte im fovealen Bereich}\label{ss::MDC}
 Trotz der Reduzierung der Abtastrate der Strahlen, wird weiterhin die gleiche Anzahl an Work-Items gestartet.
@@ -130,44 +131,55 @@ So könnte bei einer geringeren Anzahl an Strahlen, an der Mausposition, die den
 Die Bildpunkte die dann nicht direkt von einem Strahl abgedeckt werden, müssten interpoliert werden.
 Dieser Ansatz wurde aber verworfen, da die Implementierung der virtuellen Linse und der anschließenden Interpolation sich als zu aufwändig erwies und es deutlich einfacher umzusetzende Alternativen gibt.
 
-Eine Alternative ist es, zwei Mal den Raycast Kernel hintereinander, mit jeweils unterschiedlichen Auflösungen, also einer unterschiedlichen Anzahl an Work-Items, zu starten.
-Dies wurde das nächste Arbeitspaket: Das Berechnen des Bildes in zwei verschiedenen Auflösungen und die anschließende Zusammenfügung beider Bilder zu einem.
-Für die Integration wurde wie in dem Arbeitspaket gefordert, das Bild in zwei verschiedenen Auflösungen nacheinander berechnet.
-Dafür konnte die bisherigen Funktionen des \texttt{volumerendercl} Objektes weiter verwendet werden.
-Es wurden aber zwei unterschiedliche OpenGL Texturen für die Ausgabe des Kernels verwendet.
-Zuerst mit nur einem viertel der Auflösung und anschließend mit der normalen Auflösung.
-Innerhalb eines festgelegten Quadrats um den Mauszeiger herum ist die Auflösung des Bildes normal und außerhalb davon hat diese nur ein viertel der normalen Auflösung.
-Bei der ersten Berechnung wird der Teil innerhalb von diesem Quadrat nicht berechnet und entsprechend wird bei der zweiten Berechnung der Teil des Bildes außerhalb des Quadrats nicht berechnet.
-Dadurch werden so wenige Bildpunkte wie möglich doppelt berechnet.
-Da das erste Bild nur mit einem viertel der Auflösung berechnet wurde und die ID der Work-Items nicht mehr mit den Bildkoordinaten übereinstimmte, wurde die Mausposition und die Ausmaße des Quadrates sowohl bei der Berechnung des Bildes, als auch bei der Zusammenfügung beider Bilder normalisiert.
+Eine Alternative ist es, zwei Mal das selbe Bild, mit jeweils unterschiedlichen Auflösungen, also einer unterschiedlichen Anzahl an Work-Items, zu berechnen.
+Daher umfasst das nächste Arbeitspaket das Berechnen des Bildes in zwei verschiedenen Auflösungen und die anschließende Zusammenfügung beider Bilder zu einem.
+Dabei soll der normal aufgelöste Bereich an der Blickposition sein und der restliche Teil des Bildes hat die niedrigere Auflösung.
+Wie oben beschrieben soll eine Reduzierung der Auflösung auch die Anzahl der gestarteten Work-Items und Work-Groups reduzieren.
+Dadurch soll das Bild mit einer geringeren Auflösung deutlich schneller Berechnet werden können.
+Trotzdem muss ein Teil des Bildes in normaler Auflösung berechnet werden.
+Da aber nur ein kleiner Teil in dieser Auflösung berechnet werden muss, soll durch das frühzeitige Abbrechen von Work-Items, die außerhalb dieses Bereichs liegen, die zweite Bildberechnung ebenfalls beschleunigen.
+Das Ziel ist, dass die Berechnung zweier Bilder in verschiedenen Auflösungen und das anschließende Interpolieren sowie Zusammenfügen ihrer, eine insgesamt niedrigere Berechnungszeit benötigt, als die Berechnung eines Bildes in normaler Auflösung.
+Zusätzlich soll dadurch, dass ein kleiner Bereich des Ergebnisbildes an der Blickposition, der leicht größer als die projizierte Fovea ist, die normale Auflösung hat und die Auflösung im peripheren Bereich trotzdem ausreichend ist, die Wahrnehmung geschaffen werden, dass das gesamte Bild mit normaler Auflösung berechnet wurde.
+% Für die Integration wurde wie in dem Arbeitspaket gefordert, das Bild in zwei verschiedenen Auflösungen nacheinander berechnet. - Impl.
+% Dafür konnte die bisherigen Funktionen des \texttt{volumerendercl} Objektes weiter verwendet werden. - Impl.
+% Es wurden aber zwei unterschiedliche OpenGL Texturen für die Ausgabe des Kernels verwendet. - Impl.
+% Zuerst mit nur einem viertel der Auflösung und anschließend mit der normalen Auflösung. - Impl.
+% Innerhalb eines festgelegten Quadrats um den Mauszeiger herum ist die Auflösung des Bildes normal und außerhalb davon hat diese nur ein viertel der normalen Auflösung. - Impl.
+% Bei der ersten Berechnung wird der Teil innerhalb von diesem Quadrat nicht berechnet und entsprechend wird bei der zweiten Berechnung der Teil des Bildes außerhalb des Quadrats nicht berechnet. - Impl.
+% Dadurch werden so wenige Bildpunkte wie möglich doppelt berechnet. - Impl.
+% Da das erste Bild nur mit einem viertel der Auflösung berechnet wurde und die ID der Work-Items nicht mehr mit den Bildkoordinaten übereinstimmte, wurde die Mausposition und die Ausmaße des Quadrates sowohl bei der Berechnung des Bildes, als auch bei der Zusammenfügung beider Bilder normalisiert. - Impl.
 
 \subsection{Indize-Mapping}\label{ss::DDC}
-Das Ziel eines weiteren Ansatzes war es, statt nur zwei verschiedene Auflösungen zu verwenden, welche in Form eines Quadrats übereinander gelegt werden, nun drei verschiedene Bereiche des Bildes mit je unterschiedlichen Auflösungen zu berechnen.
-Ein äußerer Bereich und zwei innere Bereiche, die die Form von Ellipsen haben.
-Die drei Bereiche ergeben dann das gesamte Bild.
+Das Ziel eines weiteren Ansatzes ist es, die Auflösung von der Mausposition weg, noch weiter zu reduzieren.
+Zwischen dem Bereich, der in einer normalen Auflösung und dem Bereich, der in einer niedrigen Auflösung berechnet wird, soll dafür ein weiterer Bereich eingefügt werden, um eine starke Differenz der Bildauflösung an aneinandergrenzenden Bereichen zu verhindern.
 
-Die erste Überlegung für diesen Ansatz war es, wie bei der Umsetzung des vorherigen Arbeitspaketes, auch hier drei Mal eine Berechnung für das gesamte Bild zu starten, aber jeweils die Teile, die außerhalb des Bereichs der aktuellen Berechnung liegen, zu discarden also diese nicht zu berechnen.
-Ein früher erster Test von diesem Ansatz hat gezeigt, dass die Performanz deutlich schlechter war, als bei der vorherigen Methode.
-Trotzdem zeigten die aufaddierten Ausführungszeiten der Kernels gute Werte.
-Ein mögliches Problem dafür ist, dass der Overhead für das Starten der Kernels bei drei verschiedenen Ausführungen doch einen Einfluss auf die Performanz nimmt.
-
-Da bis zu drei Ausführungen des Raycast Kernels hintereinander nicht die gewünschte Performanz erbrachten, wurde dies verworfen und eine weitere Möglichkeit, das oben genannte Ziel zu erreichen, überlegt.
-In der zweiten Überlegung ging es nun darum, mit nur einem Raycast Kernel Aufruf eine Berechnung für das ganze Bild zu starten.
-Jedoch werden in den äußeren zwei Bereichen nur in x- und y-Richtung nur jede dritte beziehungsweise jede zweite Berechnung eines Work-Items ausgeführt.
-Die anderen Work-Items werden entsprechend früh discarded.
-Ein zweiter Kernel soll die fehlenden Bildpunkte durch bipolare Interpolation der umliegenden Bildpunkte ausfüllen, so dass ein einzelnes Bild mit normaler Auflösung entsteht.
-Hier hat ein erster Test, bei dem lediglich ein Raycast Kernel aufgerufen wurde aber in x- und y-Richtung jedes zweite Work-Item discarded wurde gezeigt, dass dies keinerlei Performanz bringt.
-Dies liegt daran, dass durch die Anordnung der Work-Groups keine Work-Group existierte, die nur aus Work-Items bestand, die discarded wurden.
-Da vermutlich eine Work-Group auf einen Thread-Block abgebildet wird und ein Thread-Block so lange ausführt, bis alle seine Thread terminiert sind, wurde bei diesem Ansatz zwar nur ein viertel der Berechnungen ausgeführt aber trotzdem konnte kein Thread-Block schneller seine Arbeit verrichten, wodurch die Ausführungszeit des Kernels gleich blieb.
+Das berechnete Bild besteht dann aus drei Bereichen.
+Ein äußerer Bereich und zwei innere Bereiche.
+Die inneren Bereiche sollen die Form von Ellipsen haben, werden also durch Ellipsen beschränkt.
+Der Mittelpunkt der beiden Ellipsen soll dem Blickpunkt entsprechen, so dass die Auflösung in der Fovea am besten ist und nach außen hin abnimmt.
+Die drei Bereiche werden jeweils interpoliert und ergeben dann das gesamte Bild.
+% Die erste Überlegung für diesen Ansatz war es, auch hier drei Mal eine Berechnung für das gesamte Bild zu starten, aber jeweils die Work-Items für Strahlen, die außerhalb des jeweiligen Bereichs der aktuellen Berechnung liegen, frühzeitig abzubrechen. Res.
+% Ein früher erster Test von diesem Ansatz hat gezeigt, dass die Performanz deutlich schlechter war, als bei der vorherigen Methode. - Res.
+% Trotzdem zeigten die aufaddierten Ausführungszeiten der Kernels gute Werte. - Res.
+% Ein mögliches Problem dafür ist, dass der Overhead für das Starten der Kernels bei drei verschiedenen Ausführungen doch einen Einfluss auf die Performanz nimmt. - Res.
+% Da bis zu drei Ausführungen des Raycast Kernels hintereinander nicht die gewünschte Performanz erbrachten, wurde dies verworfen und eine weitere Möglichkeit, das oben genannte Ziel zu erreichen, überlegt. - Res.
+% In der zweiten Überlegung ging es nun darum, mit nur einem Raycast Kernel Aufruf eine Berechnung für das ganze Bild zu starten. - Res.
+% Jedoch werden in den äußeren zwei Bereichen nur in x- und y-Richtung nur jede dritte beziehungsweise jede zweite Berechnung eines Work-Items ausgeführt. -Res.
+% Die anderen Work-Items werden entsprechend früh discarded. - Res.
+% Ein zweiter Kernel soll die fehlenden Bildpunkte durch bipolare Interpolation der umliegenden Bildpunkte ausfüllen, so dass ein einzelnes Bild mit normaler Auflösung entsteht. - Res. / Impl.
+% Hier hat ein erster Test, bei dem lediglich ein Raycast Kernel aufgerufen wurde aber in x- und y-Richtung jedes zweite Work-Item discarded wurde gezeigt, dass dies keinerlei Performanz bringt. - Res.
+% Dies liegt daran, dass durch die Anordnung der Work-Groups keine Work-Group existierte, die nur aus Work-Items bestand, die discarded wurden. - Disc. / Res.
+% Da vermutlich eine Work-Group auf einen Thread-Block abgebildet wird und ein Thread-Block so lange ausführt, bis alle seine Thread terminiert sind, wurde bei diesem Ansatz zwar nur ein viertel der Berechnungen ausgeführt aber trotzdem konnte kein Thread-Block schneller seine Arbeit verrichten, wodurch die Ausführungszeit des Kernels gleich blieb. - Disc. / Res.
 
 Dies motivierte das nächste Arbeitspaket.
-Das Umsetzen des oben genannten Ziels, indem nur so viele Work-Items, wie benötigt, gestartet werden und das Abbilden dieser Work-Items auf die entsprechenden Bildpunkte.
-Mit der Motivation, dass so wenige Work-Items wie möglich innerhalb einer Work-Group auf die Ausführung anderer Work-Items warten müssen und die Thread-Blöcke möglichst konvergieren.
-Zusätzlich gehörte dazu, dass ein weiterer Kernel geschrieben wird, der die anschließende Interpolation der Bildpunkte ausführt.
+Das Berechnen des Bildes mit einer sehr niedrigen Hintergrundauflösung und einer mittleren und normalen Auflösung innerhalb einer mittelgroßen und kleinen Ellipse um dem Blickpunkt.
+Die Implementierung sollte diesmal aber nicht aus der Berechnung von drei zusammengefügter Bilder bestehen, sondern aus einer Berechnung eines unterschiedlich stark aufgelösten Bildes und der anschließenden Interpolation der einzelnen Bereiche.
+Um dies umzusetzen wird sich von der Annahme, dass die ID eines Work-Items die Bildposition des zugehörigen Strahls ist, vollständig getrennt.
+Hier werden nun die IDs der Work-Items auf von ihrer ID her sehr unterschiedlichen Bildpunkte abgebildet.
 
-Die Integration von diesem Arbeitspaket erfordert die Berechnung der mindestens benötigten Anzahl an Work-Items, das Unterteilen in einen x- und y-Wert für die Dimensionen der Work-Items, zur Ausführung durch den Kernel.
-Anschließend muss der Raycast-Kernel mit der zuvor berechneten Anzahl an Work-Items in x- und y-Richtung gestartet werden sowie danach der Kernel für die Interpolation.
-Der Interpolation Kernel wird aber mit den Dimensionen des zu berechnenden Bildes für die Dimension der Work-Items gestartet. 
+% Die Integration von diesem Arbeitspaket erfordert die Berechnung der mindestens benötigten Anzahl an Work-Items, das Unterteilen in einen x- und y-Wert für die Dimensionen der Work-Items, zur Ausführung durch den Kernel. - Impl.
+% Anschließend muss der Raycast-Kernel mit der zuvor berechneten Anzahl an Work-Items in x- und y-Richtung gestartet werden sowie danach der Kernel für die Interpolation. - Impl.
+% Der Interpolation Kernel wird aber mit den Dimensionen des zu berechnenden Bildes für die Dimension der Work-Items gestartet. - Impl.
 
 \subsection{Auswahl des Eyetrackers}
 Da nun drei verschiedene Ansätze für die Implementierung des wahrnehmungsorientierten Raycast existieren, war es an der Zeit, die Mausposition mit der richtigen Blickposition zu ersetzen.
@@ -208,7 +220,7 @@ Dies ist der Hintergrund für das nächste Arbeitspaket, welches die Integration
 
 Für die Umsetzung des Arbeitspaket wurde eine Klasse erstellt, welche für eine Berechnung eines Bildes verschiedene Messwerte speichert.
 Für jeden Aufruf der \texttt{paintGL()} Methode wurde ein solches Objekt erstellt und gespeichert.
-Ein solches Objekt hält unter Anderem die gesamte Ausführungszeit der Kernels einer Bildberechung, welche mit Hilfe des \texttt{volumerendercl} Objektes berechnet werden kann, die ungefähre Ausführungszeit der \texttt{paintGL()} Methode selbst, welche mit Hilfe eines \texttt{QT QTime} Objektes ausgegeben werden kann und bei der Berechnung durch die \emph{MDC} oder \emph{DDC} Variante, wird auch die verwendete Position für den Blickpunkt gespeichert.
+Ein solches Objekt hält unter Anderem die gesamte Ausführungszeit der Kernels einer Bildberechung, welche mit Hilfe des \texttt{volumerendercl} Objektes berechnet werden kann, die ungefähre Ausführungszeit der \texttt{paintGL()} Methode selbst, welche mit Hilfe eines \texttt{Qt Qtime} Objektes ausgegeben werden kann und bei der Berechnung durch die \emph{MDC} oder \emph{DDC} Variante, wird auch die verwendete Position für den Blickpunkt gespeichert.
 Für die Erstellung der Messwerte wurde eine Mausbewegung über das aktuell angezeigte Bild aufgenommen und diese für die unterschiedlichen Varianten mit jeweils unterschiedlichen Volumen und Transferfunktionen wieder abgespielt.
 Dabei wurde für jede aufgenommene Mausposition eine Messung vorgenommen und gespeichert.
 Um nicht unnötig viele Messwerte zu erstellen, wurde das Bild in $10\times10$ Felder unterteilt und immer nur dann eine Mausposition für die Messung verwendet, falls diese in einem anderen Feld war, als die vorhergegangene.

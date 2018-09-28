@@ -1,3 +1,8 @@
 Latex: Detex oder so verwenden um einfach Latexbefehle zu entfernen und Word Rechtschreibung und Grammatikkorektur verwenden.
 Soll ich all die Ideen, die ich hatte bezüglich der Umsetzung aufschreiben und diskutieren, warum ich diese verwendet oder nicht verwendet habe?
 Das Bild mit Kamera und Bildebene ggf. selbst nachmachen, da sie unsauber sind (Screenshot und unscharfer Text im Hintergrund.)
+
+-----
+
+Entwurfsziele im Entwurfskapitel mehr hervorheben und diese von der Implementierung stärker trennen. Das wird dann in der Implementierung genannt.
+Andere Abkürzungen wählen für MDC und DDC.
