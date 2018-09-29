@@ -1,0 +1,2 @@
+DDC: ie 0.2 0.2; oe 0.4 0.4; g_v 7 2 1
+MDC: re 350 350 ol 0.5 0.5 // ol = outer layer, 0.5 * width, 0.5 * height

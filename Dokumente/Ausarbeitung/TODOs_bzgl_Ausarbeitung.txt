@@ -4,5 +4,6 @@ Das Bild mit Kamera und Bildebene ggf. selbst nachmachen, da sie unsauber sind (
 
 -----
 
-Entwurfsziele im Entwurfskapitel mehr hervorheben und diese von der Implementierung stärker trennen. Das wird dann in der Implementierung genannt.
+# Entwurfsziele im Entwurfskapitel mehr hervorheben und diese von der Implementierung stärker trennen. Das wird dann in der Implementierung genannt.
 Andere Abkürzungen wählen für MDC und DDC.
+Nennung der Hardware, mit welcher die Ergebnisse erstellt wurden.

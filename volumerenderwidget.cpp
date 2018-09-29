@@ -2266,75 +2266,86 @@ bool VolumeRenderWidget::load_mouse_movement(std::string file_name)
 
 void VolumeRenderWidget::keyPressEvent(QKeyEvent *event) {
 	// std::cout << "Key pressed: " << event->key() << std::endl;
-	if (event->key() == _ms_trigger_key && !_measure_with_collected_mouse_movement_data) {
-		_measurement_is_active = !_measurement_is_active;
-	}
+	if (event->key() != Qt::Key_Control) {
+		if (event->key() == _ms_trigger_key && !_measure_with_collected_mouse_movement_data) {
+			_measurement_is_active = !_measurement_is_active;
+		}
 
-	if (event->key() == _single_measurement_key && !_measure_with_collected_mouse_movement_data) {
-		// set _single_measurement to true to indicate that the next frame is measured independent to the rest of the measurements. also triggers a repaint so that the measurement can take place immediately.
-		_single_measurement = true;
-		update();
-	}
-
-	if (event->key() == _save_measurements_key && !_measure_with_collected_mouse_movement_data) {
-		_take_measurement = false;
-		_single_measurement = false;
-		_measurement_is_active = false;
-		save_measurements();
-		_measured_data.clear();
-	}
-
-	if (event->key() == _save_mouse_movements_key && !_measure_with_collected_mouse_movement_data) {
-		_collect_mouse_movement = false;
-		save_mouse_movements();
-	}
-
-	if (event->key() == _trigger_collect_mouse_movement && !_measure_with_collected_mouse_movement_data) {
-		if (_collect_mouse_movement) {
-			_collect_mouse_movement = false;
+		if (event->key() == _single_measurement_key && !_measure_with_collected_mouse_movement_data) {
+			// set _single_measurement to true to indicate that the next frame is measured independent to the rest of the measurements. also triggers a repaint so that the measurement can take place immediately.
+			_single_measurement = true;
 			update();
 		}
-		else {
-			_collect_mouse_movement = true;
-		}
-	}
 
-	if (event->key() == _trigger_mouse_replay) {
-		if (_measure_with_collected_mouse_movement_data) {
-			// abort the current measurement by resetting the _mouse_mv_data_index to 0 and setting the _measure_with_collected_mouse_movement_data to false
-			_measure_with_collected_mouse_movement_data = false;
-			_mouse_mv_data_index = 0;
+		if (event->key() == _save_measurements_key && !_measure_with_collected_mouse_movement_data) {
+			_take_measurement = false;
+			_single_measurement = false;
+			_measurement_is_active = false;
+			save_measurements();
 			_measured_data.clear();
 		}
-		else {
-			// start the measurement. only possible if no mouse data is collected during this time but already collected mouse data exists
-			if (!_collect_mouse_movement && _mouse_mv_data.size() > 0) {
-				_measure_with_collected_mouse_movement_data = true;
-				_mouse_mv_data_index = 0;
-				
+
+		if (event->key() == _save_mouse_movements_key && !_measure_with_collected_mouse_movement_data) {
+			_collect_mouse_movement = false;
+			save_mouse_movements();
+		}
+
+		if (event->key() == _trigger_collect_mouse_movement && !_measure_with_collected_mouse_movement_data) {
+			if (_collect_mouse_movement) {
+				_collect_mouse_movement = false;
+				update();
+			}
+			else {
+				_collect_mouse_movement = true;
 			}
 		}
-		update();
-	}
 
-	if (event->key() == _load_mouse_movement_data_key && !_measure_with_collected_mouse_movement_data && !_collect_mouse_movement) {
-		if (load_mouse_movement()) {
-			std::cout << "loaded mouse movement data." << std::endl;
+		if (event->key() == _trigger_mouse_replay) {
+			if (_measure_with_collected_mouse_movement_data) {
+				// abort the current measurement by resetting the _mouse_mv_data_index to 0 and setting the _measure_with_collected_mouse_movement_data to false
+				_measure_with_collected_mouse_movement_data = false;
+				_mouse_mv_data_index = 0;
+				_measured_data.clear();
+			}
+			else {
+				// start the measurement. only possible if no mouse data is collected during this time but already collected mouse data exists
+				if (!_collect_mouse_movement && _mouse_mv_data.size() > 0) {
+					_measure_with_collected_mouse_movement_data = true;
+					_mouse_mv_data_index = 0;
+
+				}
+			}
+			update();
 		}
-		else {
-			std::cout << "loading of mouse movement data failed!" << std::endl;
+
+		if (event->key() == _load_mouse_movement_data_key && !_measure_with_collected_mouse_movement_data && !_collect_mouse_movement) {
+			if (load_mouse_movement()) {
+				std::cout << "loaded mouse movement data." << std::endl;
+			}
+			else {
+				std::cout << "loading of mouse movement data failed!" << std::endl;
+			}
 		}
+
+		std::cout << "Variables:" << std::endl;
+		std::cout << "_measurement_is_active: " << _measurement_is_active << " key should be T." << std::endl;
+		std::cout << "_single_measurement: " << _single_measurement << " key should be O." << std::endl;
+		std::cout << "_collect_mouse_movement: " << _collect_mouse_movement << " key should be M." << std::endl;
+		std::cout << "save_measurments key should be S." << std::endl;
+		std::cout << "save_mouse_movements key should be P." << std::endl;
+		std::cout << "load_mouse_movement key should be L." << std::endl;
+		std::cout << "_measure_with_collected_mouse_movement_data: " << _measure_with_collected_mouse_movement_data << " key should be R." << "\n\n" << std::endl;
+
 	}
-
-	std::cout << "Variables:" << std::endl;
-	std::cout << "_measurement_is_active: " << _measurement_is_active << " key should be T." << std::endl;
-	std::cout << "_single_measurement: " << _single_measurement << " key should be O." << std::endl;
-	std::cout << "_collect_mouse_movement: " << _collect_mouse_movement << " key should be M." << std::endl;
-	std::cout << "save_measurments key should be S." << std::endl;
-	std::cout << "save_mouse_movements key should be P." << std::endl;
-	std::cout << "load_mouse_movement key should be L." << std::endl;
-	std::cout << "_measure_with_collected_mouse_movement_data: " << _measure_with_collected_mouse_movement_data << " key should be R." << "\n\n" << std::endl;
-
+	else {
+		std::cout << "Current: " << _renderingMethod 
+			<< ", rectextends: " << _rect_extends[0] << ", " << _rect_extends[1] 
+			<< ", g_v: " << _g_values.x << ", " << _g_values.y << ", " << _g_values.z 
+			<< ", ie: " << std::get<0>(_innerEllipse) << ", " << std::get<1>(_innerEllipse) 
+			<< ", oe: " << std::get<0>(_outerEllipse) << ", " << std::get<1>(_outerEllipse) 
+			<< std::endl;
+	}
+	
 	event->accept();
 }
 
