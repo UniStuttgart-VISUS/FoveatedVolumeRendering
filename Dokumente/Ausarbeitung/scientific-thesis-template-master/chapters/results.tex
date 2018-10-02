@@ -57,6 +57,17 @@ An den Konturen der Abbildung \ref{fig::res::bon_mdc} ist ein leichter Abfall de
 Die Konturen, welche in Abbildung \ref{fig::res::bon_st} noch weich gezeichnet wurden, haben außerhalb des Rechtecks um die Mausposition nun Artefakte der Unterabtastung, wie zum Beispiel leichte Treppenstufen.
 Innerhalb des Rechtecks sind die Konturen immer noch weich gezeichnet und es ist dort kein Unterschied zu Abbildung \ref{fig::res::bon_st} zu sehen.
 
+Die Größe des Rechtecks beträgt $300$\,Pixel in x- und y-Richtung.
+Wird bei aktivem Eyetracking anstelle der Mausposition die Blickposition verwendet, so ist der aktuell betrachtete Bereich immer hoch aufgelöst.
+Ein Unterschied zwischen den beiden Bereichen fällt während einer Fokussierung kaum auf.
+Das das Bild unterschiedlich aufgelöst ist, fällt meist nur während einer Augenbewegung auf.
+An dem Übergang des normal aufgelösten Bereichs zu dem Bereich mit der halben Auflösung kommt es während einer Bewegung, an den Konturen des Volumen zu leichten Veränderungen.
+Diese können die Aufmerksamkeit auf sich ziehen und daher leicht störend wirken.
+Diese sind aber sehr gering und fallen nur dann auf, wenn darauf geachtet wird.
+
+Die Latenz des Eyetrackers ist sehr gut.
+Eine merkbare Verzögerung zwischen realer Blickposition und der Blickposition des aktuell berechneten Bildes, tritt nur dann auf, falls die Berechnungsdauer eines Bildes zu lange dauert.
+Dies hängt aber auch von der Größe und Auflösung des verwendeten Volumens ab.
 \begin{landscape}
 	\begin{figure}
 		\centering
@@ -67,7 +78,7 @@ Innerhalb des Rechtecks sind die Konturen immer noch weich gezeichnet und es ist
 \end{landscape}
 
 \subsubsection{DDC Raycast}\label{ss::res::ddc}
-Der \emph{DDC} Raycast ist das Ergebnis, des Arbeitspakets aus dem Abschnitt
+Der \emph{DDC} Raycast ist das Ergebnis des Arbeitspakets aus dem Abschnitt \ref{ss::DDC}.
 
 \begin{landscape}
 	\begin{figure}
