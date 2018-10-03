@@ -8,6 +8,7 @@ Der zweite Abschnitt beinhaltet Messungen zur Performanz der verschiedenen Rayca
 Im zweiten Abschnitt werden diese näher diskutiert.
 
 \section{Ergebnisse}\label{sec::results}
+\todo{Technische Daten des Systems, mit dem die Messungen gemacht wurden, angeben. Am besten die wichtigen Messungen mit dem Eye Tracker PC wiederholen.}
 Der erste Abschnitt beinhaltet Ergebnissen der Implementierungen \emph{MDC} \ref{ss::MDC} und \emph{DDC} \ref{ss::DDC} sowie der ursprünglichen Implementierung des Raycasts \ref{ss::rc} aus Sicht der Bildqualität.
 Der zweite Abschnitt beinhaltet gemessene Performanzleistungen der jeweiligen Implementierungen bei der Verwendung unterschiedlicher Transferfunktionen und Volumendaten.
 
@@ -17,9 +18,13 @@ Dies wird anhand von zwei verschiedenen Volumen mit jeweils einer Transferfunkti
 Für jedes der Volumen wird jeweils das Bild in normaler Auflösung, welche mit der ursprünglichen Implementierung berechnet wurde sowie das Ergebnis der Berechnung des Bildes durch \emph{MDC} und \emph{DDC} gezeigt.
 Bei den Berechnungen durch \emph{MDC} und \emph{DDC} werden die jeweils verwendeten Parameter der Berechnung angegeben.
 
+Die Bilder in diesem Abschnitt wurden alle mit einer Auflösung von $2263\times1306$\,Pixel berechnet.
+Der Begriff \emph{normale Bildabtastrate} bezieht sich auf die Bildabtastrate mit einem Wert von circa $1$ und bedeutet, dass für jeden Pixel des Bildes ein Strahl berechnet wurde, der den Farbwert des Pixels angibt.
+
 \subsubsection{Standard Raycast}\label{ss::res::sr}
+\todo{Die gleiche Transferfunktion verwenden, wie die, womit die Daten gemessen wurden.}
 Abbildung \ref{fig::res::bon_st} zeigt eine Berechnung des Volumens \emph{Bonsai} mit dem ursprünglichen Raycast.
-Die ursprüngliche Implementierung berechnete das gesamte Bild mit normaler Auflösung.
+Die Bildabtastrate ist bei der Berechnung des Standard Raycasts im ganzen Bild homogen und hat den Wert $1$.
 Das heißt, dass für jeden Pixel des Bildes ein Work-Item gestartet wurde, um den Raycast eines Strahls zu berechnen.
 Der jeweilige Pixel erhält die berechnete Farbe des Work-Items.
 Die Abtastrate der Strahlen hat den Standardwert von $1.5$\,Tastungen pro Voxel.
@@ -28,7 +33,10 @@ Die Transferfunktion hebt die Voxel mit etwas höherer Dichte farblich hervor.
 Dies entspricht hier dem Stamm und den Ästen sowie der Erde und der Schale, in welcher sich der Bonsai befindet.
 Die Blätter werden teilweise ausgeblendet.
 Die Grashalme, die aus der Erde sprießen, sind vollständig ausgeblendet.
-Insgesamt sind werden die Flächen aber transparent gezeichnet, so dass auch eigentlich verdeckte Strukturen zu sehen sind.
+Insgesamt werden die Flächen aber transparent gezeichnet, so dass auch eigentlich verdeckte Strukturen zu sehen sind.
+
+Wie in den Grundlagen im Abschnitt \ref{sec::eye} zum visuellen Wahrnehmungssystem beschrieben wurde, kann man feststellen, dass wenn ein bestimmter Punkt in der Abbildung \ref{fig::res::bon_st} fokussiert wird, die vom Blickpunkt entfernten Bereiche unscharf erscheinen.
+Im Standard Raycast werden auch diese mit normaler Bildabtastrate gezeichnet, obwohl dies aufgrund der Limitierungen des visuellen Wahrnehmungssystems, eigentlich nicht notwendig ist.
 
 \begin{landscape}
 	\begin{figure}
@@ -41,33 +49,38 @@ Insgesamt sind werden die Flächen aber transparent gezeichnet, so dass auch eig
 
 \subsubsection{MDC Raycast}\label{ss::res::mdc}
 Der \emph{MDC} Raycast ist das Ergebnis des Arbeitspakets, aus dem Abschnitt \ref{ss::MDC}.
-Die Abbildung \ref{fig::res::bon_mdc} zeigt das Volumen \emph{Bonsai}, welches mit dem \emph{MDC} Raycas berechnet wurden.
+Die Abbildung \ref{fig::res::bon_mdc} zeigt das Volumen \emph{Bonsai}, welches mit dem \emph{MDC} Raycast erstellt wurde.
 Das Bild wurde dabei aus der selben Perspektive und mit der gleichen Transferfunktion berechnet, wie dies auch in Abbildung \ref{fig::res::bon_st} der Fall war.
 Die Strahlabtastrate ist ebenfalls gleich wie bei der Berechnung des Bildes in Abbildung \ref{fig::res::bon_st}, welches mit dem Standard Raycast berechnet wurde.
-Die Bildabtastrate hat statt einem Wert von $1$ einen Wert von $0.96$.
-Damit wird einer leichten Verschiebung des Bildes, aufgrund der zwei unterschiedlichen Auflösungen, entgegengewirkt.
+Die maximale Bildabtastrate in Abbildung \ref{fig::res::bon_mdc} hat einen Wert von $0.96$ statt einem Wert von $1$.
+Damit wird einer leichten Verschiebung des Bildes, aufgrund der zwei unterschiedlichen Bildabtastraten, entgegengewirkt.
+Die Anpassung der Bildabtastrate muss aber je nach Auflösung des Bildes leicht variiert werden.
 
-In diesem Fall, beim \emph{MDC} Raycast, wurde zwei Bilder berechnet, welche anschließend passend zusammengefügt wurden.
-Das erste Bild wurde mit nur einem viertel der Auflösung berechnet und anschließend auf die normale Auflösung interpoliert.
-Das zweite Bild wurde mit der normalen Auflösung berechnet, dafür aber nur ein rechteckiger Ausschnitt an der Mausposition.
-Das zweite Bild wurde anschließend an der Mausposition in das auf die normale Auflösung interpolierte erste Bild eingefügt.
+In diesem Fall, beim \emph{MDC} Raycast, wurden zwei Bilder berechnet, welche anschließend passend zusammengefügt wurden.
+Das erste Bild wurde mit nur einem viertel der Auflösung berechnet und anschließend auf die ursprüngliche Auflösung interpoliert.
+Das zweite Bild wurde mit der ursprünglichen Auflösung berechnet, dafür aber nur ein rechteckiger Ausschnitt an der Mausposition.
+Anschließend wurde das zweite Bild an der Mausposition in das auf die normale Auflösung interpolierte erste Bild eingefügt.
 
 \todo{Mausposition in das Bild einzeichnen.}
 An den Konturen der Abbildung \ref{fig::res::bon_mdc} ist ein leichter Abfall der Auflösung des Bildes zu erkennen.
 Die Konturen, welche in Abbildung \ref{fig::res::bon_st} noch weich gezeichnet wurden, haben außerhalb des Rechtecks um die Mausposition nun Artefakte der Unterabtastung, wie zum Beispiel leichte Treppenstufen.
 Innerhalb des Rechtecks sind die Konturen immer noch weich gezeichnet und es ist dort kein Unterschied zu Abbildung \ref{fig::res::bon_st} zu sehen.
 
-Die Größe des Rechtecks beträgt $300$\,Pixel in x- und y-Richtung.
+Die Größe des Rechtecks beträgt $300$\,Pixel in x- und y-Richtung und ist groß genug, dass die Abnahme der Auflösung im äußeren Bereich kaum auffällt.
 Wird bei aktivem Eyetracking anstelle der Mausposition die Blickposition verwendet, so ist der aktuell betrachtete Bereich immer hoch aufgelöst.
 Ein Unterschied zwischen den beiden Bereichen fällt während einer Fokussierung kaum auf.
-Das das Bild unterschiedlich aufgelöst ist, fällt meist nur während einer Augenbewegung auf.
-An dem Übergang des normal aufgelösten Bereichs zu dem Bereich mit der halben Auflösung kommt es während einer Bewegung, an den Konturen des Volumen zu leichten Veränderungen.
+Wenn der Fokus langsam über das Bild wandert, kann man einen Unterschied zwischen den Auflösungen erkennen.
+An dem Übergang des normal aufgelösten Bereichs zu dem Bereich mit der halben Auflösung kommt es während einer Bewegung an den Konturen des Volumen zu leichten Veränderungen.
 Diese können die Aufmerksamkeit auf sich ziehen und daher leicht störend wirken.
-Diese sind aber sehr gering und fallen nur dann auf, wenn darauf geachtet wird.
 
-Die Latenz des Eyetrackers ist sehr gut.
-Eine merkbare Verzögerung zwischen realer Blickposition und der Blickposition des aktuell berechneten Bildes, tritt nur dann auf, falls die Berechnungsdauer eines Bildes zu lange dauert.
-Dies hängt aber auch von der Größe und Auflösung des verwendeten Volumens ab.
+Obwohl der Bereich außerhalb des Rechtecks mit nur einem Viertel der Bildabtastrate innerhalb des Rechtecks berechnet wurde, ist die Bildqualität in diesem Bereich noch recht gut.
+Da die Sehschärfe mit zunehmenden Winkel von der Fovea weg immer weiter abnimmt, könnte die Bildabtastrate außerhalb des Rechtecks vermutlich weiter gesenkt werden, ohne dass dies die Bildqualität bei der Verwendung eines Eye-Trackers beeinträchtigt.
+
+% Die Latenz des Eyetrackers ist sehr gut. ; Perf.
+% Eine merkbare Verzögerung zwischen realer Blickposition und der Blickposition des aktuell berechneten Bildes, tritt nur dann auf, falls die Berechnungsdauer eines Bildes zu lange dauert. ; Perf
+% Dies hängt aber auch von der Größe und Auflösung des verwendeten Volumens ab. ; Perf.
+% In dem Fall von Abbildung \ref{fig::res::bon_st} ist dies nicht der Fall. ; Perf.
+% Da das Volumen mit einer Auflösung von $256\times256\times256$\,Voxel im Vergleich zu anderen recht klein ist, .. ; Perf.
 \begin{landscape}
 	\begin{figure}
 		\centering
