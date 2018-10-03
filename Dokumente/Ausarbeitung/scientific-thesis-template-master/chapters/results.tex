@@ -92,6 +92,22 @@ Da die Sehschärfe mit zunehmenden Winkel von der Fovea weg immer weiter abnimmt
 
 \subsubsection{DDC Raycast}\label{ss::res::ddc}
 Der \emph{DDC} Raycast ist das Ergebnis des Arbeitspakets aus dem Abschnitt \ref{ss::DDC}.
+Abbildung \ref{fig::res::bon_ddc} zeigt das Volumen \emph{Bonsai}, welches mit dem \emph{DDC} Raycast erstellt wurde.
+Das Bild wurde aus der selben Perspektive und mit der gleichen Transferfunktion berechnet, wie in den Abbildungen \ref{fig::res::bon_st} und \ref{fig::res::bon_mdc}.
+Anders als beim Standard Raycast und \emph{MDC} Raycast, wo die Strahlabtastrate über das gesamte Bild hinweg gleich ist, nimmt beim \emph{DDC} Raycast die Strahlabtastrate Abhängig zur Distanz eines Strahls zur Maus- beziehungsweise Blickposition ab.
+In einem kleinen Bereich um die Mausposition hat sie den maximalen Wert, der gleich dem Wert aus \emph{MDC} und dem Standard Raycast ist.
+Die maximale Bildabtastrate ist $1$.
+Diese nimmt in zwei Stufen nach außen hin ab.
+
+Beim \emph{DDC} Raycast wurde nur ein Aufruf des Raycasts gestartet und die Work-Items und ihre entsprechenden Strahlen auf verschiedene Bildpunkte abgebildet.
+Das gesamte Bild wurde in einem zweiten Kernel Aufruf interpoliert.
+Innerhalb eines kleinen Bereichs in der Form einer Ellipse um den Blickpunkt herum hat das Bild eine Bildabtastrate von $1$, dass heißt jeder Pixel entspricht einem Farbwert der Auswertung eines Strahls.
+Außerhalb von diesem Bereich aber innerhalb einer zweiten größeren und umschließenden Ellipse hat das Bild in x- und y-Richtung eine Bildabtastrate von $\frac{1}{2}$.
+Das heißt, dass in x- und y-Richtung nur für jedes zweiten Pixel ein Strahl ausgewertet wird.
+In dem äußersten Bereich beträgt die Bildabtastrate in x- und y-Richtung $\frac{1}{7}$.
+Es wird also in jedem $7\times7$\,Pixel-Feld nur ein Strahl ausgewertet.
+
+
 
 \begin{landscape}
 	\begin{figure}
