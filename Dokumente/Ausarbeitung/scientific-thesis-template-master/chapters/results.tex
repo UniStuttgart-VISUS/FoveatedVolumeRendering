@@ -21,8 +21,15 @@ Bei den Berechnungen durch \emph{MDC} und \emph{DDC} werden die jeweils verwende
 Die Bilder in diesem Abschnitt wurden alle mit einer Auflösung von $2263\times1306$\,Pixel berechnet.
 Der Begriff \emph{normale Bildabtastrate} bezieht sich auf die Bildabtastrate mit einem Wert von circa $1$ und bedeutet, dass für jeden Pixel des Bildes ein Strahl berechnet wurde, der den Farbwert des Pixels angibt.
 
+Das erste Volumen ist ein ct-scan eines Bonsai.
+Das Volumen hat eine Auflösung von $256\times256\times256$\,Voxel.
+Die Slice-Dicke der einzelnen Voxel ist $1.0\times1.0\times\1.0$, dass heißt, dass die Voxel in x-, y- und z-Richtung die gleichen Ausmaße haben.
+Das zweite Volumen ist ein Zeitschritt aus einer Simulation einer Supernova.
+Es hat eine Auflösung von $432\times432\times432$\,Voxel, welche ebenfalls in x-, y- und z-Richtung die Ausmaße $1.0$ haben.
+\todo{ist das richtig?} 
+
 \subsubsection{Standard Raycast}\label{ss::res::sr}
-\todo{Die gleiche Transferfunktion verwenden, wie die, womit die Daten gemessen wurden.}
+% \todo{Die gleiche Transferfunktion verwenden, wie die, womit die Daten gemessen wurden.}; ggf. auch dazu Daten messen.
 Abbildung \ref{fig::res::bon_st} zeigt eine Berechnung des Volumens \emph{Bonsai} mit dem ursprünglichen Raycast.
 Die Bildabtastrate ist bei der Berechnung des Standard Raycasts im ganzen Bild homogen und hat den Wert $1$.
 Das heißt, dass für jeden Pixel des Bildes ein Work-Item gestartet wurde, um den Raycast eines Strahls zu berechnen.
@@ -38,12 +45,27 @@ Insgesamt werden die Flächen aber transparent gezeichnet, so dass auch eigentli
 Wie in den Grundlagen im Abschnitt \ref{sec::eye} zum visuellen Wahrnehmungssystem beschrieben wurde, kann man feststellen, dass wenn ein bestimmter Punkt in der Abbildung \ref{fig::res::bon_st} fokussiert wird, die vom Blickpunkt entfernten Bereiche unscharf erscheinen.
 Im Standard Raycast werden auch diese mit normaler Bildabtastrate gezeichnet, obwohl dies aufgrund der Limitierungen des visuellen Wahrnehmungssystems, eigentlich nicht notwendig ist.
 
+Abbildung \ref{fig::res::sup_st} zeigt eine Berechnung des Volumens \emph{E\_1353}, welches einen Zeitschritt einer Supernova darstellt.
+Das Bild wurde mit dem Standard Raycast berechnet, so dass die Bildabtastrate in dem gesamten Bild gleich ist.
+Dies wird auch durch die Vergrößerung von Bereichen an unterschiedlichen Positionen innerhalb der Abbildung verdeutlicht.
+Die Strahlabtastrate hat einen Wert von $1.5$ und die Interpolation der Voxel ist aktiviert.
+Die Transferfunktion wurde so gewählt, dass das Volumen als ganzes transparent erscheint aber Bereiche mit den selben Dichtewerten farblich gruppiert und hervorgehoben wurden.
+
 \begin{landscape}
 	\begin{figure}
 		\centering
 		\includegraphics[width=\textheight]{../../Grafiken/results/picture_quality/bonsai/Standard_img-1_Ray-1-5.png}
 		\caption{Volumen Bonsai mit ursprünglichem Raycast berechnet.}
 		\label{fig::res::bon_st}
+	\end{figure}
+\end{landscape}
+
+\begin{landscape}
+	\begin{figure}
+		\centering
+		\includegraphics[width=\textheight]{../../Grafiken/results/picture_quality/supernova/Standard_img-1_Ray-1-5_edited.png}
+		\caption{Volumen Supernova mit ursprünglichem Raycast berechnet und verschiedene Abschnitte vergrößert und hervorgehoben.}
+		\label{fig::res::sup_st}
 	\end{figure}
 \end{landscape}
 
@@ -76,6 +98,17 @@ Diese können die Aufmerksamkeit auf sich ziehen und daher leicht störend wirke
 Obwohl der Bereich außerhalb des Rechtecks mit nur einem Viertel der Bildabtastrate innerhalb des Rechtecks berechnet wurde, ist die Bildqualität in diesem Bereich noch recht gut.
 Da die Sehschärfe mit zunehmenden Winkel von der Fovea weg immer weiter abnimmt, könnte die Bildabtastrate außerhalb des Rechtecks vermutlich weiter gesenkt werden, ohne dass dies die Bildqualität bei der Verwendung eines Eye-Trackers beeinträchtigt.
 
+Das Bild in Abbildung \ref{fig::res::sup_mdc} wurde ebenfalls mit dem \emph{MDC} Raycast berechnet und anschließend bearbeitet.
+Es zeigt einen Zeitschritt in einer Simulation von einer Supernova.
+Die Bild- und Strahlabtastrate ist gleich wie zuvor in Abbildung \ref{fig::res::bon_mdc}.
+Die Mausposition ist hier als nicht ganz ausgefüllter Kreis skizziert.
+In der Abbildung \ref{fig::res::sup_mdc} sind drei Bildausschnitte des berechneten Bildes, innerhalb des Rechtecks, außerhalb des Rechtecks und an der Kante des Rechtecks, vergrößert, um diese besser vergleichen zu können.
+Rechts über der skizzierten Mausposition ist ein Ausschnitt des Übergangs zwischen den Auflösungen, welcher rechts davon vergrößert dargestellt ist.
+Man kann erkennen, dass die Konturen des Objekt außerhalb des Rechtecks unschärfer sind.
+Unterhalb der skizzierten Mausposition ist zuerst ein Ausschnitt innerhalb des Rechtecks mit normaler Bildabtastrate und darunter ein Ausschnitt außerhalb des Rechtecks mit nur einem viertel der Auflösung vergrößert.
+In dem unterem Ausschnitt wirken die Konturen insgesamt ein bisschen unschärfer und verwaschen.
+Der Unterschied fällt aber nicht sehr stark auf.
+
 % Die Latenz des Eyetrackers ist sehr gut. ; Perf.
 % Eine merkbare Verzögerung zwischen realer Blickposition und der Blickposition des aktuell berechneten Bildes, tritt nur dann auf, falls die Berechnungsdauer eines Bildes zu lange dauert. ; Perf
 % Dies hängt aber auch von der Größe und Auflösung des verwendeten Volumens ab. ; Perf.
@@ -87,6 +120,15 @@ Da die Sehschärfe mit zunehmenden Winkel von der Fovea weg immer weiter abnimmt
 		\includegraphics[width=1\textheight]{../../Grafiken/results/picture_quality/bonsai/MDC_img-0-96_ray-1-5.png}
 		\caption{Volumen Bonsai mit \emph{MDC} Raycast berechnet.}
 		\label{fig::res::bon_mdc}
+	\end{figure}
+\end{landscape}
+
+\begin{landscape}
+	\begin{figure}
+		\centering
+		\includegraphics[width=\textheight]{../../Grafiken/results/picture_quality/supernova/MDC_img-0-96_ray-1-5_edited.png}
+		\caption{Volumen Supernova mit \emph{MDC} Raycast berechnet mit vergrößerten Bildausschnitten.}
+		\label{fig::res::sup_mdc}
 	\end{figure}
 \end{landscape}
 
@@ -107,14 +149,38 @@ Das heißt, dass in x- und y-Richtung nur für jedes zweiten Pixel ein Strahl au
 In dem äußersten Bereich beträgt die Bildabtastrate in x- und y-Richtung $\frac{1}{7}$.
 Es wird also in jedem $7\times7$\,Pixel-Feld nur ein Strahl ausgewertet.
 
+In Abbildung \ref{fig::res::bon_ddc} ist deutlich zu sehen, dass der Großteil des Bildes eine geringe Auflösung hat.
+In dem am niedrigsten abgetasteten Bereich sind an den Konturen, insbesondere die der Äste, deutliche Merkmale der Unterabtastung zu sehen.
+In Abbildung \ref{fig::res::bon_st} und \ref{fig::res::bon_mdc} verlaufen die Konturen der Äste noch diagonal und sind relativ weich gezeichnet, hier haben sie starke Treppeneffekte.
 
+In dem mittleren Bereich ist die Bildqualität recht gut und die das Bild scharf zu erkennen.
+Trotzdem hat das Bild hier nur ein Viertel der Auflösung.
+Zwischen dem mittleren und inneren Bereich, welcher die normale Auflösung hat, ist kaum zu erkennen.
+
+Dass die Strahlabtastrate mit zunehmender Entfernung zur Mausposition abnimmt, ist in Abbildung \ref{fig::res::bon_ddc} kaum zu erkennen.
+Die reduzierte Auflösung verändert die Bildqualität im äußeren Bereich so stark, dass die reduzierte Strahlabtastrate nicht auffällt.
+
+Abbildung \ref{fig::res::sup_ddc} zeigt das selbe Volumen wie in Abbildung \ref{fig::res::sup_st} und \ref{fig::res::sup_mdc}.
+Bildausschnitte der Übergänge zwischen den Bereichen sind hier zur Verdeutlichung hervorgehoben und vergrößert.
+Der vergrößerte Bildausschnitt rechts oben zeigt den Übergang zwischen dem mittleren und dem inneren Bereich.
+Oben links ist der vergrößerte Übergang zwischen dem inneren und dem mittleren Bereich zu sehen.
+Der Bildausschnitt unten links ist etwas größer und umfasst den Übergang von dem inneren zum mittleren und vom mittleren zum äußeren Bereich.
 
 \begin{landscape}
 	\begin{figure}
 		\centering
 		\includegraphics[width=1\textheight]{../../Grafiken/results/picture_quality/bonsai/DDC_img-1_ray-1-5.png}
-		\caption{Volumen Bonsai mit \emph{DDC} Raycast berechnet.}
+		\caption{Volumen Bonsai mit \emph{DDC} Raycast berechnet mit.}
 		\label{fig::res::bon_ddc}
+	\end{figure}
+\end{landscape}
+
+\begin{landscape}
+	\begin{figure}
+		\centering
+		\includegraphics[width=\textheight]{../../Grafiken/results/picture_quality/supernova/DDC_img-1_ray-1-5_edited.png}
+		\caption{Volumen Supernova mit \emph{DDC} Raycast berechnet mit hervorgehobenen und vergrößerten Bildausschnitten.}
+		\label{fig::res::sup_ddc}
 	\end{figure}
 \end{landscape}
 

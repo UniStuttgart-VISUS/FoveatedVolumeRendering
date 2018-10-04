@@ -1,0 +1,12 @@
+{
+    "camRotation": "0.536152 0.050785 -0.842561 0.00724643",
+    "camTranslation": "0 0 1.475",
+    "imgResFactor": 1,
+    "rayStepSize": 1.5,
+    "showBox": false,
+    "showContours": false,
+    "useAO": false,
+    "useAerial": false,
+    "useLerp": true,
+    "useOrtho": false
+}
