@@ -252,7 +252,57 @@ Der Bildausschnitt unten links ist etwas größer und umfasst den Übergang von 
 \fi
 
 \subsection{Performanz}
+Für die Messung der Performanz der Implementierungen wurden zwei Messwerte bei einer Berechnung eines Bildes genommen.
+Die Ausführungszeit des Kernels innerhalb einer Ausführung der \emph{paintGL()}-Methode und die Ausführungszeit der \emph{paintGL()}-Methode selbst.
+Dies wurde deshalb so gewählt, da die Implementierungen nicht ausschließlich innerhalb des Kernels durchgeführt wurden, sondern auch außerhalb der Kernelaufrufe Programmcode geschrieben wurde und der Start einer Kernelausführung sowie die synchronisierte Beendigung eine gewisse Zeit brauchen.
+Die Ausführungszeit der \emph{paintGL()}-Methode ist letztendlich der Wert, welcher die reale spürbare Performanz für den Nutzer angibt.
+
+Für die Messungen der Performanz wurde kein Eyetracking verwendet, da dies lediglich die Mausposition mit der Blickposition ersetzt und keinen Einfluss auf die Ausführungszeit des Kernels und nur einen konstanten Einfluss auf die Ausführungszeit der \emph{paintGL()}-Methode hat.
+Außerdem wurde in Arbeitspaket \ref{sec::workpacks::evm} gefordert, dass eine Messung reproduzierbar sein soll.
+Die Verwendung eines Eyetrackers würde es fast unmöglich machen, die selben Blickpunkte in einem gewissen Zeitraum zu fokussieren.
+
+Für die Messergebnisse selbst wurde ein spiegelverkehrtes S mit dem Mauszeiger auf einem Bild nachgefahren und dabei die Mauspositionen abgespeichert.
+Es wurden anschließend verschiedene Volumendaten mit jeweils drei verschiedenen Transferfunktionen für die drei verschiedenen Implementierungen, den Standard-, \emph{MDC}- und \emph{DDC}-Raycast, für die Messungen verwendet.
+Bei jeder dieser Messung wurde dabei für jede der Mauspositionen des gespeicherten Mausverlaufs ein Bild berechnet und zu dieser Berechnung die Mausposition, Ausführungszeit des Kernels und Ausführungszeit der \emph{paintGL()}-Methode gespeichert.
+
+Die Hardware des Computers, mit welchem die Messungen durchgeführt wurden, besteht aus einem \emph{Intel Core i5 4670k bei $3,40$\,GHz} CPU und einer \emph{GIGABYTE AMD Radeon (TM) R9 390 Series} GPU.
+Die Auflösung der zu berechnenden Bilder betrug $2263\times1306$\,Pixel.
+
+Im folgenden werden verschiedene Messungen vorgestellt.
+Aus den gemessenen Ausführungszeiten des Kernels wurden Heatmaps für das jeweils zugrundeliegende Bild erstellt.
+Da die Differenz zwischen Ausführungszeit des Kernels und der Ausführungszeit der \emph{paintGL()}-Methode unabhängig von dem zu berechnenden Volumen und der verwendeten Transferfunktion ist, wurde diese nicht für die Erstellung der Heatmaps einbezogen.
+Die Ausführungszeiten insbesondere der \emph{paintGL()}-Methode werden daher zusätzlich getrennt von den Heatmaps vorgestellt.
+
 \todo{Messbare Ergebnisse der Arbeit. (Performanzmessungen..).}
+\todo{Zusätzlich Tabelle mit Durchnschnittsperformanzwerten insbesondere der paintGL() Methode.}
+
+
+\begin{figure}
+	\centering
+	\includegraphics[width=1\textwidth]{../../Grafiken/results/performance/bonsai/ms_data_mdc_heatmap.png}
+	\caption{Bonsai Heatmap \emph{MDC}.}
+	\label{fig::res::pf::hm_bs_mdc}
+\end{figure}
+\begin{figure}
+	\centering
+	\includegraphics[width=1\textwidth]{../../Grafiken/results/performance/bonsai/ms_data_ddc_heatmap.png}
+	\caption{Bonsai Heatmap \emph{DDC}.}
+	\label{fig::res::pf::hm_bs_ddc}
+\end{figure}
+\begin{figure}
+	\centering
+	\includegraphics[width=1\textwidth]{../../Grafiken/results/performance/supernova/ms_data_mdc_heatmap.png}
+	\caption{Supernova Heatmap \emph{MDC}.}
+	\label{fig::res::pf::hm_sn_mdc}
+\end{figure}
+\begin{figure}
+	\centering
+	\includegraphics[width=1\textwidth]{../../Grafiken/results/performance/supernova/ms_data_ddc_heatmap.png}
+	\caption{Supernova Heatmap \emph{DDC}.}
+	\label{fig::res::pf::hm_sn_ddc}
+\end{figure}
+
+\cleardoublepage
 
 \subsection{Transferfunktion und Renderoptionen}
 \todo{Ergebnisse zur Nutzung der Transferfunktion, Interpolation, Ambient Occlusion und Orthografische Ansicht.}

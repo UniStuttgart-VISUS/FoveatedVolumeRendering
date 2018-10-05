@@ -214,7 +214,7 @@ Die erste Variation (\emph{MDC}) erlaubte es dafür, die Größe des normal aufg
 Bei der zweiten Variation (\emph{DDC}), kann die Auflösung der verschiedenen Bereiche sowie jeweils die Größe der inneren Ellipse, die den innersten Bereichs begrenzt und der äußeren Ellipse, die den mittleren Bereich begrenzt, angepasst werden.
 \todo{Sollen die verschiedenen Parameter hier schon angegeben werden oder erst im Abschnitt \ref{chap::results} bei den Ergebnissen?}
 
-\subsection{Erstellen von Messwerten}
+\subsection{Erstellen von Messwerten}\label{sec::workpacks::evm}
 Mit den Implementierungen \emph{MDC} und \emph{DDC} sowie ihren bestimmten Parametern ist nun das Ziel, ihre Performanz möglichst reproduzierbar zu messen. Da die Veränderungen selbst hauptsächlich im Kernel existierten, sollten die Ausführungszeiten des Kernels von \emph{MDC} und \emph{DDC} gemessen werden, um die beiden Verfahren untereinander und mit der Standardimplementierung besser vergleichen zu können.
 Trotzdem beeinflusst der Overhead der Verfahren bei der Ausführung der \texttt{paintGL()} Methode die reale Performanz, daher sollte diese auch gemessen werden.
 
