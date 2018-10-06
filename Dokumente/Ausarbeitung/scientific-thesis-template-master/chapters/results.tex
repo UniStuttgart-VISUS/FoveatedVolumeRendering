@@ -8,25 +8,26 @@ Der zweite Abschnitt beinhaltet Messungen zur Performanz der verschiedenen Rayca
 Im zweiten Abschnitt werden diese näher diskutiert.
 
 \section{Ergebnisse}\label{sec::results}
-\todo{Technische Daten des Systems, mit dem die Messungen gemacht wurden, angeben. Am besten die wichtigen Messungen mit dem Eye Tracker PC wiederholen.}
 Der erste Abschnitt beinhaltet Ergebnissen der Implementierungen \emph{MDC} \ref{ss::MDC} und \emph{DDC} \ref{ss::DDC} sowie der ursprünglichen Implementierung des Raycasts \ref{ss::rc} aus Sicht der Bildqualität.
+Dabei liegt der Fokus auf die Beschreibung der wahrgenommenen Bildqualität der verschiedenen Methoden.
 Der zweite Abschnitt beinhaltet gemessene Performanzleistungen der jeweiligen Implementierungen bei der Verwendung unterschiedlicher Transferfunktionen und Volumendaten.
+Die verschiedenen Methoden werden hier im Hinblick auf die benötigten Ausführungszeiten bei Berechnungen mit verschiedenen Volumen verglichen.
 
 \subsection{Bildqualität}
 Im folgenden werden zu den Implementierungen \emph{MDC}, \emph{DDC} und als Vergleich zur Ursprünglichen Implementierung Screenshots gezeigt, welche die Bildqualität der Implementierungen darstellen sollen.
 Dies wird anhand von zwei verschiedenen Volumen mit jeweils einer Transferfunktion dargestellt.
 Für jedes der Volumen wird jeweils das Bild in normaler Auflösung, welche mit der ursprünglichen Implementierung berechnet wurde sowie das Ergebnis der Berechnung des Bildes durch \emph{MDC} und \emph{DDC} gezeigt.
-Bei den Berechnungen durch \emph{MDC} und \emph{DDC} werden die jeweils verwendeten Parameter der Berechnung angegeben.
+% Bei den Berechnungen durch \emph{MDC} und \emph{DDC} werden die jeweils verwendeten Parameter der Berechnung angegeben.
 
 Die Bilder in diesem Abschnitt wurden alle mit einer Auflösung von $2263\times1306$\,Pixel berechnet.
 Der Begriff \emph{normale Bildabtastrate} bezieht sich auf die Bildabtastrate mit einem Wert von circa $1$ und bedeutet, dass für jeden Pixel des Bildes ein Strahl berechnet wurde, der den Farbwert des Pixels angibt.
 
 Das erste Volumen ist ein ct-scan eines Bonsai.
 Das Volumen hat eine Auflösung von $256\times256\times256$\,Voxel.
-Die Slice-Dicke der einzelnen Voxel ist $1,0\times1,0\times\1,0$, dass heißt, dass die Voxel in x-, y- und z-Richtung die gleichen Ausmaße haben.
-Das zweite Volumen ist ein Zeitschritt aus einer Simulation einer Supernova.
-Es hat eine Auflösung von $432\times432\times432$\,Voxel, welche ebenfalls in x-, y- und z-Richtung die Ausmaße $1,0$ haben.
-\todo{ist das richtig?} 
+Die Slice-Dicke der einzelnen Voxel ist $1,0\times1,0\times1,0$, dass heißt, dass die Voxel in x-, y- und z-Richtung die gleiche Skalierung haben.
+Anders als das erste Volumen, welches ein ct-scan ist, ist das zweite Volumen ein Zeitschritt aus der Simulation einer \emph{shock wave formation in core-collapse supernova} von John Blondin, NCSU.
+Es hat eine Auflösung von $432\times432\times432$\,Voxel, welche ebenfalls in x-, y- und z-Richtung eine Skalierung von $1,0$ haben.
+% Die Dichte der Voxel gibt die physikalische Entropie an der Position in der Simulation an.
 
 \subsubsection{Standard Raycast}\label{ss::res::sr}
 % \todo{Die gleiche Transferfunktion verwenden, wie die, womit die Daten gemessen wurden.}; ggf. auch dazu Daten messen.
@@ -34,18 +35,20 @@ Abbildung \ref{fig::res::bon_st} zeigt eine Berechnung des Volumens \emph{Bonsai
 Die Bildabtastrate ist bei der Berechnung des Standard Raycasts im ganzen Bild homogen und hat den Wert $1$.
 Das heißt, dass für jeden Pixel des Bildes ein Work-Item gestartet wurde, um den Raycast eines Strahls zu berechnen.
 Der jeweilige Pixel erhält die berechnete Farbe des Work-Items.
-Die Abtastrate der Strahlen hat den Standardwert von $1.5$\,Tastungen pro Voxel.
+Die Abtastrate der Strahlen hat den Standardwert von $1.5$.
+Die Abtastdistanz wird mit $1 \times Voxellänge \div Abtastrate$ berechnet, dass heißt in diesem Fall wird Strahl alle $\frac{1}{1,5}$\,Längeneinheiten abgetastet.
 Durch die Interpolation der Voxel wird das Volumen mit weichen Konturen und Flächen gezeichnet.
 Die Transferfunktion hebt die Voxel mit etwas höherer Dichte farblich hervor.
 Dies entspricht hier dem Stamm und den Ästen sowie der Erde und der Schale, in welcher sich der Bonsai befindet.
 Die Blätter werden teilweise ausgeblendet.
-Die Grashalme, die aus der Erde sprießen, sind vollständig ausgeblendet.
+Die Voxel, die nicht zu dem Bonsai Objekt gehören, zum Beispiel Leerräume, haben teilweise auch Dichtewerte größer null.
+Daher wurde die Transferfunktion so gewählt, dass diese ausgeblendet sind.
 Insgesamt werden die Flächen aber transparent gezeichnet, so dass auch eigentlich verdeckte Strukturen zu sehen sind.
 
 Wie in den Grundlagen im Abschnitt \ref{sec::eye} zum visuellen Wahrnehmungssystem beschrieben wurde, kann man feststellen, dass wenn ein bestimmter Punkt in der Abbildung \ref{fig::res::bon_st} fokussiert wird, die vom Blickpunkt entfernten Bereiche unscharf erscheinen.
 Im Standard Raycast werden auch diese mit normaler Bildabtastrate gezeichnet, obwohl dies aufgrund der Limitierungen des visuellen Wahrnehmungssystems, eigentlich nicht notwendig ist.
 
-Abbildung \ref{fig::res::sup_st} zeigt eine Berechnung des Volumens \emph{E\_1353}, welches einen Zeitschritt einer Supernova darstellt.
+Abbildung \ref{fig::res::sup_st} zeigt eine Berechnung des Volumens der Supernova im Zeitschritt $1353$.
 Das Bild wurde mit dem Standard Raycast berechnet, so dass die Bildabtastrate in dem gesamten Bild gleich ist.
 Dies wird auch durch die Vergrößerung von Bereichen an unterschiedlichen Positionen innerhalb der Abbildung verdeutlicht.
 Die Strahlabtastrate hat einen Wert von $1,5$ und die Interpolation der Voxel ist aktiviert.
@@ -118,11 +121,40 @@ Der Unterschied fällt aber nicht sehr stark auf.
 	\begin{figure}
 		\centering
 		\includegraphics[width=1\textheight]{../../Grafiken/results/picture_quality/bonsai/MDC_img-0-96_ray-1-5.png}
-		\caption{Volumen Bonsai mit \emph{MDC} Raycast berechnet.}
+		\caption{Volumen Bonsai. Das Bild wurde mit dem \emph{MDC} Raycast berechnet. Ein kleiner Teil des Bildes, in Form eines Rechtecks, hat eine Bildabtastrate von $1,0$. Das restliche Bild hat nur eine Bildabtastrate von $0,5$. Die Strahlabtastrate beträgt für das ganze Bild $1.5$.}
 		\label{fig::res::bon_mdc}
 	\end{figure}
 \end{landscape}
 
+\begin{landscape}
+	\begin{figure}[]
+	\centering
+	\begin{minipage}[t]{0.3\textheight}
+		\centering
+		\includegraphics[width=1\textwidth]{../../Grafiken/results/picture_quality/supernova/comparison/MDC/mouse_away_mdc_cut.png}
+		\caption*{Die Mausposition befindet sich außerhalb des Bildes, somit ist das Bild vollständig mit einer Bildabtastrate von $0,5$ berechnet worden.}
+		\label{fig::res::sn_comp_mouse_away_mdc}
+	\end{minipage}
+	\hfill
+	\begin{minipage}[t]{0.3\textheight}
+		\centering
+		\includegraphics[width=1\textwidth]{../../Grafiken/results/picture_quality/supernova/comparison/MDC/mouse_half_on_mdc_cut.png}
+		\caption*{Die Mausposition liegt so, dass das Rechteck nur einen Teil des Ausschnittes überdeckt.}
+		\label{fig::res::sn_comp_mouse_half_on_mdc}
+	\end{minipage}
+	\hfill
+	\begin{minipage}[t]{0.3\textheight}
+		\centering
+		\includegraphics[width=1\textwidth]{../../Grafiken/results/picture_quality/supernova/comparison/MDC/mouse_on_mdc_cut.png}
+		\caption*{Die Mausposition ist circa im Zentrum des Bildes. Der gesamte Ausschnitt liegt innerhalb dieses Rechtecks und hat eine Bildabtastrate von $1,0$.}
+		\label{fig::res::sn_comp_mouse_on_mdc}
+	\end{minipage}
+	\caption{Ausschnitte dreier Berechnungen des Supernova Volumens mit der MDC Methode. Die Strahlabtastrate beträgt in der linken und rechten Abbildung für das ganze Bild $1.5$. Die Mausposition war bei den Berechnungen jeweils verschieden.}
+	\end{figure}
+\end{landscape}
+
+
+\iffalse
 \begin{landscape}
 	\begin{figure}
 		\centering
@@ -131,6 +163,7 @@ Der Unterschied fällt aber nicht sehr stark auf.
 		\label{fig::res::sup_mdc}
 	\end{figure}
 \end{landscape}
+\fi
 
 \subsubsection{DDC Raycast}\label{ss::res::ddc}
 Der \emph{DDC} Raycast ist das Ergebnis des Arbeitspakets aus dem Abschnitt \ref{ss::DDC}.
@@ -308,4 +341,5 @@ Die Ausführungszeiten insbesondere der \emph{paintGL()}-Methode werden daher zu
 \todo{Ergebnisse zur Nutzung der Transferfunktion, Interpolation, Ambient Occlusion und Orthografische Ansicht.}
 
 \section*{Diskussion}\label{sec::disc}
+\todo{Technische Daten des Systems, mit dem das Eyetracking gemacht wurde, angeben. Am besten die wichtigen Messungen mit dem Eye Tracker PC wiederholen.}
 \todo{Diskussion und Bedeutung der Ergebnisse.}

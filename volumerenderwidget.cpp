@@ -2343,6 +2343,7 @@ void VolumeRenderWidget::keyPressEvent(QKeyEvent *event) {
 			<< ", g_v: " << _g_values.x << ", " << _g_values.y << ", " << _g_values.z 
 			<< ", ie: " << std::get<0>(_innerEllipse) << ", " << std::get<1>(_innerEllipse) 
 			<< ", oe: " << std::get<0>(_outerEllipse) << ", " << std::get<1>(_outerEllipse) 
+			<< ", mouse_position: " << _lastLocalCursorPos.x() << ", " << _lastLocalCursorPos.y()
 			<< std::endl;
 	}
 	
