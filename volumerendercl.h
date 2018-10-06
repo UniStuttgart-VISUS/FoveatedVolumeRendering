@@ -65,6 +65,7 @@ public:
 		, INVERT		 // invert									 cl_uint3 (bool), max 1d-index of each area in mode 1
 		, RESOLUTIONFACTOR // resolution factor						 cl_float3
 		, MODE			// modus									 cl_uint
+		, ORS			// reduzierte ORS aktiv wenn param = true    cl_uint
 	};
 
     // mipmap down-scaling metric
@@ -226,7 +227,7 @@ public:
 	void setEllipse2(float width, float height);
 	/**
 	* @brief setInvert
-	* @param color
+	* @param unsigned int
 	*/
 	void setInvert(unsigned int inv);
 	/*
@@ -243,7 +244,11 @@ public:
 	* @param mode
 	*/
 	void setMode(unsigned int mode);
-
+	/**
+	* @brief set rORS
+	* @param unsigned int
+	*/
+	void setORS(unsigned int inv);
 	/*
 	* Sets interpolation parameters for mode 1.
 	*/

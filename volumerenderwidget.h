@@ -266,6 +266,11 @@ private:
 	// TRI
 	std::tuple<float, float> _circle_radiuses; // Circle radiuses for inner circle (first) and outer cirlce (second) in pixel
 
+	bool _rORS; // reduzierte Objekt-Raum-Samplingrate, default true, global für alle rendering methoden
+	const Qt::Key _trigger_rORS_key = Qt::Key_J;
+
+	std::string _currentFileNameOfVolumeDataWithoutPathPrefix; // without full path
+
     // OpenGL
     QOpenGLVertexArrayObject _screenQuadVao;
     QOpenGLShaderProgram _spScreenQuad;

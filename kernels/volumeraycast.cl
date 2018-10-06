@@ -429,6 +429,7 @@ __kernel void volumeRender(  __read_only image3d_t volData
                            , const uint3 inverts  // if true (nonzero), draws everything outside the rectangle, else everything inside, tells in mode=1 which area is being drawn (A, B or C ad 2, 1 or 0)
                            , const float3 resolutionfactor // is used as g for mode: discard_dc, m is derived from the mode and from the texture width, ell1 and ell2 rx.
                            , const uint mode
+                           , const uint ORS
                            )
 {
     int2 globalId = (int2)(get_global_id(0), get_global_id(1));
@@ -441,13 +442,23 @@ __kernel void volumeRender(  __read_only image3d_t volData
 
     float samplingRate = samplingRateC;
 
-	bool decreasing_sampling_rate = true;
+	bool decreasing_sampling_rate = ORS;
 
     // check if imageCoord is in valid area according to cursorPos and rectangle (and invert)
     // shift rect that cursor is in its middle
     switch(mode){ // early discard here
         case 0: // Standard
-                break;
+            if(decreasing_sampling_rate){
+				float distance_to_cursor = length(convert_float2_rtz(globalId) - cursorPos);	// is between 0 and max diagonal of image bounds
+				if(distance_to_cursor < 10){ // in a circle of 10 pixels there is no decrease in the sampling rate
+					break;
+				}else{
+					float sr_factor = 1.0f - (distance_to_cursor) / length(convert_float2_rtz(img_bounds));
+					const float sr_boundary = 0.25f;
+					samplingRate *= max(sr_boundary, sr_factor);
+				}
+    		}
+            break;
         case 1: // distance dependent discarding
 				maxSize = max(img_bounds.x, img_bounds.y); // glaube ist notwendig, um die richtige aspect ratio weiter unten zu berechnen
 				int index_1d = index_from_2d(globalId, get_global_size(0)); // maps globalId to 1d index

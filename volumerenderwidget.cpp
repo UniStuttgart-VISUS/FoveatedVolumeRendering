@@ -65,6 +65,7 @@ VolumeRenderWidget::VolumeRenderWidget(QWidget *parent)
 	, _useEyetracking(false)
 	, _measurement_is_active(false)
 	, _single_measurement(false)
+	, _rORS(true)
 {
 	this->grabKeyboard();
     this->setMouseTracking(true);
@@ -386,6 +387,7 @@ void VolumeRenderWidget::paintGL()
 		_spScreenQuad.release();
 	}
 		_volumerender.setMode(static_cast<unsigned int>(_renderingMethod));
+		_volumerender.setORS(_rORS);
 	// std::cout << "paintGL(): " << "_renderingMethod: " << static_cast<GLint>(_renderingMethod) << std::endl;
 
 	switch (_renderingMethod) {
@@ -537,9 +539,11 @@ void VolumeRenderWidget::paintGL_standard()
 		// OpenCL raycast
 		try
 		{
-			if (_useGL)
+			if (_useGL) {
+				_volumerender.setCursorPos(_lastLocalCursorPos.x(), _lastLocalCursorPos.y());
 				_volumerender.runRaycast(floor(this->size().width() * _imgSamplingRate),
 					floor(this->size().height()* _imgSamplingRate), _timestep);
+			}
 			else
 			{
 				std::vector<float> d;
@@ -1720,7 +1724,26 @@ void VolumeRenderWidget::setVolumeData(const QString &fileName)
     int timesteps = 0;
     try
     {
-        timesteps = _volumerender.loadVolumeData(fileName.toStdString());
+		std::string s = fileName.toStdString();
+        timesteps = _volumerender.loadVolumeData(s);
+
+		std::string delim = "/";
+
+		std::string tmp_s;
+
+		auto start = 0U;
+		auto end = s.find(delim);
+		while (end != std::string::npos)
+		{
+			tmp_s = s.substr(start, end - start);
+			// std::cout << "tmp_s: " << tmp_s << std::endl;
+			start = end + delim.length();
+			end = s.find(delim, start);
+		}
+		
+		// std::cout << "s: " << s.substr(start, end) << std::endl;
+
+		_currentFileNameOfVolumeDataWithoutPathPrefix = s.substr(start, end);
     }
     catch (std::invalid_argument e)
     {
@@ -2020,6 +2043,7 @@ void VolumeRenderWidget::mouseMoveEvent(QMouseEvent *event)
 		update();
 		break;
 	default:
+		update();
 		break;
 	}
 
@@ -2160,18 +2184,28 @@ std::string VolumeRenderWidget::ReadFile(const char * path)
 bool VolumeRenderWidget::save_measurements(std::string file_name)
 {
 	if (_renderingMethod == RenderingMethod::STANDARD) { // nur für die messungen.
-		file_name = "ms_data_st.txt";
+		file_name = "ms_data_st";
 	}
 	else {
 		if (_renderingMethod == RenderingMethod::DISTANCE_DC) {
-			file_name = "ms_data_ddc.txt";
+			file_name = "ms_data_ddc";
 		}
 		else {
 			if (_renderingMethod == RenderingMethod::SQUARE_DC) {
-				file_name = "ms_data_mdc.txt";
+				file_name = "ms_data_mdc";
 			}
 		}
 	}
+
+	if (_rORS) {
+		file_name.append("_rORS");
+	}
+	
+	// add current volume data name
+	file_name.append("_").append(_currentFileNameOfVolumeDataWithoutPathPrefix.substr(0U, _currentFileNameOfVolumeDataWithoutPathPrefix.find(".")));
+
+	// add .txt
+	file_name.append(".txt");
 
 	std::cout << "Trying to save_measurements to: " << file_name << std::endl;
 
@@ -2325,6 +2359,11 @@ void VolumeRenderWidget::keyPressEvent(QKeyEvent *event) {
 			else {
 				std::cout << "loading of mouse movement data failed!" << std::endl;
 			}
+		}
+
+		if (event->key() == _trigger_rORS_key) {
+			_rORS = !_rORS;
+			std::cout << "Triggered ORS! should be Key J." << std::endl;
 		}
 
 		std::cout << "Variables:" << std::endl;

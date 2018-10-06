@@ -888,6 +888,11 @@ void VolumeRenderCL::setMode(unsigned int mode)
 	_raycastKernel.setArg(MODE, mode);
 }
 
+void VolumeRenderCL::setORS(unsigned int inv)
+{
+	_raycastKernel.setArg(ORS, inv);
+}
+
 void VolumeRenderCL::setInterpolationParametersForDDC(cl_float3 g_values, cl_float2 cursorPos, cl_float2 ell1, cl_float2 ell2)
 {
 	_interpolationKernelForDDC.setArg(2, g_values);
