@@ -528,6 +528,7 @@ __kernel void volumeRender(  __read_only image3d_t volData
                 
                 break;
         case 2: // discard with rect
+
                 if(checkPointInRectangle(cursorPos - 0.5f * rectangle, rectangle, texCoords_nlzd)){
                     if(inverts.x != 0){
                         write_imagef(outData, globalId, (float4)(0.0, 0.0, 0.0, 0.0));
@@ -539,6 +540,38 @@ __kernel void volumeRender(  __read_only image3d_t volData
                         return;
                     }
                 }
+
+                int2 tmpGlobalID = (int2)(0, 0);
+                int2 tmpImgBounds = (int2)(0, 0);
+                float2 denormCursorPos = (float2)(0.0f, 0.0f);
+
+                if(inverts.x == 0){ // low res
+                    // set tmpImgBounds to full resolution
+                    tmpImgBounds = img_bounds * 2;
+                    
+                    tmpGlobalID = 2 * globalId; // map globalID to full image as tmpGlobalID
+                }else{ // normal res
+                    tmpImgBounds = img_bounds; // img_bounds is good here
+
+                    tmpGlobalID = globalId; // globalId already good here; // map globalID to full image as tmpGlobalID
+                }
+
+                // denormalize cursorPos
+                denormCursorPos.x = cursorPos.x * tmpImgBounds.x; 
+                denormCursorPos.y = cursorPos.y * tmpImgBounds.y;
+
+                // now cursorPos and tmpGlobalID is denormalized and correspond to image coordinates
+
+                if(decreasing_sampling_rate){
+					float distance_to_cursor = length(convert_float2_rtz(tmpGlobalID) - denormCursorPos);	// is between 0 and max diagonal of image bounds
+					if(distance_to_cursor < 10){ // in a circle of 10 pixels there is no decrease in the sampling rate
+						break;
+					}else{
+						float sr_factor = 1.0f - (distance_to_cursor) / length(convert_float2_rtz(tmpImgBounds));
+						const float sr_boundary = 0.25f;
+						samplingRate *= max(sr_boundary, sr_factor);
+					}
+				}
 
                 break;
         case 3: // TRI

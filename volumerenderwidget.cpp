@@ -889,7 +889,7 @@ void VolumeRenderWidget::paintGL_square_dc()
 
 						floor(this->size().height()*_imgSamplingRate), _outTexId0, GL_TEXTURE0);
 
-					_volumerender.setCursorPos(0.0, 0.0);
+					_volumerender.setCursorPos(xPos_nlzd, yPos_nlzd);
 					_volumerender.setRectangleExtends(0.0, 0.0);
 
 					_volumerender.setInvert(true);
@@ -914,7 +914,7 @@ void VolumeRenderWidget::paintGL_square_dc()
 
 						floor(img_height), _outTexId1, GL_TEXTURE1);
 
-					_volumerender.setCursorPos(xPos_nlzd, yPos_nlzd);
+					
 					_volumerender.setRectangleExtends(rect_width_nlzd + (16.0 / img_width), rect_height_nlzd + (16.0 / img_height));
 
 					_volumerender.setInvert(false);
