@@ -1,0 +1,1 @@
+mouse_position: 812, 300
