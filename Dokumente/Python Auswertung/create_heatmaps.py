@@ -62,7 +62,18 @@ def plot_and_save(picture_path, data_path, min_sc, max_sc):
 
     # use min max for better comparison
     sc = plt.scatter(x=x, y=y, c=z, s=10, vmin=min_sc, vmax=max_sc, cmap=cmap)
-    plt.colorbar(sc)
+
+    # set and adjust colorbar size to size of graph
+    cbar = plt.colorbar(sc, fraction=0.027, pad=0.04)
+
+    # set ms to colorbar
+    cbar.ax.get_yaxis().labelpad = 15
+    cbar.ax.set_ylabel('ms', rotation=270)
+
+    # hide pixel axis
+    cur_axes = plt.gca()
+    cur_axes.axes.get_xaxis().set_visible(False)
+    cur_axes.axes.get_yaxis().set_visible(False)
 
     '''fig, ax = plt.subplot(figsize=(10,10))
     ax.scatter(x, y, color=colors)
@@ -71,14 +82,14 @@ def plot_and_save(picture_path, data_path, min_sc, max_sc):
     cbar = mplib.colorbar.ColorBase(cax, cmap=cmap, norm=normalize)'''
 
     save_path_name = data_path.split('.')[0] + '_heatmap'
-    plt.savefig(save_path_name, dpi=300)  # save the figure
+    plt.savefig(save_path_name, dpi=600)  # save the figure, 600 dpi might be too high
 
     print 'fig saved to:', save_path_name
 
     plt.clf()  # clear figure so the method can be called again.
 
 
-def main():
+def main_old():
     msr_path = 'C:/Users/bauer/Desktop/bvrc_rbn/Dokumente/Messungen/'
     dirs = ['bonsai', 'hoatzin', 'E_1353', 'chameleon']
     mmsts = ['Messung_mit_Standard_Transferfunktion', 'Messungen_mit_Transferfunktion_1',
@@ -120,6 +131,35 @@ def main():
     print 'End'
     return
 
+
+def main():
+    # path to the folder with the measurements
+    msr_path = 'C:/Users/bauer/Desktop/bvrc_rbn/Dokumente/Neue_Messungen/Chameleon/'
+
+    print 'Begin'
+
+    st_values = axes_from_data(read_data(msr_path + 'ms_data_st_chameleon.txt'))
+    st_ors_values = axes_from_data(read_data(msr_path + 'ms_data_st_rORS_chameleon.txt'))
+    mdc_values = axes_from_data(read_data(msr_path + 'ms_data_mdc_chameleon.txt'))
+    mdc_ors_values = axes_from_data(read_data(msr_path + 'ms_data_mdc_rORS_chameleon.txt'))
+    ddc_values = axes_from_data(read_data(msr_path + 'ms_data_ddc_chameleon.txt'))
+    ddc_ors_values = axes_from_data(read_data(msr_path + 'ms_data_ddc_rORS_chameleon.txt'))
+
+    total_min = min(min(st_values[2]), min(st_ors_values[2]), min(mdc_values[2]), min(mdc_ors_values[2]),
+                    min(ddc_values[2]), min(ddc_ors_values[2]))
+
+    total_max = max(max(st_values[2]), max(st_ors_values[2]), max(mdc_values[2]), max(mdc_ors_values[2]),
+                    max(ddc_values[2]), max(ddc_ors_values[2]))
+
+    plot_and_save(msr_path + 'st.png', msr_path + 'ms_data_st_chameleon.txt', total_min, total_max)
+    plot_and_save(msr_path + 'st_ors.png', msr_path + 'ms_data_st_rORS_chameleon.txt', total_min, total_max)
+    plot_and_save(msr_path + 'mdc.png', msr_path + 'ms_data_mdc_chameleon.txt', total_min, total_max)
+    plot_and_save(msr_path + 'mdc_ors.png', msr_path + 'ms_data_mdc_rORS_chameleon.txt', total_min, total_max)
+    plot_and_save(msr_path + 'ddc.png', msr_path + 'ms_data_ddc_chameleon.txt', total_min, total_max)
+    plot_and_save(msr_path + 'ddc_ors.png', msr_path + 'ms_data_ddc_rORS_chameleon.txt', total_min, total_max)
+
+    print 'End'
+    pass
 
 if __name__ == '__main__':
     main()

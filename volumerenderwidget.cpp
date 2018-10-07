@@ -562,8 +562,8 @@ void VolumeRenderWidget::paintGL_standard()
 
 			{
 				// measurements
-				_tmp_ms.frame_coordinates = { -1, -1 };
-				_tmp_ms.position_in_Grid = { -1, -1 };
+				_tmp_ms.frame_coordinates = _lastLocalCursorPos;
+				_tmp_ms.position_in_Grid = _tmp_ms.frame_coordinates / _ms_area;
 				_tmp_ms.kernel_milliseconds = _volumerender.getLastExecTime() * 1000.0;
 				if (_single_measurement) {
 					_tmp_ms.manual_measurement = true;

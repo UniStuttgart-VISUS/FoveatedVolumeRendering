@@ -400,50 +400,74 @@ Für die Messergebnisse selbst wurde ein spiegelverkehrtes \emph{S} mit dem Maus
 Es wurden anschließend verschiedene Volumendaten mit jeweils drei verschiedenen Transferfunktionen für die drei verschiedenen Implementierungen, den Standard-, \emph{MDC}- und \emph{DDC}-Raycast sowie jeweils einmal mit konstanter und einmal mit variierter Strahlabtastrate für die Messungen verwendet.
 Bei jeder dieser Messung wurde dabei für jede der Mauspositionen des gespeicherten Mausverlaufs ein Bild berechnet und zu dieser Berechnung die Mausposition, die Ausführungszeit des Kernels und die Ausführungszeit der \emph{paintGL()}-Methode gespeichert.
 
-Die Hardware des Computers, mit welchem die Messungen durchgeführt wurden, besteht aus einem \emph{Intel Core i5 4670k bei $3,40$\,GHz} CPU und einer \emph{GIGABYTE AMD Radeon (TM) R9 390 Series} GPU.
-Die Auflösung der zu berechnenden Bilder betrug $2263\times1306$\,Pixel.
+Die Hardware des Computers, mit welchem die Messungen durchgeführt wurden, besteht unter Anderem aus einem \emph{Intel Core i5 4670k bei $3,40$\,GHz} CPU und einer \emph{GIGABYTE AMD Radeon (TM) R9 390 Series} GPU.
+Die Auflösung der zu berechnenden Bilder betrug immer $2263\times1306$\,Pixel.
 
-Im folgenden werden verschiedene Messungen vorgestellt.
+Die Messungen wurden mit den Volumen \emph{Bonsai}, \emph{Supernova} und \emph{Chameleon} durchgeführt.
+Das Volumen \emph{Bonsai} hat eine Auflösung von $256\times256\times256$\,Voxel, wobei die Voxel eine Slice-Dicke von $1,0\times1,0\times1,0$ haben.
+Das Volumen \emph{Supernova} hat eine Auflösung von $432\times432\times432$\,Voxel mit jeweils einer Slice-Dicke von $1,0\times1,0\times1,0$.
+Das Volumen \emph{Chameleon} hat eine Auflösung von $1024\times1024\times1024$\,Voxel, welche jeweils eine Slice-Dicke von $0,09228515625\times0,09228515625\times0,105$ haben.
+
+\subsubsection{Heatmaps}
+
+Für einen anschaulichen Vergleich der Methoden wurde für die Messungen des Volumen Chameleon Heatmaps erstellt (Abbildung 
 Aus den gemessenen Ausführungszeiten des Kernels wurden Heatmaps für das jeweils zugrundeliegende Bild erstellt.
 Da die Differenz zwischen Ausführungszeit des Kernels und der Ausführungszeit der \emph{paintGL()}-Methode unabhängig von dem zu berechnenden Volumen und der verwendeten Transferfunktion ist, wurde diese nicht für die Erstellung der Heatmaps einbezogen.
-Die Ausführungszeiten insbesondere der \emph{paintGL()}-Methode werden daher zusätzlich getrennt von den Heatmaps vorgestellt.
 
-% Die Latenz des Eyetrackers ist sehr gut. ; Perf.
-% Eine merkbare Verzögerung zwischen realer Blickposition und der Blickposition des aktuell berechneten Bildes, tritt nur dann auf, falls die Berechnungsdauer eines Bildes zu lange dauert. ; Perf
-% Dies hängt aber auch von der Größe und Auflösung des verwendeten Volumens ab. ; Perf.
-% In dem Fall von Abbildung \ref{fig::res::bon_st} ist dies nicht der Fall. ; Perf.
-% Da das Volumen mit einer Auflösung von $256\times256\times256$\,Voxel im Vergleich zu anderen recht klein ist, .. ; Perf.
+
 \todo{Messbare Ergebnisse der Arbeit. (Performanzmessungen..).}
 \todo{Zusätzlich Tabelle mit Durchnschnittsperformanzwerten insbesondere der paintGL() Methode.}
 
+\begin{figure}
+	\centering
+	\includegraphics[width=0.7\textwidth]{../../Neue_Messungen/Chameleon/heatmaps/ms_data_st_chameleon_heatmap.png}
+	\caption{Heatmap des Chameleon Volumen mit dem Standard Raycast ohne variierter Strahlabtastrate.}
+	\label{fig::res::pf::hm_st}
+\end{figure}
 
 \begin{figure}
 	\centering
-	\includegraphics[width=1\textwidth]{../../Grafiken/results/performance/bonsai/ms_data_mdc_heatmap.png}
-	\caption{Bonsai Heatmap \emph{MDC}.}
-	\label{fig::res::pf::hm_bs_mdc}
+	\includegraphics[width=0.7\textwidth]{../../Neue_Messungen/Chameleon/heatmaps/ms_data_st_rORS_chameleon_heatmap.png}
+	\caption{Heatmap des Chameleon Volumen mit dem Standard Raycast mit variierter Strahlabtastrate.}
+	\label{fig::res::pf::hm_st_ors}
 \end{figure}
+
 \begin{figure}
 	\centering
-	\includegraphics[width=1\textwidth]{../../Grafiken/results/performance/bonsai/ms_data_ddc_heatmap.png}
-	\caption{Bonsai Heatmap \emph{DDC}.}
-	\label{fig::res::pf::hm_bs_ddc}
+	\includegraphics[width=0.7\textwidth]{../../Neue_Messungen/Chameleon/heatmaps/ms_data_mdc_chameleon_heatmap.png}
+	\caption{Heatmap des Chameleon Volumen mit dem MDC Raycast ohne variierter Strahlabtastrate.}
+	\label{fig::res::pf::hm_mdc}
 \end{figure}
+
 \begin{figure}
 	\centering
-	\includegraphics[width=1\textwidth]{../../Grafiken/results/performance/supernova/ms_data_mdc_heatmap.png}
-	\caption{Supernova Heatmap \emph{MDC}.}
-	\label{fig::res::pf::hm_sn_mdc}
+	\includegraphics[width=0.7\textwidth]{../../Neue_Messungen/Chameleon/heatmaps/ms_data_mdc_rORS_chameleon_heatmap.png}
+	\caption{Heatmap des Chameleon Volumen mit dem MDC Raycast mit variierter Strahlabtastrate.}
+	\label{fig::res::pf::hm_mdc_ors}
 \end{figure}
+
 \begin{figure}
 	\centering
-	\includegraphics[width=1\textwidth]{../../Grafiken/results/performance/supernova/ms_data_ddc_heatmap.png}
-	\caption{Supernova Heatmap \emph{DDC}.}
-	\label{fig::res::pf::hm_sn_ddc}
+	\includegraphics[width=0.7\textwidth]{../../Neue_Messungen/Chameleon/heatmaps/ms_data_ddc_chameleon_heatmap.png}
+	\caption{Heatmap des Chameleon Volumen mit dem DDC Raycast ohne variierter Strahlabtastrate.}
+	\label{fig::res::pf::hm_ddc}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.7\textwidth]{../../Neue_Messungen/Chameleon/heatmaps/ms_data_ddc_rORS_chameleon_heatmap.png}
+	\caption{Heatmap des Chameleon Volumen mit dem DDC Raycast ohne variierter Strahlabtastrate.}
+	\label{fig::res::pf::hm_ddc_ors}
 \end{figure}
 
 \cleardoublepage
 
 \section*{Diskussion}\label{sec::disc}
-\todo{Technische Daten des Systems, mit dem das Eyetracking gemacht wurde, angeben. Am besten die wichtigen Messungen mit dem Eye Tracker PC wiederholen.}
 \todo{Diskussion und Bedeutung der Ergebnisse.}
+\todo{Technische Daten des Systems, mit dem das Eyetracking gemacht wurde, angeben. Zugehörig zur Diskussion der Ergebnisse; wie man die verschiedenen Methoden empfindet.}
+
+% Die Latenz des Eyetrackers ist sehr gut. ; Disk.
+% Eine merkbare Verzögerung zwischen realer Blickposition und der Blickposition des aktuell berechneten Bildes, tritt nur dann auf, falls die Berechnungsdauer eines Bildes zu lange dauert. ; Disk
+% Dies hängt aber auch von der Größe und Auflösung des verwendeten Volumens ab. ; Disk.
+% In dem Fall von Abbildung \ref{fig::res::bon_st} ist dies nicht der Fall. ; Disk.
+% Da das Volumen mit einer Auflösung von $256\times256\times256$\,Voxel im Vergleich zu anderen recht klein ist, .. ; Disk.
