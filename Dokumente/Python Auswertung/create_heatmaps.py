@@ -82,7 +82,7 @@ def plot_and_save(picture_path, data_path, min_sc, max_sc):
     cbar = mplib.colorbar.ColorBase(cax, cmap=cmap, norm=normalize)'''
 
     save_path_name = data_path.split('.')[0] + '_heatmap'
-    plt.savefig(save_path_name, dpi=600)  # save the figure, 600 dpi might be too high
+    plt.savefig(save_path_name, dpi=600, bbox_inches='tight')  # save the figure, 600 dpi might be too high
 
     print 'fig saved to:', save_path_name
 

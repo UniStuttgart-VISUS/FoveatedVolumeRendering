@@ -405,19 +405,10 @@ Die Auflösung der zu berechnenden Bilder betrug immer $2263\times1306$\,Pixel.
 
 Die Messungen wurden mit den Volumen \emph{Bonsai}, \emph{Supernova} und \emph{Chameleon} durchgeführt.
 Das Volumen \emph{Bonsai} hat eine Auflösung von $256\times256\times256$\,Voxel, wobei die Voxel eine Slice-Dicke von $1,0\times1,0\times1,0$ haben.
-Das Volumen \emph{Supernova} hat eine Auflösung von $432\times432\times432$\,Voxel mit jeweils einer Slice-Dicke von $1,0\times1,0\times1,0$.
-Das Volumen \emph{Chameleon} hat eine Auflösung von $1024\times1024\times1024$\,Voxel, welche jeweils eine Slice-Dicke von $0,09228515625\times0,09228515625\times0,105$ haben.
+Das Volumen \emph{Supernova} hat eine Auflösung von $432\times432\times432$\,Voxel, wobei die Voxel eine Slice-Dicke von $1,0\times1,0\times1,0$ haben.
+Das Volumen \emph{Chameleon} hat eine Auflösung von $1024\times1024\times1024$\,Voxel, wobei die Voxel eine Slice-Dicke von $0,09228515625\times0,09228515625\times0,105$ haben.
 
 \subsubsection{Heatmaps}
-
-Für einen anschaulichen Vergleich der Methoden wurde für die Messungen des Volumen Chameleon Heatmaps erstellt (Abbildung 
-Aus den gemessenen Ausführungszeiten des Kernels wurden Heatmaps für das jeweils zugrundeliegende Bild erstellt.
-Da die Differenz zwischen Ausführungszeit des Kernels und der Ausführungszeit der \emph{paintGL()}-Methode unabhängig von dem zu berechnenden Volumen und der verwendeten Transferfunktion ist, wurde diese nicht für die Erstellung der Heatmaps einbezogen.
-
-
-\todo{Messbare Ergebnisse der Arbeit. (Performanzmessungen..).}
-\todo{Zusätzlich Tabelle mit Durchnschnittsperformanzwerten insbesondere der paintGL() Methode.}
-
 \begin{figure}
 	\centering
 	\includegraphics[width=0.7\textwidth]{../../Neue_Messungen/Chameleon/heatmaps/ms_data_st_chameleon_heatmap.png}
@@ -459,6 +450,15 @@ Da die Differenz zwischen Ausführungszeit des Kernels und der Ausführungszeit 
 	\caption{Heatmap des Chameleon Volumen mit dem DDC Raycast ohne variierter Strahlabtastrate.}
 	\label{fig::res::pf::hm_ddc_ors}
 \end{figure}
+
+Für einen anschaulichen Vergleich der Methoden wurde für die Messungen des Volumen Chameleon Heatmaps erstellt (Abbildung \ref{fig::res::pf::hm_st} bis Abbildung \ref{fig::res::pf::hm_ddc_ors}).
+Aus den gemessenen Ausführungszeiten des Kernels wurden Heatmaps für das jeweils zugrundeliegende Bild erstellt.
+Da die Differenz zwischen Ausführungszeit des Kernels und der Ausführungszeit der \emph{paintGL()}-Methode unabhängig von dem zu berechnenden Volumen und der verwendeten Transferfunktion ist, wurde diese nicht für die Erstellung der Heatmaps einbezogen.
+
+%\todo{Messbare Ergebnisse der Arbeit. (Performanzmessungen..).}
+%\todo{Zusätzlich Tabelle mit Durchnschnittsperformanzwerten insbesondere der paintGL() Methode.}
+
+
 
 \cleardoublepage
 
