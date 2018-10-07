@@ -41,11 +41,11 @@ In allen Berechnungen ist die maximale Strahlabtastrate $1,5$ gewählt worden.
 Wurde eine Abbildung mit variierter Strahlabtastrate berechnet, so bedeutet dies, dass die Strahlabtastrate an der Mausposition den maximalen Wert der Strahlabtastrate hat.
 Mit zunehmender Distanz zur Mausposition nimmt die Strahlabtastrate dann bis auf einen Wert von $\frac{maximale Strahlabtastrate}{4}$ ab.
 
-Das erste Volumen ist ein ct-scan eines Bonsai.
+Das erste Volumen ist ein ct-scan eines Bonsai Baums.
 Das Volumen hat eine Auflösung von $256\times256\times256$\,Voxel.
 Die Slice-Dicke der einzelnen Voxel ist $1,0\times1,0\times1,0$ und gibt die Skalierung der einzelnen Voxel an.
 Das heißt, dass die Voxel in x-, y- und z-Richtung hier eine einheitliche Skalierung haben.
-% Anders als das erste Volumen, welches ein ct-scan ist, ist das zweite Volumen ein Zeitschritt aus der Simulation einer \emph{shock wave formation in core-collapse supernova} von John Blondin, NCSU.
+% Anders als das erste Volumen, welches ein ct-scan ist, ist das zweite Volumen ein Zeitschritt aus der Simulation einer \emph{shock wave formation in core-collapse supernova} von John Blondin, NCSU. ; direkter Vergleich
 % Es hat eine Auflösung von $432\times432\times432$\,Voxel, welche ebenfalls in x-, y- und z-Richtung eine Skalierung von $1,0$ haben.
 % Die Dichte der Voxel gibt die physikalische Entropie an der Position in der Simulation an.
 
@@ -53,19 +53,24 @@ Das heißt, dass die Voxel in x-, y- und z-Richtung hier eine einheitliche Skali
 % \todo{Die gleiche Transferfunktion verwenden, wie die, womit die Daten gemessen wurden.}; ggf. auch dazu Daten messen.
 Abbildung \ref{fig::res::bon_st} zeigt eine Berechnung des Volumens \emph{Bonsai} mit dem Standard Raycast.
 Die Bildabtastrate ist bei der Berechnung des Standard Raycasts im ganzen Bild homogen und hat den Wert $1$.
+Die Strahlabtastrate ist für das ganze Bild konstant und hat den Wert $1,5$.
 Das heißt, dass für jeden Pixel des Bildes ein Work-Item gestartet wurde, um den Raycast eines Strahls zu berechnen.
 Der jeweilige Pixel erhält die berechnete Farbe des Work-Items.
 
 Durch die Interpolation der Voxel wird das Volumen mit weichen Konturen und Flächen gezeichnet.
 Die Transferfunktion hebt die Voxel mit etwas höherer Dichte farblich hervor.
-Dies entspricht hier dem Stamm und den Ästen sowie der Erde und der Schale, in welcher sich der Bonsai befindet.
-Die Blätter werden teilweise ausgeblendet.
+Dadurch sind farblich einheitliche und zusammenhängende Strukturen erkennbar, unter Anderem die Blätter, Äste und den Stamm.
 Die Voxel, die nicht zu dem Bonsai Objekt gehören, zum Beispiel Leerräume, haben teilweise auch Dichtewerte größer null.
-Daher wurde die Transferfunktion so gewählt, dass diese ausgeblendet sind.
+Daher wurde die Transferfunktion so gewählt, dass diese ebenfalls vollständig ausgeblendet sind.
 Insgesamt werden die Flächen aber transparent gezeichnet, so dass auch eigentlich verdeckte Strukturen zu sehen sind.
 
 Wie in den Grundlagen im Abschnitt \ref{sec::eye} zum visuellen Wahrnehmungssystem beschrieben wurde, kann man feststellen, dass wenn ein bestimmter Punkt in der Abbildung \ref{fig::res::bon_st} fokussiert wird, die vom Blickpunkt entfernten Bereiche unscharf erscheinen.
 Im Standard Raycast werden auch diese mit normaler Bildabtastrate gezeichnet, obwohl dies aufgrund der Limitierungen des visuellen Wahrnehmungssystems, eigentlich nicht notwendig ist.
+
+In Abbildung \ref{fig::res::bon_st_ors} wurde das Volumen auch mit dem Standard Raycast verwendet aber die Strahlabtastrate variiert.
+Mit zunehmender Distanz zur Mausposition, welche als schwarzes Kreuz eingezeichnet wurde, nimmt die Strahlabtastrate ab.
+Dies ist selbst an weit von der Mausposition entfernten Objekten, an denen die Strahlabtastrate am niedrigsten ist, kaum wahrnehmbar.
+Wird die Mausposition selbst fokussiert, ist kein Unterschied feststellbar.
 
 % Abbildung \ref{fig::res::sup_st} zeigt eine Berechnung des Volumens der Supernova im Zeitschritt $1353$. ; Supernova wird am Ende der Bildqualität zusammengefasst
 % Das Bild wurde mit dem Standard Raycast berechnet, so dass die Bildabtastrate in dem gesamten Bild gleich ist.
@@ -95,30 +100,34 @@ Im Standard Raycast werden auch diese mit normaler Bildabtastrate gezeichnet, ob
 Der \emph{MDC} Raycast ist das Ergebnis des Arbeitspakets, aus dem Abschnitt \ref{ss::MDC}.
 Die Abbildung \ref{fig::res::bon_mdc} zeigt das Volumen \emph{Bonsai}, welches mit dem \emph{MDC} Raycast erstellt wurde.
 Das Bild wurde dabei aus der selben Perspektive und mit der gleichen Transferfunktion berechnet, wie dies auch in Abbildung \ref{fig::res::bon_st} der Fall war.
-Die Strahlabtastrate ist ebenfalls gleich wie bei der Berechnung des Bildes in Abbildung \ref{fig::res::bon_st}, welches mit dem Standard Raycast berechnet wurde.
+
 Die maximale Bildabtastrate in Abbildung \ref{fig::res::bon_mdc} hat einen Wert von $0,96$ statt einem Wert von $1,0$.
 Damit wird einer leichten Verschiebung des Bildes, aufgrund der zwei unterschiedlichen Bildabtastraten, entgegengewirkt.
-Die Anpassung der Bildabtastrate muss aber je nach Auflösung des Bildes leicht variiert werden.
+Die Anpassung der Bildabtastrate ist abhängig von der Auflösung des Bildes.
 
 In diesem Fall, beim \emph{MDC} Raycast, wurden zwei Bilder berechnet, welche anschließend passend zusammengefügt wurden.
-Das erste Bild wurde mit nur einem viertel der Auflösung berechnet und anschließend auf die ursprüngliche Auflösung interpoliert.
+Das erste Bild wurde mit nur einem viertel der Auflösung berechnet, also der halben Bildabtastrate, und anschließend auf die ursprüngliche Auflösung interpoliert.
 Das zweite Bild wurde mit der ursprünglichen Auflösung berechnet, dafür aber nur ein rechteckiger Ausschnitt an der Mausposition.
 Anschließend wurde das zweite Bild an der Mausposition in das auf die normale Auflösung interpolierte erste Bild eingefügt.
 
-\todo{Mausposition in das Bild einzeichnen.}
 An den Konturen der Abbildung \ref{fig::res::bon_mdc} ist ein leichter Abfall der Auflösung des Bildes zu erkennen.
 Die Konturen, welche in Abbildung \ref{fig::res::bon_st} noch weich gezeichnet wurden, haben außerhalb des Rechtecks um die Mausposition nun Artefakte der Unterabtastung, wie zum Beispiel leichte Treppenstufen.
 Innerhalb des Rechtecks sind die Konturen immer noch weich gezeichnet und es ist dort kein Unterschied zu Abbildung \ref{fig::res::bon_st} zu sehen.
 
-Die Größe des Rechtecks beträgt $?$\,Pixel in x- und y-Richtung und ist groß genug, dass die Abnahme der Auflösung im äußeren Bereich kaum auffällt.
+Die Größe des Rechtecks beträgt $350$\,Pixel in x- und y-Richtung und ist groß genug, dass die Abnahme der Auflösung im äußeren Bereich, bei Fokussierung der Mausposition, nicht wahrnehmbar ist.
 Wird bei aktivem Eyetracking anstelle der Mausposition die Blickposition verwendet, so ist der aktuell betrachtete Bereich immer hoch aufgelöst.
 Ein Unterschied zwischen den beiden Bereichen fällt während einer Fokussierung kaum auf.
 Wenn der Fokus langsam über das Bild wandert, kann man einen Unterschied zwischen den Auflösungen erkennen.
 An dem Übergang des normal aufgelösten Bereichs zu dem Bereich mit der halben Auflösung kommt es während einer Bewegung an den Konturen des Volumen zu leichten Veränderungen.
-Diese können die Aufmerksamkeit auf sich ziehen und daher leicht störend wirken.
+Diese können die Aufmerksamkeit auf sich ziehen und daher auffallen.
 
-Obwohl der Bereich außerhalb des Rechtecks mit nur einem Viertel der Bildabtastrate innerhalb des Rechtecks berechnet wurde, ist die Bildqualität in diesem Bereich noch recht gut.
+Obwohl der Bereich außerhalb des Rechtecks mit nur einem Viertel der Auflösung innerhalb des Rechtecks berechnet wurde, ist die Bildqualität in diesem Bereich noch recht gut.
 Da die Sehschärfe mit zunehmenden Winkel von der Fovea weg immer weiter abnimmt, könnte die Bildabtastrate außerhalb des Rechtecks vermutlich weiter gesenkt werden, ohne dass dies die Bildqualität bei der Verwendung eines Eye-Trackers beeinträchtigt.
+
+Abbildung \ref{fig::res::bon_mdc_ors} zeigt die selbe Berechnung wie Abbildung \ref{fig::res::bon_mdc} aber mit einer variierten Strahlabtastrate.
+Anders als in Abbildung \ref{fig::res::bon_st_ors}, in welcher ebenfalls die Strahlabtastrate auf die gleiche Weise über das Bild hinweg variiert wurde, macht sich in Abbildung \ref{fig::res::bon_mdc_ors} an zum Beispiel den Ästen, die geringere Strahlabtastrate bemerkbar.
+Die Flächen der Äste erscheinen ein bisschen löchrig, da Voxel teilweise übersprungen werden.
+Wird die Mausposition fokussiert, kann man dies, aufgrund der Distanz zum Blickpunkt, nicht wahrnehmen.
 
 % Das Bild in Abbildung \ref{fig::res::sup_mdc} wurde ebenfalls mit dem \emph{MDC} Raycast berechnet und anschließend bearbeitet. ; Direkter Vergleich
 % Es zeigt einen Zeitschritt in einer Simulation von einer Supernova.
@@ -198,8 +207,6 @@ Da die Sehschärfe mit zunehmenden Winkel von der Fovea weg immer weiter abnimmt
 Der \emph{DDC} Raycast ist das Ergebnis des Arbeitspakets aus dem Abschnitt \ref{ss::DDC}.
 Abbildung \ref{fig::res::bon_ddc} zeigt das Volumen \emph{Bonsai}, welches mit dem \emph{DDC} Raycast erstellt wurde.
 Das Bild wurde aus der selben Perspektive und mit der gleichen Transferfunktion berechnet, wie in den Abbildungen \ref{fig::res::bon_st} und \ref{fig::res::bon_mdc}.
-Anders als beim Standard Raycast und \emph{MDC} Raycast, wo die Strahlabtastrate über das gesamte Bild hinweg gleich ist, nimmt beim \emph{DDC} Raycast die Strahlabtastrate Abhängig zur Distanz eines Strahls zur Maus- beziehungsweise Blickposition ab.
-In einem kleinen Bereich um die Mausposition hat sie den maximalen Wert, der gleich dem Wert aus \emph{MDC} und dem Standard Raycast ist.
 Die maximale Bildabtastrate ist $1$.
 Diese nimmt in zwei Stufen nach außen hin ab.
 
@@ -210,28 +217,31 @@ Außerhalb von diesem Bereich aber innerhalb einer zweiten größeren und umschl
 Das heißt, dass in x- und y-Richtung nur für jedes zweiten Pixel ein Strahl ausgewertet wird.
 In dem äußersten Bereich beträgt die Bildabtastrate in x- und y-Richtung $\frac{1}{7}$.
 Es wird also in jedem $7\times7$\,Pixel-Feld nur ein Strahl ausgewertet.
-
-\todo{Mausposition einzeichnen.}
+Die die Farbwerte der Pixel, die selbst nicht durch einen Strahl bestimmt wurden, wurden durch vier umliegende Farbwerte von Strahlen bilinear interpoliert.
 
 In Abbildung \ref{fig::res::bon_ddc} ist deutlich zu sehen, dass der Großteil des Bildes eine geringe Auflösung hat.
 In dem am niedrigsten abgetasteten Bereich sind an den Konturen, insbesondere die der Äste, deutliche Merkmale der Unterabtastung zu sehen.
 In Abbildung \ref{fig::res::bon_st} und \ref{fig::res::bon_mdc} verlaufen die Konturen der Äste noch diagonal und sind relativ weich gezeichnet, hier haben sie starke Treppeneffekte.
+Manche Konturen sind auch teilweise unterbrochen.
 
-In dem mittleren Bereich ist die Bildqualität recht gut und die das Bild scharf zu erkennen.
+In dem mittleren Bereich ist die Bildqualität recht gut und das Bild scharf zu erkennen.
 Trotzdem hat das Bild hier nur ein Viertel der Auflösung.
-Zwischen dem mittleren und inneren Bereich, welcher die normale Auflösung hat, ist kaum zu erkennen.
-
-Dass die Strahlabtastrate mit zunehmender Entfernung zur Mausposition abnimmt, ist in Abbildung \ref{fig::res::bon_ddc} kaum zu erkennen.
-Die reduzierte Auflösung verändert die Bildqualität im äußeren Bereich so stark, dass die reduzierte Strahlabtastrate nicht auffällt.
+Den Übergang zwischen dem mittleren und inneren Bereich, welcher die normale Auflösung hat, ist kaum zu erkennen.
+Aufgrund des starken Abfalls der Bildabtastrate vom mittleren zum äußeren Bereich, fällt dieser Übergang stärker auf.
 
 Bei aktivem Eyetracking wird anstelle der Mausposition die aktuelle Blickposition verwendet.
-Der Fokus liegt bei aktivem Eyetracking nun im Zentrum des inneren Bereichs.
+Der Fokus liegt bei aktivem Eyetracking nun im Zentrum des inneren Bereichs, dieser wurde hier mit der Mausposition simuliert und ist als schwarzes Kreuz eingezeichnet.
 Der innere Bereich ist groß genug, so dass der Abfall der Bildabtastrate zum mittleren Bereich nicht auffällt.
 Zusammen ergeben der innere und mittlere Bereich den Teil des Bildes, in welchem das Bild scharf zu sehen ist.
+Dieser ist ausreichend groß, dass der Bereich an und um dem Blickpunkt immer scharf wahrgenommen wird.
 Anders als in Abbildung \ref{fig::res::bon_mdc}, ist es in Abbildung \ref{fig::res::bon_ddc} auch wenn der innere und mittlere Bereich auf den Blickpunkt zentriert sind, auffallend, dass der äußere Bereich mit einer deutlich niedrigeren Bildabtastrate berechnet wurde.
 Die grundlegenden Konturen des Bildes können aber im äußeren Bereich noch erkannt werden wodurch das Identifizieren von interessanten Objekten immer noch möglich ist.
-Der äußere Bereich ist von dem Zentrum der Blickpunktes so weit entfernt, dass um mehr Informationen über Objekte im äußeren Bereich erhalten zu können, unabhängig von der Bildabtastrate des äußeren Bereichs eine Augenbewegung notwendig ist.
-Die Sehschärfe ist bei dieser Distanz zur Fovea zu schwach, um dies ohne den Blickpunkt zu bewegen, zu erreichen.
+
+Abbildung \ref{fig::res::bon_ddc_ors} zeigt die selbe Berechnung wie Abbildung \ref{fig::res::bon_ddc} aber mit einer variierten Strahlabtastrate, wie sie in Abbildung \ref{fig::res::bon_st_ors} und \ref{fig::res::bon_mdc_ors} auch der Fall war.
+Wie in Abbildung \ref{fig::res::bon_mdc_ors} erscheinen Teile, der von der Mausposition weiter entfernten Objekte, löchrig.
+Der Unterschied zwischen variierter und nicht-variierter Strahlabtastrate fällt bei der DDC Raycast Methode ein wenig stärker auf, als bei der MDC Raycast Methode.
+Trotzdem ist beeinflusst die viel niedrigere Auflösung im äußeren Bereich die Bildqualität viel maßgebender, als die reduziert Strahlabtastrate, so dass diese kaum mehr die Wahrnehmung beeinträchtigt.
+Dies ist noch weniger der Fall, wenn die Mausposition fokussiert wird.
 
 % Abbildung \ref{fig::res::sup_ddc} zeigt das selbe Volumen wie in Abbildung \ref{fig::res::sup_st} und \ref{fig::res::sup_mdc}. ; Direkter Vergleich
 % Bildausschnitte der Übergänge zwischen den Bereichen sind hier zur Verdeutlichung hervorgehoben und vergrößert.
@@ -258,15 +268,15 @@ Die Sehschärfe ist bei dieser Distanz zur Fovea zu schwach, um dies ohne den Bl
 \end{landscape}
 
 \subsubsection*{Direkter Vergleich}
+\todo{Paar Wörter zum direkten Vergleich.}
 
-\begin{landscape}
-	\begin{figure}
-		\centering
-		\includegraphics[width=1\textheight]{../../Neue_Messungen/Supernova/cut/st/st_123.png}
-		\caption{Ein Zeitschritt der Supernova mit dem Standard Raycast berechnet. Die Bildabtastrate beträgt für das ganze Bild $1$. Die Strahlabtastrate beträgt für das ganze Bild $1,5$. die Mausposition und drei nummerierte Quadrate sind eingezeichnet, die Positionen der Quadrate werden im folgenden Vergleich verwendet.}
-		\label{fig::res::sn_comp_st_123}
-	\end{figure}
-\end{landscape}
+\begin{figure}
+	\centering
+	\includegraphics[width=0.7\textwidth]{../../Neue_Messungen/Supernova/cut/st/st_123.png}
+	\caption{Ein Zeitschritt der Supernova mit dem Standard Raycast berechnet. Die Bildabtastrate beträgt für das ganze Bild $1$. Die Strahlabtastrate beträgt für das ganze Bild $1,5$. die Mausposition und drei nummerierte Quadrate sind eingezeichnet, die Positionen der Quadrate werden im folgenden Vergleich verwendet.}
+	\label{fig::res::sn_comp_st_123}
+\end{figure}
+
 
 \begin{figure}[]
 	\centering
@@ -433,12 +443,12 @@ Dies wurde deshalb so gewählt, da die Implementierungen nicht ausschließlich i
 Die Ausführungszeit der \emph{paintGL()}-Methode ist letztendlich der Wert, welcher die reale spürbare Performanz für den Nutzer angibt.
 
 Für die Messungen der Performanz wurde kein Eyetracking verwendet, da dies lediglich die Mausposition mit der Blickposition ersetzt und keinen Einfluss auf die Ausführungszeit des Kernels und nur einen konstanten Einfluss auf die Ausführungszeit der \emph{paintGL()}-Methode hat.
-Außerdem wurde in Arbeitspaket \ref{sec::workpacks::evm} gefordert, dass eine Messung reproduzierbar sein soll.
+Auch sollten, bei den Messungen mit den verschiedenen Methoden, möglichst die selben Mauspositionen verwendet werden, um vergleichbare Ergebnisse zu erhalten.
 Die Verwendung eines Eyetrackers würde es fast unmöglich machen, die selben Blickpunkte in einem gewissen Zeitraum zu fokussieren.
 
-Für die Messergebnisse selbst wurde ein spiegelverkehrtes S mit dem Mauszeiger auf einem Bild nachgefahren und dabei die Mauspositionen abgespeichert.
-Es wurden anschließend verschiedene Volumendaten mit jeweils drei verschiedenen Transferfunktionen für die drei verschiedenen Implementierungen, den Standard-, \emph{MDC}- und \emph{DDC}-Raycast, für die Messungen verwendet.
-Bei jeder dieser Messung wurde dabei für jede der Mauspositionen des gespeicherten Mausverlaufs ein Bild berechnet und zu dieser Berechnung die Mausposition, Ausführungszeit des Kernels und Ausführungszeit der \emph{paintGL()}-Methode gespeichert.
+Für die Messergebnisse selbst wurde ein spiegelverkehrtes \emph{S} mit dem Mauszeiger auf einem Bild nachgefahren und dabei die Mauspositionen abgespeichert.
+Es wurden anschließend verschiedene Volumendaten mit jeweils drei verschiedenen Transferfunktionen für die drei verschiedenen Implementierungen, den Standard-, \emph{MDC}- und \emph{DDC}-Raycast sowie jeweils einmal mit konstanter und einmal mit variierter Strahlabtastrate für die Messungen verwendet.
+Bei jeder dieser Messung wurde dabei für jede der Mauspositionen des gespeicherten Mausverlaufs ein Bild berechnet und zu dieser Berechnung die Mausposition, die Ausführungszeit des Kernels und die Ausführungszeit der \emph{paintGL()}-Methode gespeichert.
 
 Die Hardware des Computers, mit welchem die Messungen durchgeführt wurden, besteht aus einem \emph{Intel Core i5 4670k bei $3,40$\,GHz} CPU und einer \emph{GIGABYTE AMD Radeon (TM) R9 390 Series} GPU.
 Die Auflösung der zu berechnenden Bilder betrug $2263\times1306$\,Pixel.
@@ -478,9 +488,6 @@ Die Ausführungszeiten insbesondere der \emph{paintGL()}-Methode werden daher zu
 \end{figure}
 
 \cleardoublepage
-
-\subsection{Transferfunktion und Renderoptionen}
-\todo{Ergebnisse zur Nutzung der Transferfunktion, Interpolation, Ambient Occlusion und Orthografische Ansicht.}
 
 \section*{Diskussion}\label{sec::disc}
 \todo{Technische Daten des Systems, mit dem das Eyetracking gemacht wurde, angeben. Am besten die wichtigen Messungen mit dem Eye Tracker PC wiederholen.}
