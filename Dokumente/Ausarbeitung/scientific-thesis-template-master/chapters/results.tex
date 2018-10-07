@@ -18,8 +18,6 @@ Es wird von drei Methoden die Bildqualität untersucht, wobei diese jeweils Erge
 Diese sind: Standard-, \emph{MDC}- und \emph{DDC}-Methode.
 Die Bildqualität dieser Methoden wird einmal mit konstanter Strahlabtastrate und einmal mit variierte Strahlabtastrate vorgestellt.
 Dafür werden zwei Volumen verwendet, wobei die Ergebnisse des ersten Volumens für die unterschiedlichen Methoden getrennt-, und die Ergebnisse mit dem zweiten Volumen im Anschluss für einen besseren Vergleich zusammen vorgestellt werden.
-% Für jedes der Volumen wird jeweils das Bild in normaler Auflösung, welche mit der ursprünglichen Implementierung berechnet wurde sowie das Ergebnis der Berechnung des Bildes durch \emph{MDC} und \emph{DDC} gezeigt.
-% Bei den Berechnungen durch \emph{MDC} und \emph{DDC} werden die jeweils verwendeten Parameter der Berechnung angegeben.
 
 Die Ergebnisse in diesem Abschnitt wurden alle mit einer Auflösung von $2263\times1306$\,Pixel berechnet.
 Alle Abbildungen, die das selbe Volumen zeigen, wurden mit der gleichen Transferfunktion und aus der gleichen Perspektive berechnet.
@@ -45,12 +43,8 @@ Das erste Volumen ist ein ct-scan eines Bonsai Baums.
 Das Volumen hat eine Auflösung von $256\times256\times256$\,Voxel.
 Die Slice-Dicke der einzelnen Voxel ist $1,0\times1,0\times1,0$ und gibt die Skalierung der einzelnen Voxel an.
 Das heißt, dass die Voxel in x-, y- und z-Richtung hier eine einheitliche Skalierung haben.
-% Anders als das erste Volumen, welches ein ct-scan ist, ist das zweite Volumen ein Zeitschritt aus der Simulation einer \emph{shock wave formation in core-collapse supernova} von John Blondin, NCSU. ; direkter Vergleich
-% Es hat eine Auflösung von $432\times432\times432$\,Voxel, welche ebenfalls in x-, y- und z-Richtung eine Skalierung von $1,0$ haben.
-% Die Dichte der Voxel gibt die physikalische Entropie an der Position in der Simulation an.
 
 \subsubsection{Standard Raycast}\label{ss::res::sr}
-% \todo{Die gleiche Transferfunktion verwenden, wie die, womit die Daten gemessen wurden.}; ggf. auch dazu Daten messen.
 Abbildung \ref{fig::res::bon_st} zeigt eine Berechnung des Volumens \emph{Bonsai} mit dem Standard Raycast.
 Die Bildabtastrate ist bei der Berechnung des Standard Raycasts im ganzen Bild homogen und hat den Wert $1$.
 Die Strahlabtastrate ist für das ganze Bild konstant und hat den Wert $1,5$.
@@ -71,12 +65,6 @@ In Abbildung \ref{fig::res::bon_st_ors} wurde das Volumen auch mit dem Standard 
 Mit zunehmender Distanz zur Mausposition, welche als schwarzes Kreuz eingezeichnet wurde, nimmt die Strahlabtastrate ab.
 Dies ist selbst an weit von der Mausposition entfernten Objekten, an denen die Strahlabtastrate am niedrigsten ist, kaum wahrnehmbar.
 Wird die Mausposition selbst fokussiert, ist kein Unterschied feststellbar.
-
-% Abbildung \ref{fig::res::sup_st} zeigt eine Berechnung des Volumens der Supernova im Zeitschritt $1353$. ; Supernova wird am Ende der Bildqualität zusammengefasst
-% Das Bild wurde mit dem Standard Raycast berechnet, so dass die Bildabtastrate in dem gesamten Bild gleich ist.
-% Dies wird auch durch die Vergrößerung von Bereichen an unterschiedlichen Positionen innerhalb der Abbildung verdeutlicht.
-% Die Strahlabtastrate hat einen Wert von $1,5$ und die Interpolation der Voxel ist aktiviert.
-% Die Transferfunktion wurde so gewählt, dass das Volumen als ganzes transparent erscheint aber Bereiche mit den selben Dichtewerten farblich gruppiert und hervorgehoben wurden.
 
 \begin{landscape}
 	\begin{figure}
@@ -129,22 +117,6 @@ Anders als in Abbildung \ref{fig::res::bon_st_ors}, in welcher ebenfalls die Str
 Die Flächen der Äste erscheinen ein bisschen löchrig, da Voxel teilweise übersprungen werden.
 Wird die Mausposition fokussiert, kann man dies, aufgrund der Distanz zum Blickpunkt, nicht wahrnehmen.
 
-% Das Bild in Abbildung \ref{fig::res::sup_mdc} wurde ebenfalls mit dem \emph{MDC} Raycast berechnet und anschließend bearbeitet. ; Direkter Vergleich
-% Es zeigt einen Zeitschritt in einer Simulation von einer Supernova.
-% Die Bild- und Strahlabtastrate ist gleich wie zuvor in Abbildung \ref{fig::res::bon_mdc}.
-% Die Mausposition ist hier als nicht ganz ausgefüllter Kreis skizziert.
-% In der Abbildung \ref{fig::res::sup_mdc} sind drei Bildausschnitte des berechneten Bildes, innerhalb des Rechtecks, außerhalb des % Rechtecks und an der Kante des Rechtecks, vergrößert, um diese besser vergleichen zu können.
-% Rechts über der skizzierten Mausposition ist ein Ausschnitt des Übergangs zwischen den Auflösungen, welcher rechts davon vergrößert dargestellt ist.
-% Man kann erkennen, dass die Konturen des Objekt außerhalb des Rechtecks unschärfer sind.
-% Unterhalb der skizzierten Mausposition ist zuerst ein Ausschnitt innerhalb des Rechtecks mit normaler Bildabtastrate und darunter ein Ausschnitt außerhalb des Rechtecks mit nur einem viertel der Auflösung vergrößert.
-% In dem unterem Ausschnitt wirken die Konturen insgesamt ein bisschen unschärfer und verwaschen.
-% Der Unterschied fällt aber nicht sehr stark auf.
-
-% Die Latenz des Eyetrackers ist sehr gut. ; Perf.
-% Eine merkbare Verzögerung zwischen realer Blickposition und der Blickposition des aktuell berechneten Bildes, tritt nur dann auf, falls die Berechnungsdauer eines Bildes zu lange dauert. ; Perf
-% Dies hängt aber auch von der Größe und Auflösung des verwendeten Volumens ab. ; Perf.
-% In dem Fall von Abbildung \ref{fig::res::bon_st} ist dies nicht der Fall. ; Perf.
-% Da das Volumen mit einer Auflösung von $256\times256\times256$\,Voxel im Vergleich zu anderen recht klein ist, .. ; Perf.
 \begin{landscape}
 	\begin{figure}
 		\centering
@@ -162,46 +134,6 @@ Wird die Mausposition fokussiert, kann man dies, aufgrund der Distanz zum Blickp
 		\label{fig::res::bon_mdc_ors}
 	\end{figure}
 \end{landscape}
-
-\iffalse
-\begin{landscape}
-	\begin{figure}[]
-	\centering
-	\begin{minipage}[t]{0.3\textheight}
-		\centering
-		\includegraphics[width=1\textwidth]{../../Grafiken/results/picture_quality/supernova/comparison/MDC/mouse_away_mdc_cut.png}
-		\caption*{Die Mausposition befindet sich außerhalb des Bildes, somit ist das Bild vollständig mit einer Bildabtastrate von $0,5$ berechnet worden.}
-		\label{fig::res::sn_comp_mouse_away_mdc}
-	\end{minipage}
-	\hfill
-	\begin{minipage}[t]{0.3\textheight}
-		\centering
-		\includegraphics[width=1\textwidth]{../../Grafiken/results/picture_quality/supernova/comparison/MDC/mouse_half_on_mdc_cut.png}
-		\caption*{Die Mausposition liegt so, dass das Rechteck nur einen Teil des Ausschnittes überdeckt.}
-		\label{fig::res::sn_comp_mouse_half_on_mdc}
-	\end{minipage}
-	\hfill
-	\begin{minipage}[t]{0.3\textheight}
-		\centering
-		\includegraphics[width=1\textwidth]{../../Grafiken/results/picture_quality/supernova/comparison/MDC/mouse_on_mdc_cut.png}
-		\caption*{Die Mausposition ist circa im Zentrum des Bildes. Der gesamte Ausschnitt liegt innerhalb dieses Rechtecks und hat eine Bildabtastrate von $1,0$.}
-		\label{fig::res::sn_comp_mouse_on_mdc}
-	\end{minipage}
-	\caption{Ausschnitte dreier Berechnungen des Supernova Volumens mit der MDC Methode. Die Strahlabtastrate beträgt in der linken und rechten Abbildung für das ganze Bild $1.5$. Die Mausposition war bei den Berechnungen jeweils verschieden.}
-	\end{figure}
-\end{landscape}
-\fi
-
-\iffalse
-\begin{landscape}
-	\begin{figure}
-		\centering
-		\includegraphics[width=\textheight]{../../Grafiken/results/picture_quality/supernova/MDC_img-0-96_ray-1-5_edited.png}
-		\caption{Volumen Supernova mit \emph{MDC} Raycast berechnet mit vergrößerten Bildausschnitten.}
-		\label{fig::res::sup_mdc}
-	\end{figure}
-\end{landscape}
-\fi
 
 \subsubsection{DDC Raycast}\label{ss::res::ddc}
 Der \emph{DDC} Raycast ist das Ergebnis des Arbeitspakets aus dem Abschnitt \ref{ss::DDC}.
@@ -243,12 +175,6 @@ Der Unterschied zwischen variierter und nicht-variierter Strahlabtastrate fällt
 Trotzdem ist beeinflusst die viel niedrigere Auflösung im äußeren Bereich die Bildqualität viel maßgebender, als die reduziert Strahlabtastrate, so dass diese kaum mehr die Wahrnehmung beeinträchtigt.
 Dies ist noch weniger der Fall, wenn die Mausposition fokussiert wird.
 
-% Abbildung \ref{fig::res::sup_ddc} zeigt das selbe Volumen wie in Abbildung \ref{fig::res::sup_st} und \ref{fig::res::sup_mdc}. ; Direkter Vergleich
-% Bildausschnitte der Übergänge zwischen den Bereichen sind hier zur Verdeutlichung hervorgehoben und vergrößert.
-% Der vergrößerte Bildausschnitt rechts oben zeigt den Übergang zwischen dem mittleren und dem inneren Bereich.
-% Oben links ist der vergrößerte Übergang zwischen dem inneren und dem mittleren Bereich zu sehen.
-% Der Bildausschnitt unten links ist etwas größer und umfasst den Übergang von dem inneren zum mittleren und vom mittleren zum äußeren Bereich.
-
 \begin{landscape}
 	\begin{figure}
 		\centering
@@ -268,7 +194,32 @@ Dies ist noch weniger der Fall, wenn die Mausposition fokussiert wird.
 \end{landscape}
 
 \subsubsection*{Direkter Vergleich}
-\todo{Paar Wörter zum direkten Vergleich.}
+Abbildung \ref{fig::res::sn_comp_st_123} zeigt eine Berechnung des zweiten Volumens, welche mit dem Standard Raycast und ohne einer variierten Strahlabtastrate berechnet wurde.
+Anders als das erste Volumen, welches ein ct-scan ist, ist dieses der $1353$-te Zeitschritt aus der Simulation einer \emph{shock wave formation in core-collapse supernova} von John Blondin, NCSU.
+Es hat eine Auflösung von $432\times432\times432$\,Voxel, welche ebenfalls in x-, y- und z-Richtung eine Skalierung von $1,0$ haben.
+Die Dichte der Voxel gibt die physikalische Entropie an der Position in der Simulation an.
+
+In Abbildung \ref{fig::res::sn_comp_st_123} sind drei Kästchen eingezeichnet und nummeriert.
+Für jede der Berechnungsmethoden wurde das Volumen mit der gleichen Transferfunktion und Perspektive beziehungsweise Kameraausrichtung berechnet.
+Für jede der Berechnungen sind die drei Ausschnitte vergrößert worden und nebeneinander der Reihe nach aufgeführt.
+Die Mausposition für die jeweiligen Berechnungen war dabei immer an der selben Position und ist jeweils in Ausschnitt $2$ eingezeichnet.
+
+Ausschnitt $1$ liegt etwas weiter weg von der Mausposition aber circa am Übergang des mittleren Bereichs zum äußeren Bereich des \emph{DDC} Raycasts.
+Die Strahlabtastrate wäre entsprechend in Ausschnitt $1$ ein wenig geringer, als an der Mausposition, falls eine Methode mit variierte Strahlabtastrate verwendet wurde.
+Ausschnitt $2$ enthält die Mausposition und ist dementsprechend jeweils im inneren Bereich mit einer Bildabtastrate von $1$.
+Die Strahlabtastrate ist hier ebenfalls fast maximal bei $1,5$.
+Ausschnitt $3$ liegt relativ zur Auflösung des Bildes weit von der Mausposition entfernt.
+Die Bildabtastrate beträgt hier für den Standard Raycast $1$, für den \emph{MDC} Raycast $\frac{1}{2}$ und für den \emph{DDC} Raycast $\frac{1}{7}$.
+Wird eine Methode mit variierte Strahlabtastrate verwendet, so hat diese in Ausschnitt $3$ fast den minimalen Wert von $\frac{1,5}{4}$.
+
+Da die Mausposition sich innerhalb des zweiten Ausschnitts befindet, ist die Strahlabtastrate und die Bildabtastrate hier immer fast maximal, so dass Ausschnitt $2$ in den verschiedenen Methoden fast identisch ist.
+Auch ist hier auffallend, dass obwohl, dass die Strahlabtastrate in Ausschnitt $3$ bei der Verwendung des selben Raycast mit einmal konstanter Strahlabtastrate und variierter Strahlabtastrate, sehr unterschiedlich ist, dies sich bei diesem Volumen kaum auswirkt und nicht wahrgenommen wird.
+Die eigentlichen Unterschiede sieht man bei der Verwendung verschiedener Raycasts besonders in Ausschnitt $1$.
+So ist mit dem Standard Raycast der gesamte Ausschnitt $1$ scharf zu sehen (siehe Abbildung \ref{fig::res::sn_comp_st_ors}), während bei dem \emph{MDC} Raycast an den Konturen am Rand des Volumens zu sehen ist, dass diese leicht unschärfer sind (siehe Abbildung \ref{fig::res::sn_comp_mdc_ors}).
+Ausschnitt $3$ unterscheidet sich hier zwischen dem Standard Raycast und dem \emph{MDC} Raycast kaum.
+
+Ein wesentlicher Unterschied ist sowohl in Ausschnitt $1$ als auch in Ausschnitt $3$ zwischen dem \emph{DDC} Raycast und dem \emph{MDC} sowie dem Standard Raycast zusehen.
+Man kann sehen, dass der äußere Bereich des \emph{DDC} Raycast (siehe Abbildung \ref{fig::res::sn_comp_ddc_ors}), deutlich unschärfer ist, als der äußere Bereich des \emph{MDC} Raycast (siehe Abbildung \ref{fig::res::sn_comp_mdc_ors}).
 
 \begin{figure}
 	\centering
@@ -276,7 +227,6 @@ Dies ist noch weniger der Fall, wenn die Mausposition fokussiert wird.
 	\caption{Ein Zeitschritt der Supernova mit dem Standard Raycast berechnet. Die Bildabtastrate beträgt für das ganze Bild $1$. Die Strahlabtastrate beträgt für das ganze Bild $1,5$. die Mausposition und drei nummerierte Quadrate sind eingezeichnet, die Positionen der Quadrate werden im folgenden Vergleich verwendet.}
 	\label{fig::res::sn_comp_st_123}
 \end{figure}
-
 
 \begin{figure}[]
 	\centering
@@ -458,6 +408,11 @@ Aus den gemessenen Ausführungszeiten des Kernels wurden Heatmaps für das jewei
 Da die Differenz zwischen Ausführungszeit des Kernels und der Ausführungszeit der \emph{paintGL()}-Methode unabhängig von dem zu berechnenden Volumen und der verwendeten Transferfunktion ist, wurde diese nicht für die Erstellung der Heatmaps einbezogen.
 Die Ausführungszeiten insbesondere der \emph{paintGL()}-Methode werden daher zusätzlich getrennt von den Heatmaps vorgestellt.
 
+% Die Latenz des Eyetrackers ist sehr gut. ; Perf.
+% Eine merkbare Verzögerung zwischen realer Blickposition und der Blickposition des aktuell berechneten Bildes, tritt nur dann auf, falls die Berechnungsdauer eines Bildes zu lange dauert. ; Perf
+% Dies hängt aber auch von der Größe und Auflösung des verwendeten Volumens ab. ; Perf.
+% In dem Fall von Abbildung \ref{fig::res::bon_st} ist dies nicht der Fall. ; Perf.
+% Da das Volumen mit einer Auflösung von $256\times256\times256$\,Voxel im Vergleich zu anderen recht klein ist, .. ; Perf.
 \todo{Messbare Ergebnisse der Arbeit. (Performanzmessungen..).}
 \todo{Zusätzlich Tabelle mit Durchnschnittsperformanzwerten insbesondere der paintGL() Methode.}
 
