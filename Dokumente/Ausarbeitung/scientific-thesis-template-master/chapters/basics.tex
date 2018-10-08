@@ -2,25 +2,25 @@
 
 \chapter{Grundlagen}\label{chap::basics}
 \label{chap:k2}
-Der erste Abschnitt des Kapitels beschäftigt sich mit verwandten Arbeiten zum Thema Wahrnehmungsorientiertes Volumen-Rendering.
-Der zweite Abschnitt handelt über die Grundlagen des menschlichen Sehapparates.
-Hier werden die Fähigkeiten und Limitierungen der visuellen Wahrnehmung des Menschen diskutiert.
-In Abschnitt drei, wird die Funktionsweise von Raytracing erläutert, welches ein grundlegender Algorithmus, der für diese Arbeit zugrunde liegender Implementierung ist.
-Zusammenhängend mit Raytracing wird im Abschnitt vier, die Verwendung des Raytracers für das Volumenrendering erläutert.
-Abschnitt fünf diskutiert die Auswahl des für diese Arbeit zugrunde liegenden Eyetrackers und dessen Verwendung für die Erfassung des fovealen und peripheren Bereichs.
-Aus Performanzgründen kann es hilfreich sein für Berechnungen auf einer GPU, die Architektur der GPU zu betrachten und unter Umständen Algorithmen für eine bessere Effizienz anzupassen.
-Diese Thematik wird in Abschnitt sechs behandelt.
-\todo{Beschreibung der Grundlagen überarbeiten}
+Abschnitt \ref{sec::relwo} dieses Kapitels beschäftigt sich mit verwandten Arbeiten zum Thema Wahrnehmungsorientiertes Volumenrendering.
+In Abschnitt \ref{sec::eye} werden Grundlagen des menschlichen Sehapparates behandelt.
+Hier werden unter Anderem die Fähigkeiten und Limitierungen der visuellen Wahrnehmung des Menschen diskutiert.
+Abschnitt \ref{sec::voltff} behandelt einige Grundlagen zum Volumenrendering, wie Raycasting und das Verwenden einer Transferfunktion.
+Das Implementieren unterschiedlicher Methoden des Raycastings und die Wahl von geeigneten Transferfunktionen wird Teil dieser Arbeit sein.
+Anschließend befasst sich Abschnitt \ref{sec::eyetr} mit einigen Grundlagen bezüglich das Erfassen der visuellen Wahrnehmung mit Hilfe von Eyetracking.
+Der Raycast wird in der Regel auf einer GPU ausgeführt.
+Dabei sind einige Eigenschaften der GPU Architektur besonders zu beachten.
+Diese Thematik wird in Abschnitt \ref{sec::gpuarc} behandelt.
 
 \section{Related Work}\label{sec::relwo}
-Wahrnehmungsorientiertes Volumenrendering ist kein absolut neues Arbeitsgebiet und ist schon Teil einiger wissenschaftlicher Arbeiten gewesen \todo{Beispiele}.
-Da diese Arbeit auf zwei trennbare Aspekte beruht, unterteile ich den Related Work Abschnitt in zwei Teile.
-Der erste Abschnitt bezieht sich auf Arbeiten im Bereich des wahrnehmungsorientierten Renderings mit dem Ziel, die Performanz einer Anwendung zu steigern.
+Wahrnehmungsorientiertes Volumenrendering ist kein neues Arbeitsgebiet und war schon Teil verschiedener wissenschaftlicher Arbeiten.
+Der Hauptteil dieser Arbeit bezieht sich auf den Aspekt der Performanz im Wahrnehmungsorientierten Volumenrendering.
+Abschnitt \ref{ss::pfwov} behandelt daher verwandte Arbeiten bezüglich des wahrnehmungsorientierten Volumenrenderings unter dem Aspekt der Performanz.
 Die Ansätze hier beziehen sich meist darauf, dass die Qualität der Darstellung im peripheren Bereich der visuellen Wahrnehmung, gesenkt wird und so für die Berechnung eines Bildes weniger Rechenleistung aufgewendet werden muss.
-\todo{Was genau ist mit Performanz gemeint?}
-Der zweite Abschnitt bezieht sich auf Arbeiten zu wahrnehmungsorientiertem Volumenrendering, mit dem Ziel, die Qualität der Darstellung zu erhöhen.
+
+Abschnitt \ref{ss::wovrzq} bezieht sich auf Arbeiten zu wahrnehmungsorientiertem Volumenrendering, mit dem Ziel, die Qualität der Darstellung zu erhöhen.
 Dabei werden vor allem Ansätze zur geschickten Anpassung von Parametern einer Transferfunktion vorgestellt, die dem Betrachter ein insgesamt besseres Verständnis der Volumendaten ermöglichen soll.
-\subsection{Performanz- und Wahrnehmungsorientiertes Volumenrendering}
+\subsection{Performanz- und Wahrnehmungsorientiertes Volumenrendering}\label{ss::pfwov}
 In einem Paper von Marc Levoy und Ross Whitaker \emph{Gaze-Directed Volume Rendering} \cite{Levoy:1990:GVR:91385.91449} erforschten diese Methoden, wie Eyetracking-Daten in Rendering-Algorithmen eingesetzt werden könnnen.
 Das Ziel ihrer Forschung war es, dem Nutzer einen Arbeitsplatz für Echtzeit-Volumen-Rendering, mit der Illusion eines hochauflösendes Bildes über den gesamten Bildschirm, zu präsentieren, welches durch Eyetracking unterstützten Verfahren einen geringeren Berechnungsaufwand als herkömmliche Volumen-Renderer hat.
 Dafür präsentierten sie eine Implementierung eines Ray-Tracers für Volumendaten, in welcher mit Hilfe der Eyetrackingdaten der Blickfokus auf dem Bildschirm berechnet wurde und um diese Position herum, die Anzahl der Strahlen und die Samples pro Strahl, abhängig von der Distanz zum Blickfokus, angepasst wurden.
@@ -52,7 +52,7 @@ Dargestellt wurde es auf einem 23 Zoll $1920\times1080$ LCD Monitor mit einer Bi
 Mit ihrem System und Techniken erlangten sie eine Performanz-Verbesserung von einem Faktor zwischen fünf und sechs auf einem Monitor mit HD Auflösung.
 Dabei erreichten sie eine Darstellungsqualität, die vergleichbar mit dem Rendern eines hochauflösenden Bildes über den gesamten Bildschirm ist.
 
-\subsection{Wahrnehmungsorientiertes Volumenrendering zur Qualitätssteigerung}
+\subsection{Wahrnehmungsorientiertes Volumenrendering zur Qualitätssteigerung}\label{ss::wovrzq}
 R. Englund und T. Ropinski stellten in ihrem Paper \emph{Quantitative and Qualitative Analysis of the Perception of Semi-Transparent Structure in Direct Volume Rendering} \cite{doi:10.1111/cgf.13320} verschiedene Techniken, zur Verbesserung der Wahrnehmung von komplexen volumetrischen Daten, vor.
 In einer Studie mit über 300 Teilnehmern untersuchten sie, wie diese Techniken zur verbesserten Wahrnehmung von Volumen beitragen und verglichen die verschiedenen Ansätze miteinander.
 Dabei mussten die Teilnehmer jeweils kleine Aufgaben absolvieren, so dass Rückschlüsse darauf geschlossen werden können, wie sehr eine gewisse Technik dem Teilnehmer bei der Erkennung von Form und Tiefe eines Objekts in einem Volumen beiträgt.
