@@ -21,30 +21,30 @@ Die Ansätze hier beziehen sich meist darauf, dass die Qualität der Darstellung
 Abschnitt \ref{ss::wovrzq} bezieht sich auf Arbeiten zu wahrnehmungsorientiertem Volumenrendering, mit dem Ziel, die Qualität der Darstellung zu erhöhen.
 Dabei werden vor allem Ansätze zur geschickten Anpassung von Parametern einer Transferfunktion vorgestellt, die dem Betrachter ein insgesamt besseres Verständnis der Volumendaten ermöglichen soll.
 \subsection{Performanz- und Wahrnehmungsorientiertes Volumenrendering}\label{ss::pfwov}
-In einem Paper von Marc Levoy und Ross Whitaker \emph{Gaze-Directed Volume Rendering} \cite{Levoy:1990:GVR:91385.91449} erforschten diese Methoden, wie Eyetracking-Daten in Rendering-Algorithmen eingesetzt werden könnnen.
-Das Ziel ihrer Forschung war es, dem Nutzer einen Arbeitsplatz für Echtzeit-Volumen-Rendering, mit der Illusion eines hochauflösendes Bildes über den gesamten Bildschirm, zu präsentieren, welches durch Eyetracking unterstützten Verfahren einen geringeren Berechnungsaufwand als herkömmliche Volumen-Renderer hat.
-Dafür präsentierten sie eine Implementierung eines Ray-Tracers für Volumendaten, in welcher mit Hilfe der Eyetrackingdaten der Blickfokus auf dem Bildschirm berechnet wurde und um diese Position herum, die Anzahl der Strahlen und die Samples pro Strahl, abhängig von der Distanz zum Blickfokus, angepasst wurden.
-Die Implementierung basiert darauf, dass der Detaillgrad der visuellen Wahrnehmung des Menschlichen Auge nur in einem kleinen, zentralen Bereich, der Fovea, am höchsten ist und zu den Rändern des Blickfelds hin, der periphere Bereich, stark abnimmt.
-Ausgehend davon, berechneten sie in dem von dem Nutzer fokussierten Bereich, das Bild mit der vollen Auflösung und einer hohen Abtastrate der Strahlen.
+Marc Levoy und Ross Whitaker \cite{Levoy:1990:GVR:91385.91449} erforschen in ihrer Arbeit, wie Eyetracking-Daten in Rendering-Algorithmen eingesetzt werden könnnen.
+Das Ziel ihrer Forschung war es, dem Nutzer einen Arbeitsplatz für Echtzeit-Volumen-Rendering, mit der Illusion eines hochauflösendes Bildes über den gesamten Bildschirm, zu präsentieren, welches durch Eyetracking unterstützten Verfahren einen geringeren Berechnungsaufwand als herkömmliche Volumenrenderer hat.
+Dafür stellten sie eine Implementierung eines Raycasters für Volumendaten vor, in welcher mit Hilfe der Eyetrackingdaten der Blickfokus auf dem Bildschirm berechnet wurde und die Anzahl der Strahlen und die Samples pro Strahl, abhängig von der Distanz zum Blickfokus, angepasst wurden.
+Die Implementierung basierte darauf, dass der Detaillgrad der visuellen Wahrnehmung des menschlichen Auge nur in einem kleinen, zentralen Bereich, der Fovea am höchsten ist und zu den Rändern des Blickfelds hin stark abnimmt.
+Ausgehend davon berechneten sie in dem von dem Nutzer fokussierten Bereich, das Bild mit der vollen Auflösung und einer hohen Abtastrate der Strahlen.
 In dem restlichen Bereich reduzierten sie die Auflösung des Bildes und abhängig von dem Abstand eines Pixels zum Blickfokus, die Abtastrate eines Strahls.
 In ihrer Implementierung verwendeten sie 2D und 3D mip maps, einen Eye Tracker und die Pixel-Planes 5 rendering engine, ein hoch paralleles Raster Display System.
 Um die geringere Abtastung in der Peripherie gut nutzen zu können, wurde aus den 3D Volumendaten eine 3D mip map erstellt.
-Die 3D mip map wird durch den Ray-Tracing Algorithmus abgetastet und durch trilineare Interpolation eine 2D mip map erstellt.
-Die 2D mip map ist Grundlage für die Erstellung des endgültigen Bildes.
-In ihren Ergebnissen konnten sie die Rendering Kosten für ein teilweise hochauflösendes Bild im Vergleich zu einem vollständig hochauflösenden Bildes, um bis den Faktor fünf, senken.
+Die 3D mip map wurde durch den Raycasting Algorithmus abgetastet wodurch anschließend mit trilinearer Interpolation eine 2D mip map erstellt wurde.
+Die 2D mip map war Grundlage für die Erstellung des endgültigen Bildes.
+In ihren Ergebnissen konnten sie die Rendering Kosten für ein teilweise hochauflösendes Bild im Vergleich zu einem vollständig hochauflösenden Bildes, um bis einen Faktor von fünf senken.
 
-In einer Arbeit von Guenter et. al. \emph{Foveated 3D Graphics} \cite{foveated-3d-graphics}, wurde ähnlich zu dem Paper von Levoy und Whitaker, der Abfall der visuellen Auflösung des Auges außerhalb des visuellen Zentrums, der Fovea, ausgenutzt, um eine beschleunigte Berechnung des Bildes zu erhalten.
-Im Gegensatz zu der davor genannten Arbeit, ist das darunterliegende System hier kein Ray-Tracer für Volumendaten, sondern eine Grafikpipeline für die Rasterung von 3D Szenen.
-Das Bild wird hier aus drei Teilbilder zusammengesetzt, welche jeweils mit unterschiedlichen Auflösungen berechnet wurden und wie Schichten übereinander gelegt werden.
-Die drei Schichten sind: innere Schicht, mittlere Schicht und äußere Schicht.
-Die innere Schicht hat ungefähr die Größe des fovealen Bereichs auf dem Bildschirm und wird in der maximalen Auflösung berechnet.
-Ihr Mittelpunkt ist der Blickfokus des Betrachters.
-Die mittlere Schicht ist ein bisschen größer als die innere Schicht und wird mit einer niedrigeren Auflösung berechnet. 
-Sie wird ebenfalls auf den Blickfokus des Betrachters zentriert.
-Die äußerste Schicht überdeckt den gesamten Bildbereich und wird in der niedrigsten Auflösung berechnet.
-Um die Schichten zusammensetzen zu können, werden die mittlere und äußere Schicht jeweils zur nativen Auflösung des Bildschirms, die gleiche Auflösung wie die innere Schicht, interpoliert.
-Scharfe Kanten zwischen den Schichten werden dadurch vermieden, dass diese sich leicht überlappen und spezielle Blend-Masken verwendet werden, um die verschiedenen Schichten glatt übereinander zu blenden.
-In ihrer Arbeit nahmen sie sich auch das Problem an, dass das starke Unterabtasten, um bis zu dem Faktor sechs in jede Dimension, in der mittleren und äußeren Schicht zu störenden und sich bewegenden Artefakten führen kann.
+Guenter et. al. \cite{foveated-3d-graphics} behandelt, ähnlich zu dem Paper von Levoy und Whitaker, wie der Abfall der visuellen Auflösung des Auges außerhalb des visuellen Zentrums ausgenutzt werden kann, um eine beschleunigte Berechnung des Bildes zu ermöglichen.
+Im Gegensatz zu der davor genannten Arbeit, war das darunterliegende System hier kein Raycaster für Volumendaten, sondern eine Grafikpipeline für die Rasterung von 3D Szenen.
+Das Bild wurde hier aus drei Teilbilder zusammengesetzt, welche jeweils mit unterschiedlichen Auflösungen berechnet wurden und wie Schichten übereinander gelegt werden.
+Die drei Schichten waren: innere Schicht, mittlere Schicht und äußere Schicht.
+Die innere Schicht hatte ungefähr die Größe des fovealen Bereichs auf dem Bildschirm und wurde in der maximalen Auflösung berechnet.
+Ihr Mittelpunkt war der Blickfokus des Betrachters.
+Die mittlere Schicht war ein bisschen größer als die innere Schicht und wurde mit einer niedrigeren Auflösung berechnet. 
+Sie wurde ebenfalls auf den Blickfokus des Betrachters zentriert.
+Die äußerste Schicht überdeckte den gesamten Bildbereich und wurde in der niedrigsten Auflösung berechnet.
+Um die Schichten zusammensetzen zu können, wurden die mittlere und äußere Schicht jeweils zur nativen Auflösung des Bildschirms, die gleiche Auflösung wie die innere Schicht, interpoliert.
+Scharfe Kanten zwischen den Schichten wurden dadurch vermieden, dass diese sich gegenseitig leicht überdeckten und spezielle Blend-Masken verwendet wurden, um die verschiedenen Schichten glatt übereinander zu blenden.
+In ihrer Arbeit nahmen sie sich auch das Problem an, dass das starke Unterabtasten, um bis zu dem Faktor sechs in jede Dimension, in der mittleren und äußeren Schicht zu störenden Artefakten führen kann.
 Um dies entgegen zu wirken, verwendeten sie drei Antialiasing Techniken: Hardware Multi-Sample Antialiasing (MSAA), \emph{Temporal Reprojection} und \emph{whole frame jitter sampling}.
 Um die Blickposition zu erfassen nutzten sie den Tobii Tx 300 Eye Tracker mit einer Worst-Case Latency von 10\,ms.
 Das Bild wurde auf einem Computer mit Intel Xeon CPU (E5640 mit 2.67\,GHz) und einer NVidia GeForce GTX 580 GPU berechnet.
