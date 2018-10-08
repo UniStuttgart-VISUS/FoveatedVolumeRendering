@@ -239,32 +239,31 @@ Dadurch können zum Beispiel Strukturen innerhalb des Volumens mit einer hohen D
 Strukturen mit einer geringeren Dichte können transparent und weniger farblich dargestellt werden.
 
 \section{Eyetracking}\label{sec::eyetr}
-% \todo{Was ist Eyetracking?}
-Für einige wahrnehmungsorientierte Methoden ist es notwendig, den aktuellen Blickpunkt des Betrachters auf dem Bildschirm zu wissen und daher die Augenaktivitäten zu messen.
-In diesem Zusammenhang fällt meistens der Begriff \texttt{Eyetracking}.
-Aber was ist Eyetracking?
+Für viele wahrnehmungsorientierte Methoden ist es notwendig, den aktuellen Blickpunkt des Betrachters auf dem Bildschirm zu kennen.
+Ein Eyetrackinggerät ermöglicht die Übermittlung der Bickposition des Betrachter auf einem Bildschirm in Realzeit und ist daher auch für interaktive Anwendungen geeignet.
+
 Eyetracking ist das Messen von Augenaktivitäten eines Betrachters.
-In der Regel betrachtet der Betrachter dabei einen Bildschirm während seine Augenaktivität gemessen werden, wodurch Informationen über den Blickverlauf und die Fixationsdauer bestimmter Punkte auf diesem Bildschirm errechnet werden können.
+In der Regel betrachtet der Betrachter dabei einen Bildschirm und ein Eyetracker misst währenddessen seine Augenaktivitäten.
+Aus den Augenaktivitäten können Informationen über den Blickverlauf und die Fixationsdauer bestimmter Punkte auf diesem Bildschirm berechnet werden.
 Diese Informationen ermöglichen es, Rückschlüsse über das betrachtete Bild zu ziehen, wie zum Beispiel, welche Objekte eines Bildes besonders interessant für den Betrachter sind.
-Eyetracking ermöglicht aber nicht nur das Messen von Daten um diese im Nachhinein auszuwerten, sondern auch das Nutzen solche Daten für interaktive Anwendungen in Echtzeit.
-Da in dieser Arbeit ein externer Tobii Eye Tracker verwendet wurde, beziehen sich folgende Informationen hauptsächlich aber nicht ausschließlich auf Tobii Eyetracker.
-Die Firma Tobii AB schreibt auf ihrer Webseite zum Thema: Was ist Eyetracking?, dass Eye Tracking eine Technologie ist, die es ermöglicht, ein Gerät durch die natürliche Bewegung der Augen zu steuern \cite{tobii}.
+Eyetracking ermöglicht aber nicht nur das Messen von Daten, um diese im Nachhinein auszuwerten, sondern auch das Nutzen solcher Daten für interaktive Anwendungen in Echtzeit.
+Da in dieser Arbeit ein externer Tobii Eyetracker verwendet wurde, beziehen sich folgende Informationen hauptsächlich aber nicht ausschließlich auf Tobii Eyetracker.
+Die Firma \emph{Tobii AB} schreibt auf ihrer Webseite zum Thema: \emph{Was ist Eyetracking?}, dass Eyetracking eine Technologie ist, die es ermöglicht, ein Gerät durch die natürliche Bewegung der Augen zu steuern \cite{tobii}.
 \begin{figure}
 	\centering
 	\includegraphics[width=1\textwidth]{../../Grafiken/How-20DoesEyetrackingWork_ScreenBased.jpg}
 	\caption{Illustration der Funktionsweise von Tobii Pro Eyetracker. \cite{tobiipro}}
 	\label{fig::et01}
 \end{figure}
-Dabei werden vier grundlegende Bestandteile des Eye Tracking, wie die Firma Tobii AB es realisiert, genannt.
-In der Regel benötigt man für das Messen von Augenaktivitäten zwei grundlegende Dinge, die auch in Abbildung \ref{fig::et01} abgebildet sind: Eine Lichtquelle (2) und eine Kamera (3).
+Dabei werden vier grundlegende Bestandteile des Eyetracking genannt.
+In der Regel benötigt man für das Messen von Augenaktivitäten zwei grundlegende Dinge, die auch in Abbildung \ref{fig::et01} dargestellt sind: Eine Lichtquelle (2) und eine Kamera (3).
+
 Es gibt verschiedene Möglichkeiten, die Augenaktivitäten zu messen.
 Die am häufigsten genutzte Technik, welche auch von den Tobii Eyetrackern genutzt wird, ist \emph{Pupil Centre Corneal Reflection (PCCR)}.
 Die Lichtquellen sind dabei auf die Augen gerichtet und erzeugen auf ihnen ein spezielles Reflektionsmuster.
 Die Kamera des Eyetrackers (3) nimmt mit einer hohen Abtastrate Bilder der Augen und ihrer Reflektionsmuster auf.
 Nun können spezielle Bildverarbeitungsalgorithmen (4) auf die erfassten Daten angewendet werden und die Reflektionspunkte auf den Bildern bestimmt werden.
 Anhand dieser Punkte und eines Modells des Auges kann die Blickrichtung der Augen, die Position der Augen im Raum und die Blickpunkte der Augen auf dem Bildschirm berechnet werden (4 + 5).
-% \todo{Wie werden die Augen getrackt?}
-% \todo{Wie sehen Messwerte aus und wie verwendet man sie richtig (Koordinatensysteme, Bildschirm und Fensteroffset.)}
 
 \begin{figure}[]
 	\centering
@@ -282,47 +281,36 @@ Anhand dieser Punkte und eines Modells des Auges kann die Blickrichtung der Auge
 		\label{fig::et03}
 	\end{minipage}
 \end{figure}
+
 Die Position eines Auges im Raum wird als \emph{Gaze origin} bezeichnet und wird bei Tobii Pro Eyetrackern im Nutzer Koordinatensystem angegeben, siehe Abbildung \ref{fig::et02}.
 Der Blickpunkt des Auges auf dem Bildschirm ist in der Regel das, was von größtem Interesse ist und wird als \emph{Gaze point} bezeichnet.
-Der \emph{Gaze point} wird im Aktiven Display Koordinatensystem angegeben, siehe Abbildung \ref{fig::et03}.
+Der \emph{Gaze point} wird im \emph{Aktiven Display Koordinatensystem} angegeben, siehe Abbildung \ref{fig::et03}.
 Dieses Koordinatensystem hat den Ursprung an der Position oben links des aktiven Bildschirmbereichs, und der Punkt (1,1) ist an der Position rechts unten des aktiven Bildschirmbereichs.
+
 Die Umrechnung in Bildschirmkoordinaten funktioniert durch die Multiplikation mit der Breite und Höhe des Bildschirms in Pixel.
 Die Koordinaten sind dann relativ zu dem aktiven Display.
-Dieses Display muss nicht unbedingt das einzige Display sein.
 Werden mehrere Bildschirme verwendet, muss möglicherweise ein Offset auf die Werte gerechnet werden, um die richtigen Bildschirmkoordinaten für den Bildschirm, auf dem die Anwendung dargestellt wird, zu erhalten.
 
-%\todo{Umrechnung in Pixel und bei mehreren Bildschirmen.}
 In Abschnitt \ref{sec::eye} wurden verschiedene Arten von Augenbewegungen angesprochen.
 Eine sehr wichtige Rolle spielen dabei Fixationen und Sakkaden.
 Bei der Analyse der visuellen Wahrnehmung des Menschen ergeben die Daten der Fixationen wichtige Informationen über Eigenschaften des visuellen Stimuli.
 Bei einer Fixation fixieren die Augen einen gewissen Punkt für eine vergleichsweise lange Zeit (100\,ms - 1.5\,s) und können dadurch viele Informationen des fixierten Objekts erfassen.
 Sakkaden hingegen sind kurze (20\,ms - 40\,ms) und schnelle Augenbewegungen zwischen zwei Fixationen.
 Für wahrnehmungsorientierte interaktive Anwendungen ist es daher wichtig, eine hohe Abtastrate und niedrige Latenz bei der Erfassung der Augenaktivitäten zu haben.
-Dies ermöglicht es, schnell zwischen einer Sakkade und Fixation zu unterscheiden und das nächste Bild, ohne eine merkbare Verzögerung und entsprechend des neuen Blickpunktes, darzustellen.
-So sollte bei der Methode des wahrnehmungsorientierten Renderings, wobei nur in dem fovealen Bereich das Bild mit hoher Auflösung dargestellt wird, ein Update ca. zwischen 5ms bis 60ms nach der Augenbewegung gestartet worden sein, um eine Bildveränderung nicht zu bemerken.
+Dies ermöglicht es, schnell zwischen einer Sakkade und Fixation zu unterscheiden und das nächste Bild, ohne eine merkbare Verzögerung und entsprechend des zuletzt gemessenen Blickpunktes, darzustellen.
+So sollte bei einer Methode des wahrnehmungsorientierten Renderings, wobei nur in dem fovealen Bereich das Bild mit hoher Auflösung dargestellt wird, ein Update ca. zwischen 5\,ms bis 60\,ms nach der Augenbewegung gestartet worden sein, um eine Bildveränderung nicht zu bemerken.
 Diese Zeit ist dabei abhängig davon, wie weit die unscharfe Fläche von der Fovea entfernt ist \cite{doi:10.1111/cgf.13150}.
-%\begin{figure}
-%	\centering
-%	\includegraphics[width=0.5\textwidth]{../../Grafiken/Sampling-20frequency-201.png}
-%	\caption{Abtastrate einer typischen Augenbewegung \cite{tobiisdk}}
-%	\label{fig::et04}
-%\end{figure}
 
 Der in dieser Arbeit verwendete Tobii Pro Eyetracker hat eine Abtastfrequenz von 600\,Hz.
 Dies entspricht einem Abtastintervall von 1.67\,ms und ist vergleichsweise zu anderen aktuellen Eyetrackern recht hoch.
 Diese haben oft eine Abtastfrequenz von 60\,Hz oder 120\,Hz.
-Geräte mit Abtastraten im Frequenzbereich von 600\,Hz und höher sind ausreichen schnell um Sakkaden messen zu können und haben eine entsprechend niedrige Latenz, welche es ermöglicht, eine Bildveränderung nicht wahrzunehmen.
-\todo{Genaue Technische Daten des verwendeten Tobii Pro Eyetrackers nachschauen.}
+Geräte mit Abtastraten im Frequenzbereich von 600\,Hz und höher sind ausreichen schnell um Sakkaden messen zu können und haben eine entsprechend niedrige Latenz.
 Hohe Abtastraten heißt aber auch viele Daten pro Sekunde.
 Für die Anwendung in dieser Arbeit ist es wichtig, den aktuellsten Blickpunkt des Auges zu kennen.
-Daher wird der letzte gemessene \emph{gaze point} des Eyetrackers für das Berechnen des nächsten Bildes verwendet.
-Ein weiteres Problem bei vielen Messdaten ist es auch, dass es mehr fehlerhafte Messdaten gibt.
+Daher wird der letzte gültige gemessene \emph{gaze point} des Eyetrackers für das Berechnen des nächsten Bildes verwendet.
 Die Daten, die über die Tobii Pro SDK durch den Eyetracker geliefert werden, enthalten dafür einen Validity Code.
 Dieser Wert gibt an, ob eine Messung mit hoher Wahrscheinlichkeit richtige Daten enthält, oder nicht.
 Dadurch können wahrscheinlich fehlerhafte Daten früh abgestoßen werden.
-% \todo{Messgeschwindigkeit vs Augengeschwindigkeit}
-% \todo{Validity Codes}
-% \todo{Vorherige Todos ausschreiben und ggf. mehr.}
 
 \section{GPU Architektur}\label{sec::gpuarc}
 Ein wichtiger Faktor, wenn es um interaktive Anwendungen geht, ist die Performanz.
@@ -330,26 +318,26 @@ Viele Algorithmen haben essentielle Bestandteile welche ihre Komplexität nach u
 Die Einführung von Parallelität ist ein wichtiger Ansatz, um die Performanz von Anwendungen beziehungsweise ihrer Algorithmen weiter zu verbessern.
 Gerade Algorithmen in der Bildberechnung und -Verarbeitung eignen sich besonders um diese zu parallelisieren.
 In der Bildverarbeitung werden viele gleiche Berechnungen auf unterschiedlichen Daten ausgeführt.
-Graphics Processing Units (GPUs) oder auch Grafikkarten sind für diese Art von Berechnungen optimiert.
+\emph{Graphics Processing Units (GPUs)} oder auch Grafikkarten sind für diese Art von Berechnungen optimiert.
 \begin{figure}
 	\centering
 	\includegraphics[width=0.5\textwidth]{../../Grafiken/CPU-GPU-Structures1.png}
-	\caption{CPU vs. GPU. \url{http://www.keremcaliskan.com/wp-content/uploads/2011/01/CPU-GPU-Structures1.png}}
+	\caption{CPU vs. GPU. \cite{kcg}}
 	\label{fig::ga01}
 \end{figure}
 % GPU vs CPU
-Im Vergleich zu Central Processing Units (CPUs) besitzen GPUs eine deutlich höhere Anzahl an Prozessoren, siehe Abbildung \ref{fig::ga01}.
+Im Vergleich zu \emph{Central Processing Units (CPUs)} besitzen GPUs eine deutlich höhere Anzahl an Prozessoren, siehe Abbildung \ref{fig::ga01}.
 Aktuell besitzen Prozessoren meist vier oder acht Rechenkerne und eine Taktfrequenz von ca. 4\,Ghz.
 GPUs hingegen haben mehrere tausend Berechnungseinheiten die gleichzeitig Berechnungen durchführen können, dafür aber bei ca. einem drittel der Taktfrequenz von CPUs.
 
 Fast jeder Computer besitzt heutzutage hochparallele Einheiten, meist eine GPU.
-In den Anfängen waren GPUs sehr eng mit grafischen Berechnungen verbunden um die Berechnung von Farbwerten von Pixeln zu beschleunigen.
+In den Anfängen waren GPUs sehr eng mit grafischen Berechnungen verbunden um die Berechnung der Farbwerte von Pixeln zu beschleunigen.
 Heute werden GPUs zur Beschleunigung von fast beliebigen Anwendungen genutzt.
-Programmierschnittstellen wie OpenCL oder CUDA ermöglichen die Nutzung von GPUs für allgemeine Berechnungen, oder auch General Purpose Computation on Graphics Processing Unit (GPGPU).
+Programmierschnittstellen wie OpenCL oder CUDA ermöglichen die Nutzung von GPUs für allgemeine Berechnungen, oder auch \emph{General Purpose Computation on Graphics Processing Unit (GPGPU)}.
 
 \subsection*{OpenCL}
-OpenCL (Open Computing Language) ist ein Standard für das allgemeine Programmieren für parallele CPU oder GPU-Platformen.
-Dabei stellt OpenCL eine Programmierschnittstelle für das koordinieren paralleler Berechnungen auf unterschiedlichen Platformen zur Verfügung, sowie eine Programmiersprache für die eigentliche Programmierung von Programmen, die auf parallelen Platformen wie einer GPU ausgeführt werden sollen.
+\emph{OpenCL (Open Computing Language)} ist ein Standard für das allgemeine Programmieren für parallele CPU- oder GPU-Platformen.
+Dabei stellt OpenCL eine Programmierschnittstelle für das koordinieren paralleler Berechnungen auf unterschiedlichen Platformen zur Verfügung sowie eine Programmiersprache für die eigentliche Programmierung von Programmen, die auf parallelen Platformen wie einer GPU ausgeführt werden sollen.
 
 Eine OpenCL Anwendung ist die Kombination des Codes eines Programms, das auf dem Host und den OpenCL Devices ausgeführt wird.
 Der Host ist dabei der Teil der Anwendung, der mit dem OpenCL Kontext über die OpenCL API kommuniziert.
@@ -361,13 +349,13 @@ Ein Device entspricht meistens eine GPU oder CPU, die OpenCL implementiert. % bz
 \begin{figure}
 	\centering
 	\includegraphics[width=0.5\textwidth]{../../Grafiken/OpenCL_PlatformModel.png}
-	\caption{OpenCL Platform Modell ... ein Host, mehrere Compute Devices (ein Compute Device entspricht zum Beispiel einer GPU) mit je einer oder mehreren Compute Units. \url{https://www.khronos.org/registry/OpenCL/specs/opencl-2.1.pdf}}
+	\caption{OpenCL Platform Modell. Ein Host, mehrere Compute Devices mit je einer oder mehreren Compute Units. \cite{OCLSPC}}
 	\label{fig::ga02}
 \end{figure}
-Das Platform Modell von OpenCL ist eine Abstraktion davon, wie OpenCL die Hardware sieht.
-Die Beziehung zwischen seinen Einheiten und der Hardware ist dabei größtenteils von der verwendeten Hardware und ihrer Implementierung von OpenCL abhängig.
+Das Platform Modell von OpenCL, dargestellt in Abbildung \ref{fig::ga02}, ist eine Abstraktion davon, wie OpenCL die Hardware sieht.
+Die Beziehung zwischen seinen Einheiten und der Hardware ist dabei größtenteils von der verwendeten Hardware und der entsprechenden Implementierung von OpenCL abhängig.
 Es besteht aus einem Host, welcher mit ein oder mehreren Devices verbunden ist.
-Diese sind unterteilt in Compute Units (CUs), welche weiter in Processing Elements (PEs) unterteilt sind.
+Diese sind unterteilt in \emph{Compute Units (CUs)}, welche weiter in \emph{Processing Elements (PEs)} unterteilt sind.
 Berechnungen auf einem solchen Device werden in Processing Elements ausgeführt.
 Die Host-Anwendung gibt den Start des Kernel-Codes in Auftrag.
 Das OpenCL Device führt dann den Kernel Code auf den Processing Elements des Devices aus und hat dabei eine große Freiheit darüber, wie die Berechnungen auf den Processing Elements abgebildet werden.
@@ -377,7 +365,7 @@ Falls die Processing Elements innerhalb einer Compute Unit die gleiche Folge von
 Der Host kann über Funktionen der OpenCL API mit einem Device über eine Command-Queue interagieren.
 Eine Command-Queue ist mit maximal einem Device verknüpft.
 Über die Command-Queue können Befehle zum starten eines Kernels, Transferieren von Daten zwischen Host und Device und Befehle zur Synchronisation ausgeführt werden.
-Ein Befehl durchläuft dabei immer sechs Zustände: Queued (Eingereiht), Submitted (Übermittelt), Ready (Bereit), Running (Ausführend), Ended (Beendet) und Complete (Abgeschlossen).
+Ein Befehl durchläuft dabei immer sechs Zustände: \emph{Queued (Eingereiht)}, \emph{Submitted (Übermittelt)}, \emph{Ready (Bereit)}, \emph{Running (Ausführend)}, \emph{Ended (Beendet)} und \emph{Complete (Abgeschlossen)}.
 Wird ein Kernel für die Ausführung übermittelt, wird für diesen ein Index-Raum definiert.
 Der Kernel selbst, die zugehörigen Parameter und die Parameter, die seinen Index-Raum definieren, definieren eine Kernel Instanz.
 Wird eine Kernel Instanz auf dem Device ausgeführt, wird für jeden Punkt in seinem Index-Raum eine Ausführung des Kernels gestartet.
@@ -388,11 +376,10 @@ Diese Gruppen heißen Work-Groups.
 \begin{figure}
 	\centering
 	\includegraphics[width=0.75\textwidth]{../../Grafiken/OpenCL-NDRange-Mapping.png}
-	\caption{OpenCL NDRange-Mapping mit 2 Dimensionen. \url{https://www.khronos.org/registry/OpenCL/specs/opencl-2.1.pdf}}
+	\caption{OpenCL NDRange-Mapping mit 2 Dimensionen. \cite{OCLSPC}}
 	\label{fig::ga03}
 \end{figure} 
-Der Index-Raum ist durch eine NDRange definiert.
-Dies ist ein N-dimensionaler Index-Raum, wobei N die Werte 1, 2 oder 3 annehmen kann.
+Der Index-Raum ist durch eine NDRange definiert, wobei ein Index-Raum immer N-dimensional ist, wobei N die Werte 1, 2 oder 3 annehmen kann.
 Eine NDRange wird dementsprechend durch drei Integer-Arrays der Länge N definiert: Die Ausdehnung des Index-Raums, ein Offset der Indices an dem sie starten und die Größe der Work-Groups, jeweils in N Dimensionen.
 
 Jedes Work-Item hat ein N-Dimensionales Tupel, welches seine globale ID repräsentiert.
@@ -400,6 +387,7 @@ Work-Groups erhalten ebenfalls N-Dimensionale Tupel als ID.
 Die Anzahl von Work-Groups ist abhängig von der definierten Größe von Work-Groups und der Größe des Index-Raums.
 Work-Items sind je einer Work-Group zugewiesen und haben eine loakle ID innerhalb ihrer Work-Group.
 Dadurch sind Work-Items eindeutig auf zwei verschiedene Arten definiert: Durch die globale ID beziehungsweise den globalen Index und durch die ID ihrer Work-Group zusammen mit ihrer lokalen ID in dieser Work-Group.
+Abbildung \ref{fig::ga03} illustriert diesen Sachverhalt bei einem zweidimensionalen Index-Raum.
 
 Wird die Ausführung einer Kernel-Instanz gestartet, werden die damit assoziierten Work-Groups in einen Work-Pool platziert und sind damit ausführungsbereit.
 Das Device entnimmt aus dem Work-Pool nach und nach Work-Groups und führt ein oder mehrere gleichzeitig aus.
@@ -411,36 +399,36 @@ Da die Work-Groups aus dem Work-Pool in jeglicher Reihenfolge ausgeführt werden
 	\begin{minipage}[b]{0.49\textwidth}
 		\centering
 		\includegraphics[width=1\textwidth]{../../Grafiken/Ausführungsmodell-GPU-Architektur.png}
-		\caption{Ausführungsmodell NVIDIA GPU Architektur. \url{http://www.icl.utk.edu/~luszczek/teaching/courses/fall2016/cosc462/pdf/GPU_Fundamentals.pdf}}
+		\caption{Ausführungsmodell NVIDIA GPU Architektur. \cite{Larkin2016}}
 		\label{fig::ga04}
 	\end{minipage}
 	\hfill
 	\begin{minipage}[b]{0.49\textwidth}
 		\centering
 		\includegraphics[width=1\textwidth]{../../Grafiken/GPU-Memory-Hierarchie-with-Threads.PNG}
-		\caption{CUDA Thread- und Speicher Hierarchie. \url{https://www.nvidia.com/content/PDF/fermi_white_papers/NVIDIA_Fermi_Compute_Architecture_Whitepaper.pdf}}
+		\caption{CUDA Thread- und Speicher Hierarchie. \cite{NVIDIA}}
 		\label{fig::ga05}
 	\end{minipage}
 \end{figure}
-\todo{Ausrichtung der Bilder. Links in Fußnote oder Referenzen verschieben.}
 
-In der GPU Architektur gibt zwei große Konzepte, globalen Speicher und Streaming Multiprozessoren (SM).
+In der GPU Architektur gibt zwei große Konzepte, \emph{globalen Speicher} und \emph{Streaming Multiprozessoren (SM)}.
 Globaler Speicher auf der GPU ist analog zu RAM für die CPU.
 Auf diesen kann von den Recheneinheiten der GPU und auch durch die Host-Anwendung auf der CPU zugegriffen werden. 
 Eine GPU hat mehrere Streaming Multiprozessoren.
 Streaming Multiprozessoren führen die eigentlichen Berechnungen aus und haben je eigene Control Units, Register (lokaler Speicher), Ausführungs Pipelines und Caches.
 Ein Streaming Multiprozessor besitzt viele Skalare Recheneinheiten, die ähnlich zu einer ALU Berechnungen ausführen.
 
-Im GPU Ausführungsmodell werden Threads von Skalaren Prozessoren ausgeführt.
-Ein Thread Block ist eine Gruppe von Threads und wird auf einem Multiprozessor ausgeführt.
-Dabei werden Threads innerhalb eines Thread Blocks ausschließlich innerhalb eines Multiprozessors ausgeführt.
-Es könnenn aber auch mehrere Thread Blöcke gleichzeitig auf einem Multiprozessor ausgeführt werden.
+Im GPU Ausführungsmodell, siehe Abbildung \ref{fig::ga04} werden \emph{Threads} von Skalaren Prozessoren ausgeführt.
+Ein \emph{Thread Block} ist eine Gruppe von Threads und wird auf einem Streaming Multiprozessor ausgeführt.
+Dabei werden Threads innerhalb eines Thread Blocks ausschließlich innerhalb eines Streaming Multiprozessors ausgeführt.
+Es könnenn aber auch mehrere Thread Blöcke gleichzeitig auf einem Streaming Multiprozessor ausgeführt werden.
 Dies ist aber durch die verfügbaren Ressourcen limitiert.
+Abbildung \ref{fig::ga05} stellt den Zusammenhang zwischen Threads und Speicher in CUDA dar.
 
-Ein Thread Block besteht meistens aus 32-Threads und wird in einer NVIDIA Architektur Warp und in einer AMD Architektur Wavefront genannt.
-Ein solcher Thread Block wird physisch parallel auf einem Multiprozessor als Single Instruction Multiple Thread (SIMT) Ausführung ausgeführt.
-Die Ausführung eines Thread Blocks wird durch einen (Warp- / Thread-Block) Scheduler geregelt.
-Da Threads innerhalb eines Thread Blocks differenziert werden können, ermöglicht dies eine Single Instruction Mutlitple Data (SIMD) Ausführung.
+Ein Thread Block besteht meistens aus 32 Threads und wird in einer NVIDIA Architektur \emph{Warp} und in einer AMD Architektur \emph{Wavefront} genannt.
+Ein solcher Thread Block wird physisch parallel auf einem Streaming Multiprozessor als \emph{Single Instruction Multiple Thread (SIMT)} Ausführung ausgeführt.
+Die Ausführung eines Thread Blocks wird durch einen Warp- beziehungsweise Thread-Block Scheduler geregelt.
+Da Threads innerhalb eines Thread Blocks differenziert werden können, ermöglicht dies eine \emph{Single Instruction Mutlitple Data (SIMD)} Ausführung.
 Ein Programm (Kernel) auf der GPU wird als Gitter aus Thread Blöcken gestartet.
 
 OpenCL sieht die Hardware aus abstrakter Sicht und die exakte Beziehung des Platform Modells zu der Hardware wird von OpenCL nicht festgelegt.
@@ -450,7 +438,7 @@ Das OpenCL Device entspricht meist einer GPU und eine Compute Unit kann als Stre
 
 Nach OpenCL entspricht eine Work-Group einer Menge von verwandten Work-Items, die alle innerhalb der selben Compute Unit arbeiten.
 Ein Work-Item kann von einem oder mehreren Processing Units als Teil einer Work-Group verarbeitet werden.
-Sie führen die selbe Kernel Instanz aus und haben gemeinsamen lokalen Speicher und Work Group Funktionen.
+Sie führen die selbe Kernel Instanz aus und haben gemeinsamen lokalen Speicher und Work Group Funktionen, wie in Abbildung \ref{fig::ga06} dargestellt ist.
 Daher ist es naheliegend, das Work-Groups in Thread Blöcke unterteilt werden und alle Thread-Blöcke einer Work-Group auf dem selben Streaming Multiprozessor ausgeführt werden.
 In OpenCL können Work-Groups weiter in Sub-Groups unterteilt werden.
 Eine OpenCL Sub-Group ist eine implementationsabhängige Gruppierung von Work-Items innerhalb einer Work-Group.
@@ -459,18 +447,17 @@ Es ist ebenfalls naheliegend, dass eine solche Sub-Group einem Thread block ents
 
 Threads innerhalb eines Thread Blocks können also ausschließlich die selben Instruktionen ausführen.
 Müssen einige Threads innerhalb eines Thread Blocks aufgrund ihrer ID unterschiedliche Statements ausführen, resultiert dies darin, dass unter Umständen der gesamte Block alle Statements ausführt und am Ende der Berechnung die richtigen Ergebnisse auswählt.
-\todo{Quelle dafür}
 Dies hat zur Folge, dass ein Thread Block der divergiert deutlich längere Ausführungszeiten hat, als ein konvergierender Thread Block.
 Bei der Implementierung eines OpenCL Kernels kann eine geschickte Strukturierung des Codes daher das gleiche Ergebnis mit besserer Performanz generieren.
 
 Die Wahl der Work-Group Größe ist ebenfalls wichtig.
-Da Thread Blöcke aktuell meist eine Größe von 32 Threads besitzen und unter der Annahme, dass Work-Groups in Thread Blöcke unterteilt werden, macht es Sinn, die Größe einer Work-Group als vielfaches von 32 zu wählen.
+Da Thread Blöcke aktuell meist eine Größe von 32 Threads besitzen und unter der Annahme, dass Work-Groups in Thread Blöcke unterteilt werden, macht es Sinn, die Größe einer Work-Group als Vielfaches von 32 zu wählen.
 Ansonsten kann es passieren, dass Thread Blöcke zur Ausführung gestartet werden, bei denen eine große Anzahl an Threads kein Teil der Berechnung sind und Ressourcen dadurch verschwendet werden.
 
 \begin{figure}
 	\centering
 	\includegraphics[width=0.5\textwidth]{../../Grafiken/OpenCL-Memory-Model.PNG}
-	\caption{OpenCL Speicher Modell \url{https://www.khronos.org/registry/OpenCL/specs/opencl-2.1.pdf}}
+	\caption{OpenCL Speicher Modell. \cite{OCLSPC}}
 	\label{fig::ga06}
 \end{figure} 
 Ein weiteres Problem sind Speicher Konflikte bei der Ausführung eines Kernels.
@@ -479,5 +466,3 @@ Versuchen Threads eines Thread Blocks auf verschiedene Adressen innerhalb der se
 Ausführungen eines Thread Blocks mit Speicher Konflikten müssen serialisiert werden und dauern daher deutlich länger.
 Eine Ausnahme ist es, falls die Threads eines Blocks alle auf dieselbe Adresse innerhalb einer Speicher Bank lesend zugreifen.
 In diesem Fall wird der gelesene Wert an alle Threads gleichzeitig übertragen.
-\todo{Quellen einfügen.}
-\todo{Bilder Referenzieren.}
