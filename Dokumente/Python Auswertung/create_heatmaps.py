@@ -89,6 +89,16 @@ def plot_and_save(picture_path, data_path, min_sc, max_sc):
     plt.clf()  # clear figure so the method can be called again.
 
 
+# Plots all values with the picture at the picutre_path at the same index
+def plot_all_with_subplots_and_save(picture_path_s, values):
+    total_min = min(min(values[0][2]), min(values[1][2]), min(values[2][2]), min(values[3][2]),
+                    min(values[4][2]), min(values[5][2]))
+
+    total_max = max(max(values[0][2]), max(values[1][2]), max(values[2][2]), max(values[3][2]),
+                    max(values[4][2]), max(values[5][2]))
+    pass
+
+
 def main_old():
     msr_path = 'C:/Users/bauer/Desktop/bvrc_rbn/Dokumente/Messungen/'
     dirs = ['bonsai', 'hoatzin', 'E_1353', 'chameleon']
@@ -132,7 +142,7 @@ def main_old():
     return
 
 
-def main():
+def main_old_2():
     # path to the folder with the measurements
     msr_path = 'C:/Users/bauer/Desktop/bvrc_rbn/Dokumente/Neue_Messungen/Chameleon/'
 
@@ -157,6 +167,29 @@ def main():
     plot_and_save(msr_path + 'mdc_ors.png', msr_path + 'ms_data_mdc_rORS_chameleon.txt', total_min, total_max)
     plot_and_save(msr_path + 'ddc.png', msr_path + 'ms_data_ddc_chameleon.txt', total_min, total_max)
     plot_and_save(msr_path + 'ddc_ors.png', msr_path + 'ms_data_ddc_rORS_chameleon.txt', total_min, total_max)
+
+    print 'End'
+    pass
+
+
+def main():
+    # path to the folder with the measurements
+    msr_path = 'C:/Users/bauer/Desktop/bvrc_rbn/Dokumente/Neue_Messungen/Chameleon/'
+
+    print 'Begin'
+
+    st_values = axes_from_data(read_data(msr_path + 'ms_data_st_chameleon.txt'))
+    st_ors_values = axes_from_data(read_data(msr_path + 'ms_data_st_rORS_chameleon.txt'))
+    mdc_values = axes_from_data(read_data(msr_path + 'ms_data_mdc_chameleon.txt'))
+    mdc_ors_values = axes_from_data(read_data(msr_path + 'ms_data_mdc_rORS_chameleon.txt'))
+    ddc_values = axes_from_data(read_data(msr_path + 'ms_data_ddc_chameleon.txt'))
+    ddc_ors_values = axes_from_data(read_data(msr_path + 'ms_data_ddc_rORS_chameleon.txt'))
+
+    values = [st_values, st_ors_values, mdc_values, mdc_ors_values, ddc_values, ddc_ors_values]
+    picture_paths = [msr_path + 'st.png', msr_path + 'st_ors.png', msr_path + 'mdc.png',
+                     msr_path + 'mdc_ors.png', msr_path + 'ddc.png', msr_path + 'ddc_ors.png']
+
+    plot_all_with_subplots_and_save(picture_paths, values)
 
     print 'End'
     pass
