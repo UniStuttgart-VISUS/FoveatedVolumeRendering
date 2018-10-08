@@ -53,30 +53,33 @@ Mit ihrem System und Techniken erlangten sie eine Performanz-Verbesserung von ei
 Dabei erreichten sie eine Darstellungsqualität, die vergleichbar mit dem Rendern eines hochauflösenden Bildes über den gesamten Bildschirm ist.
 
 \subsection{Wahrnehmungsorientiertes Volumenrendering zur Qualitätssteigerung}\label{ss::wovrzq}
-R. Englund und T. Ropinski stellten in ihrem Paper \emph{Quantitative and Qualitative Analysis of the Perception of Semi-Transparent Structure in Direct Volume Rendering} \cite{doi:10.1111/cgf.13320} verschiedene Techniken, zur Verbesserung der Wahrnehmung von komplexen volumetrischen Daten, vor.
+R. Englund und T. Ropinski \cite{doi:10.1111/cgf.13320} stellten verschiedene Techniken, zur Verbesserung der Wahrnehmung von komplexen volumetrischen Daten, vor.
 In einer Studie mit über 300 Teilnehmern untersuchten sie, wie diese Techniken zur verbesserten Wahrnehmung von Volumen beitragen und verglichen die verschiedenen Ansätze miteinander.
 Dabei mussten die Teilnehmer jeweils kleine Aufgaben absolvieren, so dass Rückschlüsse darauf geschlossen werden können, wie sehr eine gewisse Technik dem Teilnehmer bei der Erkennung von Form und Tiefe eines Objekts in einem Volumen beiträgt.
-Um eine bessere direkte Erforschung der Volumendaten später ermöglichen zu können, wurden Techniken, die automatisch Rendering-Parameter angepasst haben hier ausgelassen.
-Nur wenn der Nutzer selbst interaktiv sein kann, also die Parameter des Volumen-Renderings, wie die Transferfunktion und Kamera selbst anpassen kann, ermöglicht dies eine direkte Erforschung.
-In ihrer Studie haben sie sechs Techniken ausgewertet. Darunter \emph{Direct Volume Raytracing} (DVR) als grundlegende Technik und \emph{Depth Darkening} wobei Tiefeneffekte ähnlich zu \emph{Ambient Occlusion} dadurch hervorgerufen werden, dass tiefere Objekte dunkler gezeichnet werden. 
+Um eine bessere direkte Erforschung der Volumendaten später ermöglichen zu können, wurden Techniken, die automatisch Renderingparameter angepasst haben, hier ausgelassen.
+Nur wenn der Nutzer selbst interaktiv ist, also die Parameter des Volumenrenderings, wie die Transferfunktion und Kamera selbst anpassen kann, ermöglicht dies eine direkte Erforschung.
+In ihrer Studie haben sie sechs Techniken ausgewertet.
+Darunter \emph{Direct Volume Raytracing} (DVR) als grundlegende Technik und \emph{Depth Darkening}, wobei Tiefeneffekte ähnlich zu \emph{Ambient Occlusion} dadurch hervorgerufen werden, dass tiefere Objekte dunkler gezeichnet werden. 
 In ihrer Auswertung kamen sie unter Anderem dazu, dass Techniken, die natürliche Lichteffekte in den Volumendaten simulieren, deutliche Vorteile gegenüber die anderen getesteten Ansätze gezeigt haben.
 
-Anders als zu den untersuchten Techniken von Englund und Ropinski \cite{doi:10.1111/cgf.13320} präsentieren Aidong Lu et. al. in ihrem Paper \emph{Volume Composition Using Eye Tracking Data} \cite{Lu:2006:VCU:2384796.2384814} eine Methode für automatisierte Parameterauswahl bei der Betrachtung von Volumendaten mit Hilfe eines Eye Tracking Gerätes.
-Das Ziel, welches sie mit dieser Methode verfolgen ist es, die mühsame Nutzerinteraktionen bei der Auswahl der Parameter zu vereinfachen und damit die Nutzbarkeit des Darstellungssystems zu verbessern.
-Volumendaten können sehr komplex sein und daher ist es oft schwierig herauszufinden, was der Nutzer in dem Volumen betrachten möchte und was dahingehend hervorgehoben werden soll.
-Trotzdem ermöglichen Eigenschaften des Volumen-Renderings, wie konstante Größen, Formen und Positionen der Objekte eine automatische Anpassung der Parameter.
-Um die Bereiche, die für den Nutzer von Interesse sind, zu bestimmen, wird ein Eyetracker zur Hilfe genommen.
-Dieser misst die Augenbewegungen und die Blickposition auf dem Bildschirm.
-Es wird zwischen zwei Hauptsächlichen Augenbewegungen unterschieden: Sakkade und Fixation.
+Anders als zu den untersuchten Techniken von Englund und Ropinski \cite{doi:10.1111/cgf.13320} präsentieren Aidong Lu et. al. \cite{Lu:2006:VCU:2384796.2384814} eine Methode für automatisierte Parameterauswahl bei der Betrachtung von Volumendaten mit Hilfe eines Eye Tracking Gerätes.
+Das Ziel, welches sie mit dieser Methode verfolgten, war die Vereinfachung der mühsamen Nutzerinteraktionen bei der Auswahl der Parameter, um somit die Nutzbarkeit des Darstellungssystems zu verbessern.
+
+Volumendaten können sehr komplex sein.
+Daher ist es oft schwierig herauszufinden, was der Nutzer in dem Volumen betrachten möchte und was dahingehend hervorgehoben werden soll.
+Eigenschaften der Volumendaten, wie konstante Größen, Formen und Positionen der Objekte ermöglichen aber Methoden für eine automatische Anpassung der Parameter.
+
+Aidong Lu et. al. nutzten einen Eyetracker, um die Bereiche, die für den Nutzer von Interesse sind, zu bestimmen.
+Dieser maß die Augenbewegungen und die Blickposition auf dem Bildschirm.
+Es wurde zwischen zwei Hauptsächlichen Augenbewegungen unterschieden, einer Sakkade und einer Fixation.
 Eine Sakkade ist eine schnelle Augenbewegung von einem Punkt zu einem anderem.
 Bei einer Fixation ruht das Auge auf einem Punkt.
-Die Punkte, die fixiert werden, sind meist für den Nutzer von Interesse.
-Da die Blickposition durch den Eye Tracker nur auf einer 2D-Ebene bestimmt werden kann, wird durch ein konstantes Rotieren des Volumenobjekts und der parallelen Aufzeichnung der Augenbewegung versucht, die 3D Position des fixierten Objektes zu rekonstruieren.
-Aus den Eyetracking und Volumendaten bestimmen sie mit Hilfe mehrerer Clustering-Methoden gewichte für die einzelnen Voxel des Volumens und berechnen so die Wichtigkeit der Objekte innerhalb des Volumens für den Nutzer.
-Entsprechend dieser Ergebnisse wurden die Render Parameter angepasst, um die für den Nutzer am interessantesten Objekte hervorzuheben und anzuzeigen.
+Punkte, die fixiert werden, sind für den Nutzer meist von Interesse.
+Da die Blickposition durch den Eye Tracker nur auf einer 2D-Ebene bestimmt werden konnte, wurde durch ein konstantes Rotieren des Volumenobjekts und der parallelen Aufzeichnung der Augenbewegung versucht, die 3D Position des fixierten Objektes zu rekonstruieren.
+Aus den Eyetracking und Volumendaten bestimmenten sie dann mit Hilfe mehrerer Clustering-Methoden Gewichte für die einzelnen Voxel des Volumens und berechneten so einen Wichtigkeitswert für die verschiedenen Objekte innerhalb des Volumens.
+Entsprechend dieser Ergebnisse wurden die Renderingparameter angepasst, um die für den Nutzer am interessantesten Objekte hervorzuheben und anzuzeigen.
 Aidong Lu et. al. kamen zu dem Schluss, dass die präsentierte Methode den Aufwand für den Nutzer, die Render Parameter anzupassen, signifikant reduzieren kann.
-Trotzdem kann ein solcher regelbasierter Ansatz nicht mit einer manuellen Einstellung der Render-Parameter mithalten.
-\todo{Related Work nochmal anschauen. Zum Bsp. ob aus der richtigen Perspektive geschrieben wurde.}
+Trotzdem konnte ein solcher regelbasierter Ansatz nicht mit der manuellen Einstellung der Renderingparameter mithalten.
 
 \section{Sehapparat}\label{sec::eye}
 Das Auge ist der visuelle Sensor des Menschen und ermöglicht ihm das Sehen.
