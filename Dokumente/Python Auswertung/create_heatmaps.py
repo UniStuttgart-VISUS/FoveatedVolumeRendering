@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import matplotlib as mplib
 from ast import literal_eval
+import matplotlib.gridspec as gridspec
 
 # Data Object to hold measured data
 class MsData():
@@ -96,6 +97,41 @@ def plot_all_with_subplots_and_save(picture_path_s, values):
 
     total_max = max(max(values[0][2]), max(values[1][2]), max(values[2][2]), max(values[3][2]),
                     max(values[4][2]), max(values[5][2]))
+
+    if picture_path_s.__len__() != values.__len__() and picture_path_s.__len__() != 6:
+        print('error_1')
+
+    # fig, ax = plt.subplots(nrows=2, ncols=3)  # create subplots
+    fig = plt.figure()
+    gs = gridspec.GridSpec(nrows=2, ncols=3, wspace=0.0, hspace=0.0, figure=fig)
+
+    color_map = mplib.cm.get_cmap('viridis')  # get cmap viridis
+
+    #stx = ax[0][0]
+    #mdcx = ax[0][1]
+    #ddcx = ax[0][2]
+
+    #stox = ax[1][0]
+    #mdcox = ax[1][1]
+    #ddcox = ax[1][2]
+
+    for i in range(6):
+        print i
+        idx = [0,3,1,4,2,5]
+        ax = fig.add_subplot(gs[idx[i]])
+        image = mpimg.imread(picture_path_s[i])  # read image_data
+        ax.imshow(image)  # plot image
+        sc = ax.scatter(x=values[i][0], y=values[i][1], c=values[i][2], s=10,
+                          vmin=total_min, vmax=total_max, cmap=color_map)
+        ax.axis('off')
+
+    fig.subplots_adjust(right=0.8)
+    cbar_ax = fig.add_axes([0.85, 0.15, 0.05, 0.7])
+    cbar = fig.colorbar(sc, cax=cbar_ax)
+    cbar.ax.set_ylabel('ms', rotation=270)
+
+    # fig.tight_layout()
+    fig.show()
     pass
 
 
@@ -193,6 +229,7 @@ def main():
 
     print 'End'
     pass
+
 
 if __name__ == '__main__':
     main()
