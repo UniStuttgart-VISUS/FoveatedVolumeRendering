@@ -182,7 +182,7 @@ Raycasting ermöglicht in Verbindung mit einer Transferfunktion, ein Volumen auf
 \subsection{Raycasting}\label{sec::rc}
 Raycasting ist ein Verfahren um Volumendaten abzutasten und auf eine 2D Rastergrafik zu projizieren.
 Wie beim Raytracing werden beim Raycasting auch Sichtstrahlen verfolgt.
-Die Sichtstrahlen werden dabei ausgehend von einer virtuellen Kamera im Raum verfolgt.
+Die Sichtstrahlen werden dabei ausgehend von einer virtuellen Kamera im Raum ausgesendet und in bestimmten Abständen abgetastet.
 \begin{figure}[]
 	\centering
 	\begin{minipage}[b]{0.49\textwidth}
@@ -203,7 +203,7 @@ Die virtuelle Kamera, siehe Abbildung \ref{fig::rc01}, ist im Raum an Position $
 Die Position $\vec{e}$ entspricht relativ der Position des Betrachters vor dem Bildschirm.
 Mit $\vec{u}$, $\vec{v}$ und $\vec{w}$ wird die Ausrichtung der Kamera im Raum eindeutig bestimmt.
 In einer Entfernung \texttt{d} von $\vec{e}$ aus in Richtung $\vec{-w}$ ist die Bildebene \ref{fig::rc02} Positioniert.
-Die Größe der Bildebene wird durch \texttt{l}, \texttt{r}, \texttt{b} und \texttt{t} bestimmt.
+Die Größe der Bildebene wird durch \texttt{l}, \texttt{r}, \texttt{b} und \texttt{t} definiert.
 Abhängig von der Größe des Bildschirms oder der Größe der gewünschten Rastergrafik, wird die Bildebene virtuell in die gewünschte Anzahl an Pixel in die Breite und Höhe unterteilt.
 Jeder dieser Teile entspricht nun einem Pixel der Rastergrafik.
 Nun kann für jeden Pixel ein Strahl, ausgehend von $\vec{e}$, in Richtung des entsprechenden Punktes auf der Bildebene, ausgesendet und verfolgt werden.
@@ -213,18 +213,23 @@ Nun kann für jeden Pixel ein Strahl, ausgehend von $\vec{e}$, in Richtung des e
 	\caption{Illustration der Projektion von Objekten auf die Bildebene mit Hilfe von Raytracing. \cite{Dr.MichaelKrone2016/2017}}
 	\label{fig::rc03}
 \end{figure}
-Trifft ein Strahl Objekte in der Szene, wird dadurch ein Farbwert ermittelt, den der entsprechende Pixel annehmen kann und und die Szene dadurch auf den Bildschirm projiziert wird.
-Siehe auch Abbildung \ref{fig::rc03}.
+Trifft ein Strahl Objekte in der Szene, wird dadurch ein Farbwert ermittelt, den der entsprechende Pixel annehmen kann und die Szene dadurch auf den Bildschirm projiziert wird.
+Abbildung \ref{fig::rc03} skizziert die Projektion von Objekten in einer Szene auf eine Bildebene.
 
 \subsection{Volumenrendering}
-Ein Volumen kann mit Hilfe von Raycasting abgetastet und auf den Bildschirm projiziert werden.
-Hier wird wie beschrieben, für jeden Pixel ein Strahl in die Szene gesendet.
-Anstelle von verschiedenen Objekten gibt es nun ein Volumen welches aus vielen kleinen Voxeln besteht.
-Das Volumen ist ein dreidimensionales Bild, wobei statt 2D Pixel es aus 3D Voxel besteht.
+\begin{figure}
+	\centering
+	\includegraphics[width=0.5\textwidth]{../../Grafiken/Abtasten_eines_Strahls.png}
+	\caption{Illustration des Abtasten eines Strahls in 2D. Jeder ausgefüllte Kreis stellt einen Abtastpunkt dar.}
+	\label{fig::rc04}
+\end{figure}
+Das Volumen ist ein dreidimensionales Bild und besteht aus 3D Voxel.
 Ein Voxel ist eine Box in dem Volumen, mit einer Position, einer Ausdehnung in drei Dimensionen und einer Dichte.
-Wird ein Strahl in das Volumen gesendet, so wird dieser in Intervallen abgetastet.
-Für jeden Abtastpunkt kann mit Hilfe einer Transferfunktion ein Farbwert ermittelt werden, welche zusammen einen Farbwert für den Pixel ergeben.
-\todo{Anwendung von Raycasting zum Volumenrendering. Illustration von Rayasting und Volumenrendering mit mehreren Raysamples einfügen.}
+Es kann mit Hilfe von Raycasting abgetastet und auf den Bildschirm projiziert werden.
+Dabei wird für jeden Pixel ein Strahl in die Szene gesendet und in Intervallen abgetastet.
+Abbildung \ref{fig::rc04} skizziert dies in einer 2D Ansicht.
+Für jeden Abtastpunkt kann mit Hilfe einer Transferfunktion ein Farbwert ermittelt werden.
+Zusammen ergeben die abgetasteten Werte einen Farbwert, der das Ergebnis des Raycasts für diesen Strahl repräsentiert und dem zugehörigen Pixel zugewiesen werden kann.
 
 \subsection{Transferfunktion}
 Die Transferfunktion ist ein mächtiges Werkzeug für die Visualisierung von Volumendaten.
@@ -232,7 +237,6 @@ Mit Hilfe einer Transferfunktion können bestimmte Bereiche des Volumen verschie
 Die Transferfunktion bestimmt für einen Voxel, abhängig von seiner Dichte, einen Farb- und Opazitätswert.
 Dadurch können zum Beispiel Strukturen innerhalb des Volumens mit einer hohen Dichte farbig und kräftig hervorgehoben werden.
 Strukturen mit einer geringeren Dichte können transparent und weniger farblich dargestellt werden.
-\todo{Funktion der Transferfrunktion im Volumenrendering erläutern. Unter Umständen ein Beispiel Bild mit einer Anwendung der Transferfunktion verwenden.}
 
 \section{Eyetracking}\label{sec::eyetr}
 % \todo{Was ist Eyetracking?}
