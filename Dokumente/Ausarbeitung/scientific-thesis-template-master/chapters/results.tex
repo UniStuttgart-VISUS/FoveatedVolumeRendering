@@ -461,8 +461,28 @@ Das Volumen \emph{Chameleon} hat eine Auflösung von $1024\times1024\times1024$\
 \fi
 
 Für einen anschaulichen Vergleich der Methoden wurde für die Messungen des Volumen Chameleon Heatmaps erstellt (Abbildung \ref{fig::res::pf::hm_wa}).
-Aus den gemessenen Ausführungszeiten des Kernels wurden Heatmaps für das jeweils zugrundeliegende Bild erstellt.
-Da die Differenz zwischen Ausführungszeit des Kernels und der Ausführungszeit der \emph{paintGL()}-Methode unabhängig von dem zu berechnenden Volumen und der verwendeten Transferfunktion ist, wurde diese nicht für die Erstellung der Heatmaps einbezogen.
+Die gemessene Ausführungszeiten des Kernels für die unterschiedlichen Mauspositionen wurden für die Erstellung der Heatmaps verwendet.
+Da die Differenz zwischen Ausführungszeit des Kernels und der Ausführungszeit der \emph{paintGL()}-Methode unabhängig von dem zu berechnenden Volumen und der verwendeten Transferfunktion ist, wurde diese hier nicht einbezogen.
+
+In Abbildung \ref{fig::res::pf::hm_wa} kann man erkennen, dass die Ausführungszeit des Kernels für den Standard Raycast ohne variierter Strahlabtastrate für alle Mauspositionen im Bereich von 80\,ms liegt und damit im Vergleich zu den anderen Methoden am höchsten ist.
+Betrachtet man nun die Standard Variante mit variierter Strahlabtastrate, so kann man eine allgemeine Verbesserung feststellen.
+Die Ausführungszeit des Kernels liegt bei dieser Methode bei circa 65\,ms und variiert je nach Mausposition leicht.
+So ist die Ausführungszeit für eine Mausposition am oberen und unterem Rande des Bildes ein wenig geringer, als wenn diese sich in der Mitte des Bildes befindet.
+Die Heatmap zur Methode mit dem MDC Raycast und ohne variierter Strahlabtastrate zeigt zu beiden Standard Raycast Methoden eine Verbesserung.
+Die Ausführungszeit des Kernels liegt hier bei circa 40\,ms und ist im mittleren Bereich des Bildes minimal höher als im oberen oder unteren Bereich.
+Wird der MDC Raycast mit einer variierten Strahlabtastrate kombiniert, so ist die Ausführungszeit des Kernels im oberen und unteren Bereich des Bildes sichtbar schneller, als in der Variante ohne einer variierten Strahlabtastrate.
+Im mittleren Bereich des Bildes liegt sie nun bei circa 35\,ms und in den äußeren Bereichen des Bildes liegt sie bei circa 20\,ms.
+Die Heatmap zum DDC Raycast zeigt, dass mit dem DDC Raycast je nach Mausposition die niedrigsten Ausführungszeit des Kernels erreicht wurde.
+Auch ohne einer variierten Strahlabtastrate zeigt der DDC Raycast verhältnismäßig ein ähnliches Muster, wie der Standard und MDC Raycast mit variierter Strahlabtastrate.
+Die Ausführungszeit des Kernels betrug hier im äußeren Bild ebenfalls geringere Werte als im mittigen Bereich des Bildes.
+Im äußeren Bereich betrug sie circa 20\,ms und im mittleren circa 45\,ms.
+Es ist auffallend, dass die Differenz zwischen der Ausführungszeit des Kernels im oberen und unteren Bereich und der Ausführungszeit im mittleren Bereich des Bildes hier größer als bei den anderen Verfahren ist.
+In der Heatmap zum DDC Raycast mit variierter Strahlabtastrate ist zu erkennen, dass die äußeren Bereiche des Bildes, besonders oben links und unten rechts, nochmal niedrigere Ausführungszeiten des haben, als im DDC Raycast ohne variierter Strahlabtastrate.
+In den äußeren Bereichen fällt diese auf bis zu 15\,ms und im mittleren Bereich auf leicht über 40\,ms.
+Vergleicht man die Heatmaps des DDC und MDC Raycasts miteinander, so fällt auf, dass der DDC Raycast in den äußeren Bereichen des Bildes niedrigere Ausführungszeiten als der MDC Raycast erreicht, dafür die Ausführungszeiten des DDC Raycasts im mittleren Bereich des Bildes leicht höher ist, als die des MDC Raycasts.
+
+
+
 
 %\todo{Messbare Ergebnisse der Arbeit. (Performanzmessungen..).}
 %\todo{Zusätzlich Tabelle mit Durchnschnittsperformanzwerten insbesondere der paintGL() Methode.}
@@ -471,7 +491,7 @@ Da die Differenz zwischen Ausführungszeit des Kernels und der Ausführungszeit 
 
 \cleardoublepage
 
-\section*{Diskussion}\label{sec::disc}
+\section{Diskussion}\label{sec::disc}
 \todo{Diskussion und Bedeutung der Ergebnisse.}
 \todo{Technische Daten des Systems, mit dem das Eyetracking gemacht wurde, angeben. Zugehörig zur Diskussion der Ergebnisse; wie man die verschiedenen Methoden empfindet.}
 

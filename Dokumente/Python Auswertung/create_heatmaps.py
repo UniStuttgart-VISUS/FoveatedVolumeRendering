@@ -92,6 +92,13 @@ def plot_and_save(picture_path, data_path, min_sc, max_sc):
 
 # Plots all values with the picture at the picutre_path at the same index
 def plot_all_with_subplots_and_save(picture_path_s, values):
+    #set font size
+    font = {'family': 'normal',
+            'weight': 'bold',
+            'size': 30}
+
+    mplib.rc('font', **font)
+
     total_min = min(min(values[0][2]), min(values[1][2]), min(values[2][2]), min(values[3][2]),
                     min(values[4][2]), min(values[5][2]))
 
@@ -125,8 +132,8 @@ def plot_all_with_subplots_and_save(picture_path_s, values):
                           vmin=total_min, vmax=total_max, cmap=color_map)
         ax.axis('off')
 
-    fig.subplots_adjust(right=0.8)
-    cbar_ax = fig.add_axes([0.85, 0.15, 0.05, 0.7])
+    fig.subplots_adjust(wspace=0, hspace=0,right=0.85)
+    cbar_ax = fig.add_axes([0.85, 0.15, 0.01, 0.7])
     cbar = fig.colorbar(sc, cax=cbar_ax)
     cbar.ax.set_ylabel('ms', rotation=0)
 
