@@ -9,4 +9,5 @@ Andere Abkürzungen wählen für MDC und DDC.
 
 -----
 
+bilder zu den Eyetracking Koordinatensysteme schneiden, so dass diese Größer sind und der Text lesbarer ist.
 Zweite Version der PDF mit reduzierter Dateigröße oder allgemein die dateigröße reduzieren.
