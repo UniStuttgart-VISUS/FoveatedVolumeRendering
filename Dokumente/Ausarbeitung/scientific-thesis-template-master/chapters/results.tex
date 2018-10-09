@@ -399,6 +399,7 @@ Auch sollten, bei den Messungen mit den verschiedenen Methoden, möglichst die s
 Die Verwendung eines Eyetrackers würde es fast unmöglich machen, die selben Blickpunkte in einem gewissen Zeitraum zu fokussieren.
 
 Für die Messergebnisse selbst wurde ein spiegelverkehrtes \emph{S} mit dem Mauszeiger auf einem Bild nachgefahren und dabei die Mauspositionen abgespeichert.
+Insgesamt wurden hier 584 Mauspositionen aufgezeichnet.
 Es wurden anschließend verschiedene Volumendaten mit jeweils drei verschiedenen Transferfunktionen für die drei verschiedenen Implementierungen, den Standard-, \emph{MDC}- und \emph{DDC}-Raycast sowie jeweils einmal mit konstanter und einmal mit variierter Strahlabtastrate für die Messungen verwendet.
 Bei jeder dieser Messung wurde dabei für jede der Mauspositionen des gespeicherten Mausverlaufs ein Bild berechnet und zu dieser Berechnung die Mausposition, die Ausführungszeit des Kernels und die Ausführungszeit der \emph{paintGL()}-Methode gespeichert.
 
@@ -414,53 +415,9 @@ Das Volumen \emph{Chameleon} hat eine Auflösung von $1024\times1024\times1024$\
 \begin{figure}
 	\centering
 	\includegraphics[width=1\textwidth]{../../Neue_Messungen/Chameleon/heatmaps/hm_wa.png}
-	\caption{Heatmaps der verschiedenen Verfahren. Von links nach rechts: Standard Raycast, MDC Raycast und DDC Raycast. In der ersten Zeile ohne variierter Strahlabtastrate und in der zweiten Zeile mit variierte Strahlabtastrate.}
+	\caption{Heatmaps der verschiedenen Verfahren für das Volumen Chameleon. Für verschiedene Mauspositionen wurde eine Berechnung durchgeführt. Die jeweilige Ausführungszeit des Kernels für diese Berechnung wurde entsprechend des Farbbalkens farblich eingezeichnet. Der Farbbalken gibt die Werte in \,ms an. }
 	\label{fig::res::pf::hm_wa}
 \end{figure}
-
-\iffalse
-\begin{figure}
-	\centering
-	\includegraphics[width=0.7\textwidth]{../../Neue_Messungen/Chameleon/heatmaps/ms_data_st_chameleon_heatmap.png}
-	\caption{Heatmap des Chameleon Volumen mit dem Standard Raycast ohne variierter Strahlabtastrate.}
-	\label{fig::res::pf::hm_st}
-\end{figure}
-
-\begin{figure}
-	\centering
-	\includegraphics[width=0.7\textwidth]{../../Neue_Messungen/Chameleon/heatmaps/ms_data_st_rORS_chameleon_heatmap.png}
-	\caption{Heatmap des Chameleon Volumen mit dem Standard Raycast mit variierter Strahlabtastrate.}
-	\label{fig::res::pf::hm_st_ors}
-\end{figure}
-
-\begin{figure}
-	\centering
-	\includegraphics[width=0.7\textwidth]{../../Neue_Messungen/Chameleon/heatmaps/ms_data_mdc_chameleon_heatmap.png}
-	\caption{Heatmap des Chameleon Volumen mit dem MDC Raycast ohne variierter Strahlabtastrate.}
-	\label{fig::res::pf::hm_mdc}
-\end{figure}
-
-\begin{figure}
-	\centering
-	\includegraphics[width=0.7\textwidth]{../../Neue_Messungen/Chameleon/heatmaps/ms_data_mdc_rORS_chameleon_heatmap.png}
-	\caption{Heatmap des Chameleon Volumen mit dem MDC Raycast mit variierter Strahlabtastrate.}
-	\label{fig::res::pf::hm_mdc_ors}
-\end{figure}
-
-\begin{figure}
-	\centering
-	\includegraphics[width=0.7\textwidth]{../../Neue_Messungen/Chameleon/heatmaps/ms_data_ddc_chameleon_heatmap.png}
-	\caption{Heatmap des Chameleon Volumen mit dem DDC Raycast ohne variierter Strahlabtastrate.}
-	\label{fig::res::pf::hm_ddc}
-\end{figure}
-
-\begin{figure}
-	\centering
-	\includegraphics[width=0.7\textwidth]{../../Neue_Messungen/Chameleon/heatmaps/ms_data_ddc_rORS_chameleon_heatmap.png}
-	\caption{Heatmap des Chameleon Volumen mit dem DDC Raycast ohne variierter Strahlabtastrate.}
-	\label{fig::res::pf::hm_ddc_ors}
-\end{figure}
-\fi
 
 Für einen anschaulichen Vergleich der Methoden wurde für die Messungen des Volumen Chameleon Heatmaps erstellt (Abbildung \ref{fig::res::pf::hm_wa}).
 Die gemessene Ausführungszeiten des Kernels für die unterschiedlichen Mauspositionen wurden für die Erstellung der Heatmaps verwendet.
@@ -486,22 +443,46 @@ Vergleicht man die Heatmaps des DDC und MDC Raycasts miteinander, so fällt auf,
 \begin{figure}
 	\centering
 	\includegraphics[width=1\textwidth]{../../Neue_Messungen/Chameleon/boxplots.png}
-	\caption{Boxplots der Ausführungszeiten des Kernels der verschiedenen Verfahren.}
+	\caption{Boxplots der Ausführungszeiten des Kernels der verschiedenen Verfahren bei der Verwendung des Volumen Chameleon.}
 	\label{fig::res::pf::bp}
 \end{figure}
+
+Die Ausführungszeiten des Kernels der unterschiedlichen Methoden, wie sie in den Heatmaps (Abbildung \ref{fig::res::pf::hm_wa}) farbig dargestellt wurden, sind in Abbildung \ref{fig::res::pf::bp} als Boxplots dargestellt.
+Wie an den Heatmaps schon ersichtlich war, sind die Ausführungszeiten des Standard Raycast ohne variierter Strahlabtastrate am höchsten und relativ gleich.
+Die Messwerte sind konzentriert um die 77,5\,ms.
+Die Ausführungszeiten für den Standard Raycast mit variierter Strahlabtastrate sind ein wenig geringer und sind untereinander stärker verteilt.
+Für den MDC Raycast sieht es ähnlich aus.
+Ohne variierter Strahlabtastrate sind die Werte ein wenig höher und dafür kompakter.
+Mit einer variierten Strahlabtastrate sind sind die Werte niedriger aber weiter verteilt.
+Anders wie bei den vorherigen Raycast Methoden sind die Ausführungszeiten des DDC Raycast mit variierter Strahlabtastrate ein wenig kopakter, als ohne variierter Strahlabtastrate.
+Mit variierter Strahlabtastrate sind die Werte insgesamt aber trotzdem niedriger.
 
 \begin{figure}
 	\centering
 	\includegraphics[width=1\textwidth]{../../Neue_Messungen/Messungen_in_Tabelle.PNG}
-	\caption{Die Ergebnisse der verschiedenen Verfahren mit den Volumen Bonsai, Supernova und Chameleon. Für jedes Verfahren und Volumen ist die durchschnittliche Ausführungszeit des Kernel, der durchschnittliche Overhead und die summierte Ausführungszeit der \emph{paintGL()}-Methode für die verschiedenen Mauspositionen aufgeführt.}
+	\caption{Die Ergebnisse der verschiedenen Verfahren mit den Volumen Bonsai, Supernova und Chameleon. Für jedes Verfahren und Volumen ist die durchschnittliche Ausführungszeit des Kernel (K.) und die Varianz von dieser sowie der durchschnittliche Overhead (Oh.) und die summierte Ausführungszeit der \emph{paintGL()}-Methode (Md.) für die verschiedenen Mauspositionen angegeben.}
 	\label{fig::res::pf::table}
 \end{figure}
 
+Wie schon in Abbildung \ref{fig::res::pf::hm_wa} und \ref{fig::res::pf::bp} die Verhältnisse der Ausführungszeiten der verschiedenen Methoden dargestellt wurden, wird dies in Abbildung \ref{fig::res::pf::table} durch die genauen Werte bestätigt.
+In Abbildung \ref{fig::res::pf::table} sind für die unterschiedlichen Verfahren und die Volumen Bonsai, Supernova und Chameleon die durchschnittliche Kernelzeit, dessen Varianz sowie der durchschnittliche Overhead der \emph{paintGL()}-Methode ohne die Ausführungszeit des Kernels dargestellt.
+Zusätzlich ist auch die summierte Ausführungszeit der \emph{paintGL()}-Methode für die insgesamt 584 verschiedenen Berechnungen jeder Messung angegeben.
 
-%\todo{Messbare Ergebnisse der Arbeit. (Performanzmessungen..).}
-%\todo{Zusätzlich Tabelle mit Durchnschnittsperformanzwerten insbesondere der paintGL() Methode.}
+Betrachtet man den Overhead der verschiedenen Methoden, so sieht man, dass der Standard Raycast für die unterschiedlichen Volumen ähnlich ist und mit circa 10\,s den geringsten Overhead hat.
+Die Implementierung des Standard Raycasts verwendet auch nur einen Kernel Aufruf.
+Der Overhead des MDC Raycasts ist ein wenig höher als der des Standard Raycasts und beträgt für das Bonsai Volumen circa 12\,s, für das Supernova Volumen circa 13\,s und für das Chameleon Volumen circa 14\,s.
+Der Overhead des DDC Raycasts ist am höchsten und beträgt für den Bonsai circa 16\,s, für die Supernova circa 19\,s und für das Chameleon circa 20\,s.
+Sowohl der MDC Raycast als auch der DDC Raycast verwenden jeweils zwei Kernel Aufrufe aber der DDC Raycast berechnet vor der Ausführung des Kernels noch einige Werte, die für diesen Raycast benötigt werden.
 
-
+Vergleicht man die verschiedenen Volumen, so wird das Bonsai Volumen deutlich schneller als das Supernova oder Chameleon Volumen berechnet.
+Dies wird hauptsächlich an der geringeren Auflösung des Volumens und damit einer deutlich geringeren Anzahl an Voxeln liegen.
+Im Widerspruch dazu benötigt aber die Messung für das Supernova Volumens etwas länger, als die Messung für das Chameleon Volumen.
+Die Wahl der Transferfunktion in Verbindung mit dem in allen Raycasts vorimplementierten \emph{Empty-Space-Skipping (ESS)} könnte hier eine Rolle spielen.
+Werden in einem Volumen die Voxel nicht vollständig transparent gemacht, sondern haben immer noch einen gewissen Opazitätswert, so werden diese nicht durch das ESS übersprungen, was zu einer längeren Berechnung führt.
+Ein weiterer Grund ist kann die Perspektive auf die Volumen sein.
+Das Chameleon Volumen wird von der Seite betrachtet und hat aufgrund der nicht einheitlichen Slice-Dicken eine geringere Tiefe, wenn man es von der Seite betrachtet.
+Daher terminieren die Strahlen von der Seite vermutlich früher.
+Das Supernova Volumen hingegen ist relativ rund und hat eine einheitlich Slice-Dicke.
 
 \cleardoublepage
 

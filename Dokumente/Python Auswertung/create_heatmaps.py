@@ -233,14 +233,14 @@ def main_old_2():
     print 'End'
     pass
 
-msr_path = 'C:/Users/bauer/Desktop/bvrc_rbn/Dokumente/Neue_Messungen/Supernova/'
+msr_path = 'C:/Users/bauer/Desktop/bvrc_rbn/Dokumente/Neue_Messungen/Chameleon/'
 
-st_values = axes_from_data(read_data(msr_path + 'ms_data_st_E_1353.txt'))
-st_ors_values = axes_from_data(read_data(msr_path + 'ms_data_st_rORS_E_1353.txt'))
-mdc_values = axes_from_data(read_data(msr_path + 'ms_data_mdc_E_1353.txt'))
-mdc_ors_values = axes_from_data(read_data(msr_path + 'ms_data_mdc_rORS_E_1353.txt'))
-ddc_values = axes_from_data(read_data(msr_path + 'ms_data_ddc_E_1353.txt'))
-ddc_ors_values = axes_from_data(read_data(msr_path + 'ms_data_ddc_rORS_E_1353.txt'))
+st_values = axes_from_data(read_data(msr_path + 'ms_data_st_chameleon.txt'))
+st_ors_values = axes_from_data(read_data(msr_path + 'ms_data_st_rORS_chameleon.txt'))
+mdc_values = axes_from_data(read_data(msr_path + 'ms_data_mdc_chameleon.txt'))
+mdc_ors_values = axes_from_data(read_data(msr_path + 'ms_data_mdc_rORS_chameleon.txt'))
+ddc_values = axes_from_data(read_data(msr_path + 'ms_data_ddc_chameleon.txt'))
+ddc_ors_values = axes_from_data(read_data(msr_path + 'ms_data_ddc_rORS_chameleon.txt'))
 
 vs = [st_values, st_ors_values, mdc_values, mdc_ors_values, ddc_values, ddc_ors_values]
 pps = [msr_path + 'st.png', msr_path + 'st_ors.png', msr_path + 'mdc.png',
@@ -265,10 +265,17 @@ def print_sums():
         print np.sum(v[3])
 
 
+def print_varianz():
+    print 'varianz der kernel zeiten:'
+    for i, v in enumerate(vs):
+        print np.var(v[2])
+
+
 def print_all():
     print_averages()
     print_overhead()
     print_sums()
+    print_varianz()
 
 
 def main():
