@@ -411,6 +411,14 @@ Das Volumen \emph{Chameleon} hat eine Auflösung von $1024\times1024\times1024$\
 \subsubsection{Heatmaps}
 \begin{figure}
 	\centering
+	\includegraphics[width=1\textwidth]{../../Neue_Messungen/Chameleon/heatmaps/hm_wa.png}
+	\caption{Heatmaps der verschiedenen Verfahren. Von links nach rechts: Standard Raycast, MDC Raycast und DDC Raycast. In der ersten Zeile ohne variierter Strahlabtastrate und in der zweiten Zeile mit variierte Strahlabtastrate.}
+	\label{fig::res::pf::hm_wa}
+\end{figure}
+
+\iffalse
+\begin{figure}
+	\centering
 	\includegraphics[width=0.7\textwidth]{../../Neue_Messungen/Chameleon/heatmaps/ms_data_st_chameleon_heatmap.png}
 	\caption{Heatmap des Chameleon Volumen mit dem Standard Raycast ohne variierter Strahlabtastrate.}
 	\label{fig::res::pf::hm_st}
@@ -450,8 +458,9 @@ Das Volumen \emph{Chameleon} hat eine Auflösung von $1024\times1024\times1024$\
 	\caption{Heatmap des Chameleon Volumen mit dem DDC Raycast ohne variierter Strahlabtastrate.}
 	\label{fig::res::pf::hm_ddc_ors}
 \end{figure}
+\fi
 
-Für einen anschaulichen Vergleich der Methoden wurde für die Messungen des Volumen Chameleon Heatmaps erstellt (Abbildung \ref{fig::res::pf::hm_st} bis Abbildung \ref{fig::res::pf::hm_ddc_ors}).
+Für einen anschaulichen Vergleich der Methoden wurde für die Messungen des Volumen Chameleon Heatmaps erstellt (Abbildung \ref{fig::res::pf::hm_wa}).
 Aus den gemessenen Ausführungszeiten des Kernels wurden Heatmaps für das jeweils zugrundeliegende Bild erstellt.
 Da die Differenz zwischen Ausführungszeit des Kernels und der Ausführungszeit der \emph{paintGL()}-Methode unabhängig von dem zu berechnenden Volumen und der verwendeten Transferfunktion ist, wurde diese nicht für die Erstellung der Heatmaps einbezogen.
 

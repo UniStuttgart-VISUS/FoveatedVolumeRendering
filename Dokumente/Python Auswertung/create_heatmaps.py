@@ -121,17 +121,20 @@ def plot_all_with_subplots_and_save(picture_path_s, values):
         ax = fig.add_subplot(gs[idx[i]])
         image = mpimg.imread(picture_path_s[i])  # read image_data
         ax.imshow(image)  # plot image
-        sc = ax.scatter(x=values[i][0], y=values[i][1], c=values[i][2], s=10,
+        sc = ax.scatter(x=values[i][0], y=values[i][1], c=values[i][2], s=30,
                           vmin=total_min, vmax=total_max, cmap=color_map)
         ax.axis('off')
 
     fig.subplots_adjust(right=0.8)
     cbar_ax = fig.add_axes([0.85, 0.15, 0.05, 0.7])
     cbar = fig.colorbar(sc, cax=cbar_ax)
-    cbar.ax.set_ylabel('ms', rotation=270)
+    cbar.ax.set_ylabel('ms', rotation=0)
 
     # fig.tight_layout()
     fig.show()
+
+    # plt.savefig('C:/Users/bauer/Desktop/bvrc_rbn/Dokumente/Neue_Messungen/Chameleon/hm_wa.png', dpi=600, bbox_inches='tight')  # save the figure, 600 dpi might be too high
+
     pass
 
 
