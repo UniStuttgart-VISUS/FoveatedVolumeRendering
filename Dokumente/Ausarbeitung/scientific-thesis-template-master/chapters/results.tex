@@ -386,7 +386,7 @@ Man kann sehen, dass der äußere Bereich des \emph{DDC} Raycast (siehe Abbildun
 	\label{fig::res::sn_comp_ddc_ors}
 \end{figure}
 
-\clearpage
+% \clearpage
 
 \subsection{Performanz}
 Für die Messung der Performanz der Implementierungen wurden zwei Messwerte bei einer Berechnung eines Bildes genommen.
@@ -411,11 +411,10 @@ Das Volumen \emph{Bonsai} hat eine Auflösung von $256\times256\times256$\,Voxel
 Das Volumen \emph{Supernova} hat eine Auflösung von $432\times432\times432$\,Voxel, wobei die Voxel eine Slice-Dicke von $1,0\times1,0\times1,0$ haben.
 Das Volumen \emph{Chameleon} hat eine Auflösung von $1024\times1024\times1024$\,Voxel, wobei die Voxel eine Slice-Dicke von $0,09228515625\times0,09228515625\times0,105$ haben.
 
-\subsubsection{Heatmaps}
 \begin{figure}
 	\centering
 	\includegraphics[width=1\textwidth]{../../Neue_Messungen/Chameleon/heatmaps/hm_wa.png}
-	\caption{Heatmaps der verschiedenen Verfahren für das Volumen Chameleon. Für verschiedene Mauspositionen wurde eine Berechnung durchgeführt. Die jeweilige Ausführungszeit des Kernels für diese Berechnung wurde entsprechend des Farbbalkens farblich eingezeichnet. Der Farbbalken gibt die Werte in \,ms an. }
+	\caption{Heatmaps der verschiedenen Verfahren für das Volumen Chameleon. Für verschiedene Mauspositionen wurde eine Berechnung durchgeführt. Die jeweilige Ausführungszeit des Kernels für diese Berechnung wurde entsprechend des Farbbalkens farblich eingezeichnet. Der Farbbalken gibt die Werte in \,ms an. \emph{v. S. a. r.} steht für \emph{variierter Strahlabtastrate}}
 	\label{fig::res::pf::hm_wa}
 \end{figure}
 
@@ -439,6 +438,13 @@ Es ist auffallend, dass die Differenz zwischen der Ausführungszeit des Kernels 
 In der Heatmap zum DDC Raycast mit variierter Strahlabtastrate ist zu erkennen, dass die äußeren Bereiche des Bildes, besonders oben links und unten rechts, nochmal niedrigere Ausführungszeiten des haben, als im DDC Raycast ohne variierter Strahlabtastrate.
 In den äußeren Bereichen fällt diese auf bis zu 15\,ms und im mittleren Bereich auf leicht über 40\,ms.
 Vergleicht man die Heatmaps des DDC und MDC Raycasts miteinander, so fällt auf, dass der DDC Raycast in den äußeren Bereichen des Bildes niedrigere Ausführungszeiten als der MDC Raycast erreicht, dafür die Ausführungszeiten des DDC Raycasts im mittleren Bereich des Bildes leicht höher ist, als die des MDC Raycasts.
+
+Das die Ausführungszeiten im äußeren Bereich des Bildes geringer sind wird zwei unterschiedliche Gründe haben.
+Erstens wird, wenn sich die Mausposition weiter weg von dem Volumen befindet, ein Großteil des Volumens beziehungsweise des Bildes mit einer geringeren Strahlabtastrate abgetastet, wodurch und einige Work-Items und Work-Groups früher terminieren können.
+Zweitens ist die Bildabtastrate in der Nähe der Mausposition am höchsten.
+Ist diese am Rande des Volumens, wie es in Abbildung \ref{fig::res::pf::hm_wa} auch der Fall ist, so fällt ein großer Anteil der Strahlen auf Bereiche, in denen nur wenige Voxel abgetastet werden müssen und dadurch wieder einige Work-Items und Work-Groups früher terminieren.
+Das die MDC Methode ohne einer variierten Strahlabtastrate auch in den äußeren Bereichen eine relativ gleiche Ausführungszeit hat, wie in den inneren Bereichen des Volumens, wird daran liegen, dass der hoch aufgelöste innere Bereich des MDC Raycasts deutlich kompakter und ein wenig kleiner ist, als der des DDC Raycasts.
+Dadurch fallen auch weniger Strahlen des hoch aufgelösten Bereichs außerhalb des Volumens, auch wenn sich die Mausposition am Rande des Volumens befindet.
 
 \begin{figure}
 	\centering
@@ -481,12 +487,16 @@ Die Wahl der Transferfunktion in Verbindung mit dem in allen Raycasts vorimpleme
 Werden in einem Volumen die Voxel nicht vollständig transparent gemacht, sondern haben immer noch einen gewissen Opazitätswert, so werden diese nicht durch das ESS übersprungen, was zu einer längeren Berechnung führt.
 Ein weiterer Grund ist kann die Perspektive auf die Volumen sein.
 Das Chameleon Volumen wird von der Seite betrachtet und hat aufgrund der nicht einheitlichen Slice-Dicken eine geringere Tiefe, wenn man es von der Seite betrachtet.
-Daher terminieren die Strahlen von der Seite vermutlich früher.
+Daher terminieren die Strahlen von der Seite früher.
 Das Supernova Volumen hingegen ist relativ rund und hat eine einheitlich Slice-Dicke.
 
-\cleardoublepage
-
 \section{Diskussion}\label{sec::disc}
+% Bildqualität: Abstrakter, was sieht gut, was eher schlechter aus. Einfluss der variierten Bild- und Strahlabtastrate.
+% Performanz: Nochmal das Standard am langsamsten ist, mit v. Sar. aber beschleunigt. 
+% Verknüpfung mit Eyetracker
+% Tradeoff
+
+
 \todo{Diskussion und Bedeutung der Ergebnisse.}
 \todo{Technische Daten des Systems, mit dem das Eyetracking gemacht wurde, angeben. Zugehörig zur Diskussion der Ergebnisse; wie man die verschiedenen Methoden empfindet.}
 
