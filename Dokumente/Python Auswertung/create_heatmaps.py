@@ -38,10 +38,11 @@ def read_data(ms_data_path):
     return ms_data
 
 
-# return three arrays, one for x_pos, one for y_pos and one for kernel time and takes in an array of MsData objects
+# return four arrays, one for x_pos, one for y_pos, one for kernel times and one for paintGL() times
+# and takes in an array of MsData objects
 def axes_from_data(ms_data):
     return [ms_obj.mouse_position[0] for ms_obj in ms_data], [ms_obj.mouse_position[1] for ms_obj in ms_data], \
-    [ms_obj.kernel_time for ms_obj in ms_data]
+    [ms_obj.kernel_time for ms_obj in ms_data], [ms_obj.elapsed_time for ms_obj in ms_data]
 
 
 # plots the picture as background and the data read from a ms data file on top of it as a colormap
@@ -145,6 +146,21 @@ def plot_all_with_subplots_and_save(picture_path_s, values):
     pass
 
 
+def plot_boxplots(values, labels):
+    total_min = min(min(values[0][2]), min(values[1][2]), min(values[2][2]), min(values[3][2]),
+                    min(values[4][2]), min(values[5][2]))
+
+    total_max = max(max(values[0][2]), max(values[1][2]), max(values[2][2]), max(values[3][2]),
+                    max(values[4][2]), max(values[5][2]))
+
+    fig, ax = plt.subplots(figsize=(4, 3))
+    ax.set_xlim(left=total_min-5, right=total_max+5)
+    ax.set_xlabel('ms')
+    ax.boxplot([v[2] for v in values], vert=False, labels=labels)
+    fig.show()
+    pass
+
+
 def main_old():
     msr_path = 'C:/Users/bauer/Desktop/bvrc_rbn/Dokumente/Messungen/'
     dirs = ['bonsai', 'hoatzin', 'E_1353', 'chameleon']
@@ -217,25 +233,58 @@ def main_old_2():
     print 'End'
     pass
 
+msr_path = 'C:/Users/bauer/Desktop/bvrc_rbn/Dokumente/Neue_Messungen/Supernova/'
+
+st_values = axes_from_data(read_data(msr_path + 'ms_data_st_E_1353.txt'))
+st_ors_values = axes_from_data(read_data(msr_path + 'ms_data_st_rORS_E_1353.txt'))
+mdc_values = axes_from_data(read_data(msr_path + 'ms_data_mdc_E_1353.txt'))
+mdc_ors_values = axes_from_data(read_data(msr_path + 'ms_data_mdc_rORS_E_1353.txt'))
+ddc_values = axes_from_data(read_data(msr_path + 'ms_data_ddc_E_1353.txt'))
+ddc_ors_values = axes_from_data(read_data(msr_path + 'ms_data_ddc_rORS_E_1353.txt'))
+
+vs = [st_values, st_ors_values, mdc_values, mdc_ors_values, ddc_values, ddc_ors_values]
+pps = [msr_path + 'st.png', msr_path + 'st_ors.png', msr_path + 'mdc.png',
+                     msr_path + 'mdc_ors.png', msr_path + 'ddc.png', msr_path + 'ddc_ors.png']
+
+
+def print_averages():
+    print 'Kernel averages:'
+    for i, v in enumerate(vs):
+        print np.average(v[2])
+
+
+def print_overhead():
+    print 'Overhead average:'
+    for i, v in enumerate(vs):
+        print np.average([v[3][j] - v[2][j] for j, _ in enumerate(v[3])])
+
+
+def print_sums():
+    print 'total time paintGL():'
+    for i, v in enumerate(vs):
+        print np.sum(v[3])
+
+
+def print_all():
+    print_averages()
+    print_overhead()
+    print_sums()
+
 
 def main():
     # path to the folder with the measurements
-    msr_path = 'C:/Users/bauer/Desktop/bvrc_rbn/Dokumente/Neue_Messungen/Chameleon/'
+
 
     print 'Begin'
 
-    st_values = axes_from_data(read_data(msr_path + 'ms_data_st_chameleon.txt'))
-    st_ors_values = axes_from_data(read_data(msr_path + 'ms_data_st_rORS_chameleon.txt'))
-    mdc_values = axes_from_data(read_data(msr_path + 'ms_data_mdc_chameleon.txt'))
-    mdc_ors_values = axes_from_data(read_data(msr_path + 'ms_data_mdc_rORS_chameleon.txt'))
-    ddc_values = axes_from_data(read_data(msr_path + 'ms_data_ddc_chameleon.txt'))
-    ddc_ors_values = axes_from_data(read_data(msr_path + 'ms_data_ddc_rORS_chameleon.txt'))
+    # plot_all_with_subplots_and_save(picture_paths, values)
 
-    values = [st_values, st_ors_values, mdc_values, mdc_ors_values, ddc_values, ddc_ors_values]
-    picture_paths = [msr_path + 'st.png', msr_path + 'st_ors.png', msr_path + 'mdc.png',
-                     msr_path + 'mdc_ors.png', msr_path + 'ddc.png', msr_path + 'ddc_ors.png']
+    labels = ['Standard ohne v. S.a.r.', 'Standard mit v. S.a.r.', 'MDC ohne v. S.a.r.',
+              'MDC mit v. S.a.r', 'DDC ohne v. S.a.r', 'DDC mit v. S.a.r.']
 
-    plot_all_with_subplots_and_save(picture_paths, values)
+    # plot_boxplots(vs, labels)
+
+    print_all()
 
     print 'End'
     pass

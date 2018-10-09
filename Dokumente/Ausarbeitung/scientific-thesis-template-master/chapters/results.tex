@@ -213,12 +213,14 @@ Die Bildabtastrate beträgt hier für den Standard Raycast $1$, für den \emph{M
 Wird eine Methode mit variierte Strahlabtastrate verwendet, so hat diese in Ausschnitt $3$ fast den minimalen Wert von $\frac{1,5}{4}$.
 
 Da die Mausposition sich innerhalb des zweiten Ausschnitts befindet, ist die Strahlabtastrate und die Bildabtastrate hier immer fast maximal, so dass Ausschnitt $2$ in den verschiedenen Methoden fast identisch ist.
-Auch ist hier auffallend, dass obwohl, dass die Strahlabtastrate in Ausschnitt $3$ bei der Verwendung des selben Raycast mit einmal konstanter Strahlabtastrate und variierter Strahlabtastrate, sehr unterschiedlich ist, dies sich bei diesem Volumen kaum auswirkt und nicht wahrgenommen wird.
+Auch ist hier auffallend, dass obwohl, dass die Strahlabtastrate in Ausschnitt $3$ bei der Verwendung des selben Raycast mit einmal konstanter Strahlabtastrate und variierter Strahlabtastrate, sehr unterschiedlich ist, dies sich bei diesem Bild aber kaum auswirkt und nicht wahrgenommen wird.
+Womöglich liegt das daran, dass durch die Transferfunktion in diesem Volumen eher größere und dickere Strukturen hervorgehoben wurden und daher selbst bei einer deutlich geringeren Strahlabtastrate diese Strukturen genügend oft abgetastet wurden.
+
 Die eigentlichen Unterschiede sieht man bei der Verwendung verschiedener Raycasts besonders in Ausschnitt $1$.
 So ist mit dem Standard Raycast der gesamte Ausschnitt $1$ scharf zu sehen (siehe Abbildung \ref{fig::res::sn_comp_st_ors}), während bei dem \emph{MDC} Raycast an den Konturen am Rand des Volumens zu sehen ist, dass diese leicht unschärfer sind (siehe Abbildung \ref{fig::res::sn_comp_mdc_ors}).
 Ausschnitt $3$ unterscheidet sich hier zwischen dem Standard Raycast und dem \emph{MDC} Raycast kaum.
 
-Ein wesentlicher Unterschied ist sowohl in Ausschnitt $1$ als auch in Ausschnitt $3$ zwischen dem \emph{DDC} Raycast und dem \emph{MDC} sowie dem Standard Raycast zusehen.
+Ein wesentlicher Unterschied ist sowohl in Ausschnitt $1$ als auch in Ausschnitt $3$ zwischen dem \emph{DDC} Raycast und dem \emph{MDC} sowie dem Standard Raycast wahrnehmbar.
 Man kann sehen, dass der äußere Bereich des \emph{DDC} Raycast (siehe Abbildung \ref{fig::res::sn_comp_ddc_ors}), deutlich unschärfer ist, als der äußere Bereich des \emph{MDC} Raycast (siehe Abbildung \ref{fig::res::sn_comp_mdc_ors}).
 
 \begin{figure}
@@ -464,7 +466,7 @@ Für einen anschaulichen Vergleich der Methoden wurde für die Messungen des Vol
 Die gemessene Ausführungszeiten des Kernels für die unterschiedlichen Mauspositionen wurden für die Erstellung der Heatmaps verwendet.
 Da die Differenz zwischen Ausführungszeit des Kernels und der Ausführungszeit der \emph{paintGL()}-Methode unabhängig von dem zu berechnenden Volumen und der verwendeten Transferfunktion ist, wurde diese hier nicht einbezogen.
 
-In Abbildung \ref{fig::res::pf::hm_wa} kann man erkennen, dass die Ausführungszeit des Kernels für den Standard Raycast ohne variierter Strahlabtastrate für alle Mauspositionen im Bereich von 80\,ms liegt und damit im Vergleich zu den anderen Methoden am höchsten ist.
+Abbildung \ref{fig::res::pf::hm_wa} zeigt, dass die Ausführungszeit des Kernels für den Standard Raycast ohne variierter Strahlabtastrate für alle Mauspositionen im Bereich von 80\,ms liegt und damit im Vergleich zu den anderen Methoden am höchsten ist.
 Betrachtet man nun die Standard Variante mit variierter Strahlabtastrate, so kann man eine allgemeine Verbesserung feststellen.
 Die Ausführungszeit des Kernels liegt bei dieser Methode bei circa 65\,ms und variiert je nach Mausposition leicht.
 So ist die Ausführungszeit für eine Mausposition am oberen und unterem Rande des Bildes ein wenig geringer, als wenn diese sich in der Mitte des Bildes befindet.
@@ -481,7 +483,19 @@ In der Heatmap zum DDC Raycast mit variierter Strahlabtastrate ist zu erkennen, 
 In den äußeren Bereichen fällt diese auf bis zu 15\,ms und im mittleren Bereich auf leicht über 40\,ms.
 Vergleicht man die Heatmaps des DDC und MDC Raycasts miteinander, so fällt auf, dass der DDC Raycast in den äußeren Bereichen des Bildes niedrigere Ausführungszeiten als der MDC Raycast erreicht, dafür die Ausführungszeiten des DDC Raycasts im mittleren Bereich des Bildes leicht höher ist, als die des MDC Raycasts.
 
+\begin{figure}
+	\centering
+	\includegraphics[width=1\textwidth]{../../Neue_Messungen/Chameleon/boxplots.png}
+	\caption{Boxplots der Ausführungszeiten des Kernels der verschiedenen Verfahren.}
+	\label{fig::res::pf::bp}
+\end{figure}
 
+\begin{figure}
+	\centering
+	\includegraphics[width=1\textwidth]{../../Neue_Messungen/Messungen_in_Tabelle.PNG}
+	\caption{Die Ergebnisse der verschiedenen Verfahren mit den Volumen Bonsai, Supernova und Chameleon.}
+	\label{fig::res::pf::table}
+\end{figure}
 
 
 %\todo{Messbare Ergebnisse der Arbeit. (Performanzmessungen..).}
