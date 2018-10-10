@@ -39,4 +39,4 @@ Die Funktion \texttt{lenght()} ist eine \emph{Built-In OpenCL Function} und bere
 Mit der Distanz $d$ zwischen einem Strahl und der Mausposition wurde ein Faktor $sf$ berechnet: $sf = 1,0 - d  / ib$.
 Hierbei bezeichnet $ib$ die maximale Distanz zwischen zwei Bildkoordinaten, also die Länge der Diagonale des Bildes.
 Ist $d < 10$ wird die Strahlabtastrate $sr$ nicht verändert.
-Ansonsten berechnet sich die neue Strahlabtastrate mit $sr = \texttt{max(}sf * sr, 0,25\texttt{)}$.
+Ansonsten berechnet sich die neue Strahlabtastrate mit $sr = \texttt{max(}sf * sr, 0.25\texttt{)}$.
