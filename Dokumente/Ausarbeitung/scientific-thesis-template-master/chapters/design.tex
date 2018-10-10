@@ -96,7 +96,7 @@ Die Einbindung eines Eyetrackers ist für die ersten Arbeitsschritte, wie das Im
 Das Projekt bietet aber einfache Möglichkeiten auf Maus- oder Tastatureingaben zu reagieren.
 Daher ist das zweite Arbeitspaket, das Erkennen von Mausbewegungen innerhalb des Volumerenderwidgets und das Abspeichern der letzten erkannten Mausposition in einer globalen Variable, um die Blickposition mit der Maus simulieren zu können.
 
-\subsection{Reduzierung der Strahlabtastrate im fovealen Bereich}\label{sec::workpacks::ors}
+\subsection{Reduzierung der Strahlabtastrate im peripheren Bereich}\label{sec::workpacks::ors}
 Nun ist es möglich, die Mausposition zu verwenden, um den Blickpunkt auf dem Bildschirm zu simulieren.
 Dies erlaubt das Erstellen und Testen von wahrnehmungsorientierten Implementierung. 
 Das ursprüngliche Projekt stellt zwei Parameter zur Verfügung, welche auf zwei verschiedene Arten die Ausführungszeit des Kernels beeinflussen.
@@ -107,14 +107,8 @@ Das dritte Arbeitspaket umfasst die Verwendung der an den Raycast Kernel überge
 Die Anpassung des Kernels hat zur Folge, dass für jeden Strahl abhängig seiner Distanz zum Mauszeiger eine eigene Abtastrate berechnet wird.
 Aufgrund dessen, dass wie im Abschnitt \ref{ss::rc} die Work-Items den Texel zugeordnet sind und die Work-Groups quadratisch angeordnet sind, soll dies bewirken, dass die Work-Items innerhalb der selben Work-Group eine ähnliche Abtastrate für ihren Strahl berechnen und die gesamte Work-Group früher terminieren kann.
 Da der Kernel erst beendet wird, wenn alle Work-Groups ihre Arbeit abgeschlossen haben, würde eine schnellere Ausführung einzelner Work-Groups eine insgesamt schnellere Ausführung des Kernels und auch eine bessere Performanz beim Berechnen des Bildes bewirken.
-% Die Mausposition wurde in Bildkoordinaten, bezüglich des Volumerenderwidgets dem Kernel übergeben. - Impl.
-% Da die Anzahl der gestarteten Work-Items den Ausmaßen des Volumerenderwidgets entspricht, entspricht auch die ID eines Work-Items einer Bildkoordinate. - Impl.
-% Daher konnte die Entfernung der Work-Items zum Mauszeiger einfach berechnet werden und die Abtastrate abhängig von dieser Distanz angepasst. - Impl.
-% Erste Tests der Implementierung haben eine Erhöhung der im Volumerenderwidget durchschnittlichen angezeigten Bilder pro Sekunde ergeben. - Res.
-% Die Verminderung der Abtastrate machte sich nur bei dünnen Volumen visuell bemerkbar. - Res.
-% Bei dünnen Volumen kam es vor, dass einige Strahlen Teile des Volumen gar nicht abgetastet haben, da die Distanz der abgetasteten Punkte außerhalb des Volumenabschnitts lag. - Res.
 
-\subsection{Reduzierung der Strahldichte im fovealen Bereich}\label{ss::MDC}
+\subsection{Reduzierung der Strahldichte im peripheren Bereich}\label{ss::MDC}
 Trotz der Reduzierung der Abtastrate der Strahlen, wird weiterhin die gleiche Anzahl an Work-Items gestartet.
 Dies ermöglicht eine weitere Möglichkeit, die Ausführungszeit des Kernels zu reduzieren, indem die Anzahl der Strahlen und somit auch die Auflösung des berechneten Bildes variiert wird.
 Weniger zu berechnenden Strahlen bedeutet hier auch weniger benötigte Work-Items und Work-Groups, die ausgeführt werden müssen.
@@ -134,14 +128,6 @@ Trotzdem muss ein Teil des Bildes in normaler Auflösung berechnet werden.
 Da aber nur ein kleiner Teil in dieser Auflösung berechnet werden muss, soll durch das frühzeitige Abbrechen von Work-Items, die außerhalb dieses Bereichs liegen, die zweite Bildberechnung ebenfalls beschleunigen.
 Das Ziel ist, dass die Berechnung zweier Bilder in verschiedenen Auflösungen und das anschließende Interpolieren sowie Zusammenfügen ihrer, eine insgesamt niedrigere Berechnungszeit benötigt, als die Berechnung eines Bildes in normaler Auflösung.
 Zusätzlich soll dadurch, dass ein kleiner Bereich des Ergebnisbildes an der Blickposition, der leicht größer als die projizierte Fovea ist, die normale Auflösung hat und die Auflösung im peripheren Bereich trotzdem ausreichend ist, die Wahrnehmung geschaffen werden, dass das gesamte Bild mit normaler Auflösung berechnet wurde.
-% Für die Integration wurde wie in dem Arbeitspaket gefordert, das Bild in zwei verschiedenen Auflösungen nacheinander berechnet. - Impl.
-% Dafür konnte die bisherigen Funktionen des \texttt{volumerendercl} Objektes weiter verwendet werden. - Impl.
-% Es wurden aber zwei unterschiedliche OpenGL Texturen für die Ausgabe des Kernels verwendet. - Impl.
-% Zuerst mit nur einem viertel der Auflösung und anschließend mit der normalen Auflösung. - Impl.
-% Innerhalb eines festgelegten Quadrats um den Mauszeiger herum ist die Auflösung des Bildes normal und außerhalb davon hat diese nur ein viertel der normalen Auflösung. - Impl.
-% Bei der ersten Berechnung wird der Teil innerhalb von diesem Quadrat nicht berechnet und entsprechend wird bei der zweiten Berechnung der Teil des Bildes außerhalb des Quadrats nicht berechnet. - Impl.
-% Dadurch werden so wenige Bildpunkte wie möglich doppelt berechnet. - Impl.
-% Da das erste Bild nur mit einem viertel der Auflösung berechnet wurde und die ID der Work-Items nicht mehr mit den Bildkoordinaten übereinstimmte, wurde die Mausposition und die Ausmaße des Quadrates sowohl bei der Berechnung des Bildes, als auch bei der Zusammenfügung beider Bilder normalisiert. - Impl.
 
 \subsection{Index-Mapping}\label{ss::DDC}
 Das Ziel eines weiteren Ansatzes ist es, die Auflösung von der Mausposition weg, noch weiter zu reduzieren.
@@ -170,10 +156,6 @@ Das Berechnen des Bildes mit einer sehr niedrigen Hintergrundauflösung und eine
 Die Implementierung sollte diesmal aber nicht aus der Berechnung von drei zusammengefügter Bilder bestehen, sondern aus einer Berechnung eines unterschiedlich stark aufgelösten Bildes und der anschließenden Interpolation der einzelnen Bereiche.
 Um dies umzusetzen wird sich von der Annahme, dass die ID eines Work-Items die Bildposition des zugehörigen Strahls ist, vollständig getrennt.
 Hier werden nun die IDs der Work-Items auf von ihrer ID her sehr unterschiedlichen Bildpunkte abgebildet.
-
-% Die Integration von diesem Arbeitspaket erfordert die Berechnung der mindestens benötigten Anzahl an Work-Items, das Unterteilen in einen x- und y-Wert für die Dimensionen der Work-Items, zur Ausführung durch den Kernel. - Impl.
-% Anschließend muss der Raycast-Kernel mit der zuvor berechneten Anzahl an Work-Items in x- und y-Richtung gestartet werden sowie danach der Kernel für die Interpolation. - Impl.
-% Der Interpolation Kernel wird aber mit den Dimensionen des zu berechnenden Bildes für die Dimension der Work-Items gestartet. - Impl.
 
 \subsection{Auswahl des Eyetrackers}
 Für das Ersetzen der Mausposition durch Blickpositionen auf dem Bildschirm, ist es notwendig, diese zu messen und die Daten der Anwendung zur Verfügung zu stellen.

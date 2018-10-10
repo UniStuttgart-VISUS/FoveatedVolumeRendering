@@ -26,9 +26,9 @@ Zusätzlich wird beschrieben, wie die Messungen im Projekt vorbereitet wurden, s
 Da die Einbindung des Eyetrackers für das oberflächliche Testen der Raycast Methoden nicht notwendig ist, wurde die Blickposition vorerst mit der Mausposition simuliert.
 Das Volumerenderwidget verfügt über eine Callback-Methode, die auf Mausbewegungen reagiert.
 Diese Methoden wurde sich zu Nutze gemacht, so dass durch einen Aufruf dieser Methode, aufgrund einer Veränderung in der Mausposition, sofort die aktuelle Position des Mauszeigers bezüglich des Volumerenderwidgets in einer globalen Variable abgespeichert wurde.
-Damit jede Raycast Methode diese auch zu Verfügung hat, wurde diese zu Beginn der paintGL() Methode dem OpenCL Raycast Kernel übergeben. (Abschnitt \ref{sec::workpacks::sdb})
+Damit jede Raycast Methode diese auch zu Verfügung hat, wurde diese zu Beginn der paintGL() Methode dem OpenCL Raycast Kernel übergeben. (Arbeitspaket aus Abschnitt \ref{sec::workpacks::sdb})
 
-\subsection{Reduzierung der Strahlabtastrate im fovealen Bereich}\label{sec::ida::rdsifb}
+\subsection{Reduzierung der Strahlabtastrate im peripheren Bereich}\label{sec::ida::rdsifb}
 Die Reduzierung der Strahlabtastrate wurde im Raycast Kernel implementiert.
 Nachdem alle Operationen der jeweiligen Raycastmodifikationen ausgeführt wurden, wurde für jedes Work-Item die Distanz der zugehörigen Bildkoordinate des entsprechenden Strahls zu der Mausposition berechnet.
 Im MDC Raycast lag die Bildkoordinate nur normalisiert vor und wurde dementsprechend vor der Distanzberechnung umgerechnet.
@@ -39,4 +39,26 @@ Die Funktion \texttt{lenght()} ist eine \emph{Built-In OpenCL Function} und bere
 Mit der Distanz $d$ zwischen einem Strahl und der Mausposition wurde ein Faktor $sf$ berechnet: $sf = 1,0 - d  / ib$.
 Hierbei bezeichnet $ib$ die maximale Distanz zwischen zwei Bildkoordinaten, also die Länge der Diagonale des Bildes.
 Ist $d < 10$ wird die Strahlabtastrate $sr$ nicht verändert.
-Ansonsten berechnet sich die neue Strahlabtastrate mit $sr = \texttt{max(}sf * sr\,t\texttt{)}$. Mit $t = 0,25$ hat sich als guter Schwellwert erwiesen, der auch bei großen Distanzen zwischen einem Strahl und der Mausposition kaum Artefakte generiert.
+Ansonsten berechnet sich die neue Strahlabtastrate mit $sr = \texttt{max(}sf * sr,\,t\texttt{)}$. 
+Bei einer zu geringen Abtastrate kann es vorkommen, dass vor allem dünne Strukturen eines Volumens von einigen Strahlen gar nicht oder nur sehr geringfügig abgetastet werden und es so sich kleine bis große Löcher in diesen Flächen bilden können.
+$t = 0,25$ hat sich als guter Schwellwert erwiesen, der auch bei großen Distanzen zwischen einem Strahl und der Mausposition kaum Artefakte generiert. (Arbeitspaket aus Abschnitt \ref{sec::workpacks::ors})
+
+\subsection{Reduzierung der Strahldichte im peripheren Bereich}
+Die Reduzierung der Strahldichte im peripheren Bereich wurde durch zwei verschiedene Methoden umgesetzt, die MDC Methode (Abschnitt \ref{ss::MDC}) und die DDC Methode (Abschnitt \ref{ss::DDC}).
+Im folgenden werden die Implementierungen beider Methoden getrennt voneinander beschrieben.
+
+\subsection{MDC Implementierung}
+Für die des Arbeitspakets aus Abschnitt \ref{ss::MDC} Integration wurde, wie in dem Arbeitspaket gefordert, das Bild in zwei verschiedenen Auflösungen nacheinander berechnet.
+Die Implementierung wurde in einer eigenen Methode des Volumerenderwidgets umgesetzt, die von der paintGL() Methode aufgerufen wird.
+Für die Berechnung des Raycasts konnte die bisherigen Funktionen des \texttt{volumerendercl} Objektes wieder verwendet werden und wurde zwei Mal hintereinander ausgeführt.
+Zuerst wurde der Kernel mit in x- und y-Richtung halbierter Anzahl an Work-Items gestartet was in einem Viertel der Auflösung resultierte.
+Daher wurde für die Ausgabe des Raycasts hier eine neue Textur verwendet, die nur ein Viertel der Auflösung hat.
+Innerhalb eines festgelegten Quadrats um den Mauszeiger herum, dessen Ausmaße dem Kernel als Parameter übergeben wurden,\todo{ hier steht ein komischer Satz} ist die Auflösung des Bildes normal und außerhalb davon hat diese nur ein viertel der normalen Auflösung.
+% Bei der ersten Berechnung wird der Teil innerhalb von diesem Quadrat nicht berechnet und entsprechend wird bei der zweiten Berechnung der Teil des Bildes außerhalb des Quadrats nicht berechnet. - Impl.
+% Dadurch werden so wenige Bildpunkte wie möglich doppelt berechnet. - Impl.
+% Da das erste Bild nur mit einem viertel der Auflösung berechnet wurde und die ID der Work-Items nicht mehr mit den Bildkoordinaten übereinstimmte, wurde die Mausposition und die Ausmaße des Quadrates sowohl bei der Berechnung des Bildes, als auch bei der Zusammenfügung beider Bilder normalisiert. - Impl.
+
+\subsection{DDC Implementierung}
+% Die Integration von diesem Arbeitspaket erfordert die Berechnung der mindestens benötigten Anzahl an Work-Items, das Unterteilen in einen x- und y-Wert für die Dimensionen der Work-Items, zur Ausführung durch den Kernel. - Impl.
+% Anschließend muss der Raycast-Kernel mit der zuvor berechneten Anzahl an Work-Items in x- und y-Richtung gestartet werden sowie danach der Kernel für die Interpolation. - Impl.
+% Der Interpolation Kernel wird aber mit den Dimensionen des zu berechnenden Bildes für die Dimension der Work-Items gestartet. - Impl.

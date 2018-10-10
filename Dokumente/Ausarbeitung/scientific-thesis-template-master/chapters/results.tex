@@ -463,15 +463,15 @@ Mit einer variierten Strahlabtastrate sind sind die Werte niedriger aber weiter 
 Anders wie bei den vorherigen Raycast Methoden sind die Ausführungszeiten des DDC Raycast mit variierter Strahlabtastrate ein wenig kopakter, als ohne variierter Strahlabtastrate.
 Mit variierter Strahlabtastrate sind die Werte insgesamt aber trotzdem niedriger.
 
-\begin{figure}
+\begin{table}
 	\centering
 	\includegraphics[width=1\textwidth]{../../Neue_Messungen/Messungen_in_Tabelle.PNG}
 	\caption{Die Ergebnisse der verschiedenen Verfahren mit den Volumen Bonsai, Supernova und Chameleon. Für jedes Verfahren und Volumen ist die durchschnittliche Ausführungszeit des Kernel (K.) und die Varianz von dieser sowie der durchschnittliche Overhead (Oh.) und die summierte Ausführungszeit der \emph{paintGL()}-Methode (Md.) für die verschiedenen Mauspositionen angegeben.}
 	\label{fig::res::pf::table}
-\end{figure}
+\end{table}
 
-Wie schon in Abbildung \ref{fig::res::pf::hm_wa} und \ref{fig::res::pf::bp} die Verhältnisse der Ausführungszeiten der verschiedenen Methoden dargestellt wurden, wird dies in Abbildung \ref{fig::res::pf::table} durch die genauen Werte bestätigt.
-In Abbildung \ref{fig::res::pf::table} sind für die unterschiedlichen Verfahren und die Volumen Bonsai, Supernova und Chameleon die durchschnittliche Kernelzeit, dessen Varianz sowie der durchschnittliche Overhead der \emph{paintGL()}-Methode ohne die Ausführungszeit des Kernels dargestellt.
+Wie schon in Abbildung \ref{fig::res::pf::hm_wa} und \ref{fig::res::pf::bp} die Verhältnisse der Ausführungszeiten der verschiedenen Methoden dargestellt wurden, wird dies in Tabelle \ref{fig::res::pf::table} durch die genauen Werte bestätigt.
+In Tabelle \ref{fig::res::pf::table} sind für die unterschiedlichen Verfahren und die Volumen Bonsai, Supernova und Chameleon die durchschnittliche Kernelzeit, dessen Varianz sowie der durchschnittliche Overhead der \emph{paintGL()}-Methode ohne die Ausführungszeit des Kernels dargestellt.
 Zusätzlich ist auch die summierte Ausführungszeit der \emph{paintGL()}-Methode für die insgesamt 584 verschiedenen Berechnungen jeder Messung angegeben.
 
 Betrachtet man den Overhead der verschiedenen Methoden, so sieht man, dass der Standard Raycast für die unterschiedlichen Volumen ähnlich ist und mit circa 10\,s den geringsten Overhead hat.
