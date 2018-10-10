@@ -496,7 +496,19 @@ Das Supernova Volumen hingegen ist relativ rund und hat eine einheitlich Slice-D
 % Verknüpfung mit Eyetracker
 % Tradeoff Bildqualität MDC DDC Standard, MDC insgesamt am besten
 % Transferfunktion parameter, Interpolationparameter
+Betrachtet man rückblickend auf die Ergebnisse die unterschiedlichen Bildabtastraten, so ist es offensichtlich, dass der Standard Raycast von den unterschieldichen Methoden her, die beste Bildqualität erzeugt.
+Trotzdem kann durch das Ausnutzen der Limitierungen des visuellen Wahrnehmungssystems des Menschen bei der Verwendung eines Eyetrackers annähernd der Effekt erzeugt werden, dass die Raycast Methoden MDC und DDC das Bild in voller Auflösung berechnen, obwohl dies nicht der Fall.
+Da die Auflösung beim MDC Raycast im äußeren Bereich im Vergleich zum DDC Raycast immer noch deutlich höher ist, ist dieser Effekt für den MDC Raycast viel realistischer und kaum wahrnehmbar während beim DDC Raycast noch Artefakte des am niedrigsten aufgelösten Bereichs wahrnehmbar sind.
+Um die Bildqualität des DDC Raycasts weiter zu verbessern, könnte die Bildabtastrate des äußersten Bereichs angehoben und oder der Radius des mittleren Bereichs vergrößert werden, so dass die reduzierte Auflösung noch weniger auffällt.
+Für den MDC Raycast hingegen wäre es denkbar, die Auflösung des äußeren Bereichs selbst weiter zu verringern oder einen zusätzlichen Bereich einzufügen, der nur noch ein Achtel der maximalen Auflösung hat.
 
+Betrachtet man rückblickend auf die Ergebnisse die unterschiedlichen Varianten, mit variierter und ohne variierter Strahlabtastrate, so gibt es hier bei den Bildern kaum wahrnehmbare Unterschiede.
+Im Gegensatz zu den statischen Bildern wurde aber bei aktivem Eyetracking bei den Varianten mit variierter Strahabtastrate, Artefakte durch die veränderte Strahlabtastrate im Bild wahrgenommen, wenn sich die Augen über das Bild bewegt haben.
+Während einer Fixation verblassen diese Artefakte und sind wie bei einem statischen Bild kaum mehr wahrnehmbar.
+Die Ergebnisse scheinen anzudeuten, dass die Strahlabtastrate im äußeren Bereich noch weiter reduziert werden könnte, da diese bisher nur auf ein Minimum von ein Viertel der normalen Strahlabtastrate nach außen hin fallen kann.
+In weiteren Tests hat das Reduzieren des Limits auf ein Fünftel schon deutlich Artefakte der Unterabtastung ergeben, die dafür aber auch nur an den vom Blickpunkt entferntesten Stellen aufgetreten sind und daher nicht so aufgefallen sind.
+Weiter wäre es denkbar, die Funktion, die die Strahlabtastrate abhängig von der Distanz zur Mausposition anpasst, abzuändern, so dass diese schon bei einer geringeren Entfernung stärker abnimmt und früher das Limit erreicht.
+Da selbst bei nur einem Viertel der maximalen Strahlabtastrate kaum Artefakte wahrnehmbar sind, sollte dies ohne eine wahrnehmbare Reduzierung der Bildqualität möglich sein.
 
 \todo{Diskussion und Bedeutung der Ergebnisse.}
 \todo{Technische Daten des Systems, mit dem das Eyetracking gemacht wurde, angeben. Zugehörig zur Diskussion der Ergebnisse; wie man die verschiedenen Methoden empfindet.}

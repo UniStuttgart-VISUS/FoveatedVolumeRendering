@@ -443,6 +443,7 @@ __kernel void volumeRender(  __read_only image3d_t volData
     float samplingRate = samplingRateC;
 
 	bool decreasing_sampling_rate = ORS;
+	const float sr_boundary = 0.25f;
 
     // check if imageCoord is in valid area according to cursorPos and rectangle (and invert)
     // shift rect that cursor is in its middle
@@ -454,7 +455,6 @@ __kernel void volumeRender(  __read_only image3d_t volData
 					break;
 				}else{
 					float sr_factor = 1.0f - (distance_to_cursor) / length(convert_float2_rtz(img_bounds));
-					const float sr_boundary = 0.25f;
 					samplingRate *= max(sr_boundary, sr_factor);
 				}
     		}
@@ -531,7 +531,6 @@ __kernel void volumeRender(  __read_only image3d_t volData
 						break;
 					}else{
 						float sr_factor = 1.0f - (distance_to_cursor) / length(convert_float2_rtz(img_bounds));
-						const float sr_boundary = 0.25f;
 						samplingRate *= max(sr_boundary, sr_factor);
 					}
 
@@ -579,7 +578,6 @@ __kernel void volumeRender(  __read_only image3d_t volData
 						break;
 					}else{
 						float sr_factor = 1.0f - (distance_to_cursor) / length(convert_float2_rtz(tmpImgBounds));
-						const float sr_boundary = 0.25f;
 						samplingRate *= max(sr_boundary, sr_factor);
 					}
 				}
