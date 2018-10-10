@@ -1,3 +1,21 @@
 % Implementation: Umsetzung, Probleme, Lösungen
 \chapter{Implementierung}\label{chap::impl}
 Das Implementierungskapitel enthält eine genauere Beschreibung der Implementierung der Arbeitspakete aus Abschnitt \ref{sec::workpacks}.
+Die Beschreibungen sollen einen Überblick geben, wie die Arbeitspakete umgesetzt wurden ohne zu stark ins Detail zu gehen.
+
+\section{Strukturelle Modifikationen}
+Das Projekt wurde strukturell modifiziert und für die Integration der Arbeitspakete vorbereitet.
+So wurde im Volumerenderwidget eine globale Variable erstellt, welche den Wert der aktuellen Raycast Methode beinhaltet.
+In der paintGL() Methode wurde dann über diese Variable in einem switch-case die jeweilige Methode aufgerufen, die die Berechnung des aktuellen Raycasts durchführt.
+Da die Raycasts durch einen OpenCL Kernel berechnet werden und nicht direkt gerendert werden, werden die Ergebnisse immer in einer Textur abgespeichert, welche durch OpenGL auf ein Fullscreen-Quad gezeichnet wird.
+Da die MDC Methode zwei verschiedene Texturen verwendet wurde dementsprechend der Fragment-Shader durch ein switch-case ergänzt, welches für jede Raycast Methode unterschiedliche Anweisungen ausführen kann.
+
+Die Kernfunktion des Raycasts, die Strahlverfolgung, bleibt für alle Raycast Methoden die gleiche.
+Daher wurde das gleiche Prinzip im OpenCL Kernel auch angewandt.
+Ein switch-case, relativ am Anfang des Raycast Kernels, führt je nach aktueller Raycast Methode die entsprechenden Operationen aus.
+Dadurch konnten für alle Raycast Methoden der gleiche Raycast Kernel verwendet werden, welche lediglich mit unterschiedlichen Parametern ausgeführt wurde.
+
+Die GUI des Projekts wurde mit einigen Funktionen ergänzt, über die diese Parameter bestimmt werden konnten.
+Dies ermöglichte insbesondere die einfache Umstellung der Raycast Methoden zur Laufzeit des Projekts.
+
+\section{Implementierung der Arbeitspakte}
