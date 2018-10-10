@@ -93,6 +93,22 @@ Der Fragment Shader hat dafür die selben Parameter übergeben bekommen, wie der
 Eine normalisierte Texturkoordinate wurde dann wie eine normalisierte Work-Item ID behandelt und je nach dem ob sich die Texturkoordinate innerhalb des Quadrats befunden hat oder nicht, wurde der Farbwert in der entsprechenden Textur ausgelesen.
 
 \subsection{DDC Implementierung}
+\begin{figure}[]
+	\centering
+	\begin{minipage}[t]{0.49\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{../../Grafiken/results/implementierung/ddc_o_ip.png}
+		\caption{Ausschnitt einer Berechnung mit dem DDC Raycast.}
+		\label{fig::imp::ddc_o_ip}
+	\end{minipage}
+	\hfill
+	\begin{minipage}[t]{0.49\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{../../Grafiken/results/implementierung/ddc_m_ip.png}
+		\caption{Ausschnitt einer Berechnung mit dem DDC Raycast.}
+		\label{fig::imp::ddc_m_ip}
+	\end{minipage}
+\end{figure}
 % Die Integration von diesem Arbeitspaket erfordert die Berechnung der mindestens benötigten Anzahl an Work-Items, das Unterteilen in einen x- und y-Wert für die Dimensionen der Work-Items, zur Ausführung durch den Kernel. - Impl.
 % Anschließend muss der Raycast-Kernel mit der zuvor berechneten Anzahl an Work-Items in x- und y-Richtung gestartet werden sowie danach der Kernel für die Interpolation. - Impl.
 % Der Interpolation Kernel wird aber mit den Dimensionen des zu berechnenden Bildes für die Dimension der Work-Items gestartet. - Impl.
