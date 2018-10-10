@@ -3,19 +3,29 @@
 Das Implementierungskapitel enthält eine genauere Beschreibung der Implementierung der Arbeitspakete aus Abschnitt \ref{sec::workpacks}.
 Die Beschreibungen sollen einen Überblick geben, wie die Arbeitspakete umgesetzt wurden ohne zu stark ins Detail zu gehen.
 
-\section{Strukturelle Modifikationen}
+\section{Strukturelle Modifikationen}\label{sec::sm}
 Das Projekt wurde strukturell modifiziert und für die Integration der Arbeitspakete vorbereitet.
 So wurde im Volumerenderwidget eine globale Variable erstellt, welche den Wert der aktuellen Raycast Methode beinhaltet.
 In der paintGL() Methode wurde dann über diese Variable in einem switch-case die jeweilige Methode aufgerufen, die die Berechnung des aktuellen Raycasts durchführt.
 Da die Raycasts durch einen OpenCL Kernel berechnet werden und nicht direkt gerendert werden, werden die Ergebnisse immer in einer Textur abgespeichert, welche durch OpenGL auf ein Fullscreen-Quad gezeichnet wird.
-Da die MDC Methode zwei verschiedene Texturen verwendet wurde dementsprechend der Fragment-Shader durch ein switch-case ergänzt, welches für jede Raycast Methode unterschiedliche Anweisungen ausführen kann.
+Da die MDC Methode zwei verschiedene Texturen verwendet, wurde dementsprechend der Fragment-Shader durch ein switch-case ergänzt, welches für jede Raycast Methode unterschiedliche Anweisungen ausführen kann.
 
 Die Kernfunktion des Raycasts, die Strahlverfolgung, bleibt für alle Raycast Methoden die gleiche.
-Daher wurde das gleiche Prinzip im OpenCL Kernel auch angewandt.
+Daher wurde dieses Prinzip im OpenCL Kernel auch angewandt.
 Ein switch-case, relativ am Anfang des Raycast Kernels, führt je nach aktueller Raycast Methode die entsprechenden Operationen aus.
-Dadurch konnten für alle Raycast Methoden der gleiche Raycast Kernel verwendet werden, welche lediglich mit unterschiedlichen Parametern ausgeführt wurde.
+Dadurch konnte für alle Raycast Methoden der gleiche Raycast Kernel verwendet werden, welcher lediglich mit unterschiedlichen Parametern ausgeführt wurde.
 
-Die GUI des Projekts wurde mit einigen Funktionen ergänzt, über die diese Parameter bestimmt werden konnten.
+Die GUI des Projekts wurde mit einigen Funktionen ergänzt über die bestimmte Parameter verändert werden konnten.
 Dies ermöglichte insbesondere die einfache Umstellung der Raycast Methoden zur Laufzeit des Projekts.
 
-\section{Implementierung der Arbeitspakte}
+\section{Implementierung der Arbeitspakte}\label{sec::ida}
+Im folgenden werden die genaueren Umsetzungen der Arbeitspakete vorgestellt, insbesondere die Implementierung des MDC und DDC Raycasts sowie die Anpassung der Strahlabtastrate.
+Zusätzlich wird beschrieben, wie die Messungen im Projekt vorbereitet wurden, so dass Messwerte erstellt werden konnten.
+
+\subsection{Simulieren der Blickposition}\label{sec::ida::sdb}
+Da die Einbindung des Eyetrackers für das oberflächliche Testen der Raycast Methoden nicht notwendig ist, wurde die Blickposition vorerst mit der Mausposition simuliert.
+Das Volumerenderwidget verfügt über eine Callback-Methode, die auf Mausbewegungen reagiert.
+Diese Methoden wurde sich zu Nutze gemacht, so dass durch einen Aufruf dieser Methode, aufgrund einer Veränderung in der Mausposition, sofort die aktuelle Position des Mauszeigers bezüglich des Volumerenderwidgets in einer globalen Variable abgespeichert wurde.
+Damit jede Raycast Methode diese auch zu Verfügung hat, wurde diese zu Beginn der paintGL() Methode dem OpenCL Raycast Kernel übergeben. (Abschnitt \ref{sec::workpacks::sdb})
+
+\subsection{Reduzierung der Strahlabtastrate im fovealen Bereich}\label{sec::ida::rdsifb}

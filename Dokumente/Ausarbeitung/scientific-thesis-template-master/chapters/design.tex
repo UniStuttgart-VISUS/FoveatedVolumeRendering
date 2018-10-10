@@ -84,19 +84,17 @@ Ausgehend von der in Abschnitt \ref{sec::proj} beschriebenen Ausgangslage des Pr
 Im folgenden werden die für dieses Ziel entstandenen Vorüberlegungen und daraus erstellte Arbeitspakete aufgeführt und die dazugehörigen Ansätze zur Integration in das bestehende Projekt skizziert.
 Genauere Angaben zur Implementierung bestimmter Arbeitspakete werden im Kapitel \ref{chap::impl} vorgestellt.
 
-\subsection{Einarbeitung in das Projekt}
+\subsection{Einarbeitung in das Projekt}\label{sec::workpacks::eidp}
 Das erste Arbeitspaket, welches nicht zu vernachlässigen ist, ist die Einarbeitung in das Projekt beziehungsweise in die bestehende Implementierung.
 Dies erfordert das Einarbeiten in einige Grundlagen der c++ Programmierung sowie in den grundlegenden Umgang mit dem Qt Framework.
 Da das Projekt ein Visual Studio Projekt ist und Programmierschnittstellen wie OpenCL oder auch Qt verwendet, ist das Erlangen einer Kenntnisse für das richtige Verlinken der Bibliotheken mit dem Projekt auch Teil dieses Arbeitspakets.
 
-\subsection{Simulieren der Blickposition}
+\subsection{Simulieren der Blickposition}\label{sec::workpacks::sdb}
 Um die Eigenschaften des visuellen Wahrnehmungssystems des Menschen auszunutzen, dass die Genauigkeit des Auges außerhalb des zentralen Bereichs stark abnimmt, ist es notwendig, die Blickposition beziehungsweise den fokussierten Punkt auf dem Bildschirm zu kennen.
 Ein Eyetracker kann dies messen und die Daten der Anwendung zur Verfügung stellen.
 Die Einbindung eines Eyetrackers ist für die ersten Arbeitsschritte, wie das Implementieren erster Versuche und den Raycast Kernel wahrnehmungsorientiert umzuschreiben, nicht notwendig und kann dies sogar behindern.
 Das Projekt bietet aber einfache Möglichkeiten auf Maus- oder Tastatureingaben zu reagieren.
 Daher ist das zweite Arbeitspaket, das Erkennen von Mausbewegungen innerhalb des Volumerenderwidgets und das Abspeichern der letzten erkannten Mausposition in einer globalen Variable, um die Blickposition mit der Maus simulieren zu können.
-% Zusätzlich muss diese auch dem OpenCL Kernel, der den Raycast ausführt, zur Verfügung gestellt werden. -Impl.
-% Daher wurde die Mausposition dem OpenCL Kernel als Parameter übergeben. - Impl.
 
 \subsection{Reduzierung der Strahlabtastrate im fovealen Bereich}\label{sec::workpacks::ors}
 Nun ist es möglich, die Mausposition zu verwenden, um den Blickpunkt auf dem Bildschirm zu simulieren.
