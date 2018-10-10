@@ -19,8 +19,7 @@ Innerhalb eines Widgets können Elemente platziert werden, welche Informationen,
 Für die bequeme Erstellung der grafischen Oberfläche bietet Qt die Anwendung Qt Designer.
 Der Qt Designer ermöglicht es, Widgets und andere Bausteine der grafischen Oberfläche per Drag und Drop anzuordnen.
 Die durch den Qt Designer definierte Oberfläche kann abgespeichert werden und wird von Qt verwendet, um eine c++ Header File zu erstellen.
-Dies ermöglicht es die verschiedenen Elemente der grafischen Oberfläche an die Logik der Anwendung zu binden.
-\todo{Quelle zu Qt einfügen.}
+Dies ermöglicht es die verschiedenen Elemente der grafischen Oberfläche an die Logik der Anwendung zu binden. \cite{Qt}
 
 % Struktur des Projekts (verschiedene Widgets)
 Das Projekt ist dementsprechend in c++ geschrieben und die grafische Oberfläche wurde mit Hilfe des Qt Designers erstellt.
@@ -33,11 +32,10 @@ Das erste von ihnen ermöglicht das variieren der Abtastrate im Bildraum, also d
 Außerdem können hier weitere Rendering Parameter festgelegt werden, wie die Hintergrundfarbe oder ob Voxel beim Abtasten interpoliert werden.
 Das zweite Widget ist ein Farbenrad, welches für die einfache Auswahl der Farben einzelner Kontrollpunkte der Transferfunktion verwendet werden kann.
 Das dritte Widget ermöglicht schließlich das Setzen von Kontrollpunkten der Transferfunktion innerhalb eines Diagramms.
-Die x-Richtung gibt die Dichte, auf die sich ein Kontrollpunkt bezieht an.
+Die x-Richtung gibt die Dichte an, auf die sich ein Kontrollpunkt bezieht.
 Die y-Richtung gibt seinen Opazitätswert an.
 Die Werte zwischen zwei Kontrollpunkten werden entweder linear oder quadratisch interpoliert.
 Daher gibt es immer mindestens einen Kontrollpunkt für den Dichtewert null und einen Kontrollpunkt für den Dichtewert eins.
-\todo{Bitte auf Richtigkeit von diesem Teil prüfen, wie: Interpolation von Voxel und Einstellen der Transferfunkton.}
 
 % Speziell VolumeRenderWidget: OpenCL, OpenGL Host Code
 Das Volumenrenderwidget ist ein OpenGL Widget und für die Darstellung der berechneten Bilder zuständig.
@@ -81,7 +79,6 @@ Dies wird mit Hilfe eines zuvor gröber Berechneten Volumen ermöglicht.
 Da das Volumen nur eine begrenzte Auflösung hat aber an einer beliebigen Position ein Wert aus dieser 3D-Textur abgerufen werden kann, muss angegeben werden, wie dieser Wert abhängig von den umliegenden Voxel bestimmt wird.
 Daher kann hier gewählt werden, dass beim Auslesen des Dichtewerts an einer bestimmten Position des Volumens, dieser interpoliert wird.
 Außerdem kann eine Orthografische Sicht des Volumens aktiviert werden, indem die Strahlen parallel ausgesendet werden und für solide Oberflächen gibt es die Möglichkeit, den Effekt der \emph{Ambient Occlusion} darzustellen.
-\todo{Beschreibung der Funktionsweise des Raycasters für das Volumenrendering in dem Projekt.}
 
 \section{Arbeitspakete und Integration}\label{sec::workpacks}
 Ausgehend von der in Abschnitt \ref{sec::proj} beschriebenen Ausgangslage des Projekts, wurden einige Vorüberlegungen und Arbeitspakete erstellt, welche das Ziel hatten, das Projekt so zu erweitern, dass die Aspekte des wahrnehmungsorientierten Volumenrendering veranschaulicht und umgesetzt werden können.
@@ -135,7 +132,7 @@ Eine Alternative ist es, zwei Mal das selbe Bild, mit jeweils unterschiedlichen 
 Daher umfasst das nächste Arbeitspaket das Berechnen des Bildes in zwei verschiedenen Auflösungen und die anschließende Zusammenfügung beider Bilder zu einem.
 Dabei soll der normal aufgelöste Bereich an der Blickposition sein und der restliche Teil des Bildes hat die niedrigere Auflösung.
 Wie oben beschrieben soll eine Reduzierung der Auflösung auch die Anzahl der gestarteten Work-Items und Work-Groups reduzieren.
-Dadurch soll das Bild mit einer geringeren Auflösung deutlich schneller Berechnet werden können.
+Dadurch soll das Bild mit einer geringeren Auflösung deutlich schneller berechnet werden können.
 Trotzdem muss ein Teil des Bildes in normaler Auflösung berechnet werden.
 Da aber nur ein kleiner Teil in dieser Auflösung berechnet werden muss, soll durch das frühzeitige Abbrechen von Work-Items, die außerhalb dieses Bereichs liegen, die zweite Bildberechnung ebenfalls beschleunigen.
 Das Ziel ist, dass die Berechnung zweier Bilder in verschiedenen Auflösungen und das anschließende Interpolieren sowie Zusammenfügen ihrer, eine insgesamt niedrigere Berechnungszeit benötigt, als die Berechnung eines Bildes in normaler Auflösung.
@@ -149,7 +146,7 @@ Zusätzlich soll dadurch, dass ein kleiner Bereich des Ergebnisbildes an der Bli
 % Dadurch werden so wenige Bildpunkte wie möglich doppelt berechnet. - Impl.
 % Da das erste Bild nur mit einem viertel der Auflösung berechnet wurde und die ID der Work-Items nicht mehr mit den Bildkoordinaten übereinstimmte, wurde die Mausposition und die Ausmaße des Quadrates sowohl bei der Berechnung des Bildes, als auch bei der Zusammenfügung beider Bilder normalisiert. - Impl.
 
-\subsection{Indize-Mapping}\label{ss::DDC}
+\subsection{Index-Mapping}\label{ss::DDC}
 Das Ziel eines weiteren Ansatzes ist es, die Auflösung von der Mausposition weg, noch weiter zu reduzieren.
 Zwischen dem Bereich, der in einer normalen Auflösung und dem Bereich, der in einer niedrigen Auflösung berechnet wird, soll dafür ein weiterer Bereich eingefügt werden, um eine starke Differenz der Bildauflösung an aneinandergrenzenden Bereichen zu verhindern.
 
@@ -212,7 +209,6 @@ Das nächste Arbeitspaket bestand aus dem Testen der Implementierungen.
 Dabei sollte mit der Implementierung aus Teilabschnitt \ref{ss::MDC}, abgekürzt mit \emph{MDC}, und der Implementierung aus Teilabschnitt \ref{ss::DDC}, abgekürzt mit \emph{DDC}, verschiedene Renderingparameter und Transferfunktionen getestet werden.
 Die erste Variation (\emph{MDC}) erlaubte es dafür, die Größe des normal aufgelösten Bereiches, welcher die Form eines Quadrates hat, zu verändern.
 Bei der zweiten Variation (\emph{DDC}), kann die Auflösung der verschiedenen Bereiche sowie jeweils die Größe der inneren Ellipse, die den innersten Bereichs begrenzt und der äußeren Ellipse, die den mittleren Bereich begrenzt, angepasst werden.
-\todo{Sollen die verschiedenen Parameter hier schon angegeben werden oder erst im Abschnitt \ref{chap::results} bei den Ergebnissen?}
 
 \subsection{Erstellen von Messwerten}\label{sec::workpacks::evm}
 Mit den Implementierungen \emph{MDC} und \emph{DDC} sowie ihren bestimmten Parametern ist nun das Ziel, ihre Performanz möglichst reproduzierbar zu messen. Da die Veränderungen selbst hauptsächlich im Kernel existierten, sollten die Ausführungszeiten des Kernels von \emph{MDC} und \emph{DDC} gemessen werden, um die beiden Verfahren untereinander und mit der Standardimplementierung besser vergleichen zu können.
@@ -233,9 +229,10 @@ Die Speicherung aller relevanten Parameter einer Messung, inklusive der Mausbewe
 Für die gemessenen Messwerte ist es nun notwendig, diese in eine geeignete Darstellung zu bringen.
 Das Ziel war es hier, die Mauspositionen und die jeweils gemessene Ausführungszeit in einem Diagramm darzustellen.
 Hier wurde sich für eine Repräsentation mittels einer Heatmap entschieden.
-Das letzte Arbeitspaket umfasste daher die Aufgabe, die Messwerte je Volumen, verwendeter Transferfunktion und verwendetem Verfahren für die Bildberechnung, in Form einer Heatmap darzustellen.
+Das letzte Arbeitspaket umfasste daher die Aufgabe, die Messwerte je Volumen, verwendeter Transferfunktion und verwendetem Verfahren für die Bildberechnung, in einer verständlichen Form darzustellen.
+Dies wurde in Form von Heatmaps, Boxplots und einer Tabelle umgesetzt.
 % Für die Erstellung der Heatmaps wurde \emph{pyplot} aus der Python Bibliothek \emph{matplotlib} verwendet. - Impl.
-Dabei soll das Bild, welches mit der Standardvariante und einer bestimmten Transferfunktion erstellt wurde, als Hintergrund des Plots dienen.
+Für die Heatmap sollte das Bild, welches mit der Standardvariante und einer bestimmten Transferfunktion erstellt wurde, als Hintergrund des Plots dienen.
 Die entsprechenden Mausposition sollen über das Bild als Punkte mit bestimmten Farben eingezeichnet werden.
 Die Farbe eines Punktes soll angeben, wie lange der Kernel ausgeführt wurde, um das Bild mit der Mausposition an dieser Stelle zu berechnen.
 Für ein Volumen und einer bestimmten Transferfunktion soll ein solcher Plot jeweils für die Messwerte von \emph{MDC} und \emph{DDC} erstellt werden.
