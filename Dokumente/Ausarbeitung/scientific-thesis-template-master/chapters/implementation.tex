@@ -29,3 +29,14 @@ Diese Methoden wurde sich zu Nutze gemacht, so dass durch einen Aufruf dieser Me
 Damit jede Raycast Methode diese auch zu Verfügung hat, wurde diese zu Beginn der paintGL() Methode dem OpenCL Raycast Kernel übergeben. (Abschnitt \ref{sec::workpacks::sdb})
 
 \subsection{Reduzierung der Strahlabtastrate im fovealen Bereich}\label{sec::ida::rdsifb}
+Die Reduzierung der Strahlabtastrate wurde im Raycast Kernel implementiert.
+Nachdem alle Operationen der jeweiligen Raycastmodifikationen ausgeführt wurden, wurde für jedes Work-Item die Distanz der zugehörigen Bildkoordinate des entsprechenden Strahls zu der Mausposition berechnet.
+Im MDC Raycast lag die Bildkoordinate nur normalisiert vor und wurde dementsprechend vor der Distanzberechnung umgerechnet.
+
+Sei nun $\vec{r}$ ein 2D-Vektor, der die x- und y-Position der Bildkoordinate eines Strahls enthält und $\vec{m}$ ein 2D-Vektor, der die Bildkoordinaten der Mausposition enthält.
+Die Distanz zwischen der Mausposition und einem Strahl wurde wie folgt berechnet: $d = \texttt{length(}\vec{r}-\vec{m}\texttt{)}$.
+Die Funktion \texttt{lenght()} ist eine \emph{Built-In OpenCL Function} und berechnet die Länge eines Vektors.
+Mit der Distanz $d$ zwischen einem Strahl und der Mausposition wurde ein Faktor $sf$ berechnet: $sf = 1,0 - d  / ib$.
+Hierbei bezeichnet $ib$ die maximale Distanz zwischen zwei Bildkoordinaten, also die Länge der Diagonale des Bildes.
+Ist $d < 10$ wird die Strahlabtastrate $sr$ nicht verändert.
+Ansonsten berechnet sich die neue Strahlabtastrate mit $sr = \texttt{max(}sf * sr, 0,25\texttt{)}$.
