@@ -35,11 +35,11 @@ Im MDC Raycast lag die Bildkoordinate nur normalisiert vor und wurde dementsprec
 
 Sei nun $\vec{r}$ ein 2D-Vektor, der die x- und y-Position der Bildkoordinate eines Strahls enthält und $\vec{m}$ ein 2D-Vektor, der die Bildkoordinaten der Mausposition enthält.
 Die Distanz zwischen der Mausposition und einem Strahl wurde wie folgt berechnet: $d = \texttt{length(}\vec{r}-\vec{m}\texttt{)}$.
-Die Funktion \texttt{lenght()} ist eine \emph{Built-In OpenCL Function} und berechnet die Länge eines Vektors.
+Die Funktion \texttt{length()} ist eine \emph{Built-In OpenCL Function} und berechnet die Länge eines Vektors.
 Mit der Distanz $d$ zwischen einem Strahl und der Mausposition wurde ein Faktor $sf$ berechnet: $sf = 1,0 - d  / ib$.
 Hierbei bezeichnet $ib$ die maximale Distanz zwischen zwei Bildkoordinaten, also die Länge der Diagonale des Bildes.
 Ist $d < 10$ wird die Strahlabtastrate $sr$ nicht verändert.
-Ansonsten berechnet sich die neue Strahlabtastrate mit $sr = \texttt{max(}sf * sr,\,t\texttt{)}$. 
+Ansonsten berechnet sich die neue Strahlabtastrate mit $sr = \texttt{max(}sf * sr,\,t\texttt{)}$, wobei die Funktion \texttt{max()} auch eine \emph{OpenCL Built-In Function} ist.
 Bei einer zu geringen Abtastrate kann es vorkommen, dass vor allem dünne Strukturen eines Volumens von einigen Strahlen gar nicht oder nur sehr geringfügig abgetastet werden und es so sich kleine bis große Löcher in diesen Flächen bilden können.
 $t = 0,25$ hat sich als guter Schwellwert erwiesen, der auch bei großen Distanzen zwischen einem Strahl und der Mausposition kaum Artefakte generiert. (Arbeitspaket aus Abschnitt \ref{sec::workpacks::ors})
 
@@ -48,15 +48,49 @@ Die Reduzierung der Strahldichte im peripheren Bereich wurde durch zwei verschie
 Im folgenden werden die Implementierungen beider Methoden getrennt voneinander beschrieben.
 
 \subsection{MDC Implementierung}
-Für die des Arbeitspakets aus Abschnitt \ref{ss::MDC} Integration wurde, wie in dem Arbeitspaket gefordert, das Bild in zwei verschiedenen Auflösungen nacheinander berechnet.
-Die Implementierung wurde in einer eigenen Methode des Volumerenderwidgets umgesetzt, die von der paintGL() Methode aufgerufen wird.
+\begin{figure}[]
+	\centering
+	\begin{minipage}[t]{0.49\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{../../Grafiken/results/implementierung/mdc_ol.png}
+		\caption{Ausschnitt einer Berechnung mit dem MDC Raycast, bei der nur der äußere niedrig aufgelöste Bereich angezeigt wird. Der niedriger aufgelöste Bereich hat nur ein Viertel der normalen Auflösung.}
+		\label{fig::imp::mdc_ol}
+	\end{minipage}
+	\hfill
+	\begin{minipage}[t]{0.49\textwidth}
+		\centering
+		\includegraphics[width=1\textwidth]{../../Grafiken/results/implementierung/mdc_il.png}
+		\caption{Ausschnitt einer Berechnung mit dem MDC Raycast, bei der nur der innere, normal aufgelöste Bereich angezeigt wird.}
+		\label{fig::imp::mdc_il}
+	\end{minipage}
+\end{figure}
+
+Die Implementierung des MDC Raycasts wurde in einer eigenen Methode des Volumerenderwidgets umgesetzt, die von der paintGL() Methode aufgerufen wird.
 Für die Berechnung des Raycasts konnte die bisherigen Funktionen des \texttt{volumerendercl} Objektes wieder verwendet werden und wurde zwei Mal hintereinander ausgeführt.
-Zuerst wurde der Kernel mit in x- und y-Richtung halbierter Anzahl an Work-Items gestartet was in einem Viertel der Auflösung resultierte.
-Daher wurde für die Ausgabe des Raycasts hier eine neue Textur verwendet, die nur ein Viertel der Auflösung hat.
-Innerhalb eines festgelegten Quadrats um den Mauszeiger herum, dessen Ausmaße dem Kernel als Parameter übergeben wurden,\todo{ hier steht ein komischer Satz} ist die Auflösung des Bildes normal und außerhalb davon hat diese nur ein viertel der normalen Auflösung.
-% Bei der ersten Berechnung wird der Teil innerhalb von diesem Quadrat nicht berechnet und entsprechend wird bei der zweiten Berechnung der Teil des Bildes außerhalb des Quadrats nicht berechnet. - Impl.
-% Dadurch werden so wenige Bildpunkte wie möglich doppelt berechnet. - Impl.
-% Da das erste Bild nur mit einem viertel der Auflösung berechnet wurde und die ID der Work-Items nicht mehr mit den Bildkoordinaten übereinstimmte, wurde die Mausposition und die Ausmaße des Quadrates sowohl bei der Berechnung des Bildes, als auch bei der Zusammenfügung beider Bilder normalisiert. - Impl.
+Zuerst wurde der Kernel mit einer in x- und y-Richtung halbierter Anzahl an Work-Items gestartet.
+Da ein Work-Item einen Pixel berechnet, wurde dadurch das Bild in nur einem Viertel der ursprünglichen Auflösung berechnet.
+Daher wurde für die Ausgabe des Raycasts hier eine neue Textur verwendet, deren Größe ebenfalls nur ein Viertel der ursprünglichen Auflösung ist.
+In dem jeweiligen Teil des switch-case im Rayast Kernel, der beim MDC Raycast ausgeführt wird, konnte über einen Parameter entschieden werden, ob es die erste oder die zweite Ausführung des Raycasts Kernels innerhalb der MDC Methode ist.
+Ist es der erste Aufruf, so wurden innerhalb eines festgelegten Quadrats um den Mauszeiger herum alle in diesem Quadrat sich befindenden Work-Items zu Beginn des Kernels discarded.
+Die Ausmaße des Quadrat wurden dem Kernel als Parameter übergeben.
+Anschließend führte der Raycast Kernel den normalen Ablauf fort.
+Wurde nun die berechnete Textur auf das OpenGL Fullscreen-Quad projiziert, so sah das berechnete Bild ungefähr so aus, wie es in Abbildung \ref{fig::imp::mdc_ol} dargestellt ist.
+Der äußere Bereich des Bildes hat hier also nur ein Viertel der normalen Auflösung.
+Die Interpolation dieser niedrigen Auflösung auf die normale wurde dabei durch den OpenGL Fragment Shader beim Auslesen der Texturdaten geregelt.
+Der innere Bereich des Bildes entspricht den Work-Items, die frühzeitig im Raycast Kernel discarded wurden, wodurch die Textur an dieser Stelle schwarz ist.
+Bei der zweiten Ausführung wurde der Kernel mit der normalen Anzahl an Work-Items gestartet.
+Dafür wurde eine andere Textur verwendet, deren Größe der normalen Auflösung entspricht.
+Im Gegensatz zur ersten Ausführung wurde nun der äußere Bereich, also alle Work-Items, die sich außerhalb des Quadrat befanden, discarded.
+Entsprechend sah das Ergebnis dieser Ausführung in etwa so aus, wie in Abbildung \ref{fig::imp::mdc_il}.
+Hier wurde aber die Größe des Quadrats durch einen Offset ergänzt, wodurch bei der Zusammenfügung der Bilder keine schwarze Umrandung des Quadrat übrig bleibt.
+
+Bei der Implementierung mussten beachtet werden, dass aufgrund dessen, das bei den verschiedenen Ausführungen verschieden Viele Work-Items gestartet wurden, die ID's der Work-Items nicht immer mit ihrer zugehörigen Bildkoordinate übereingestimmt haben.
+Daher wurden alle Werte, die sich auf Bildpositionen beziehen, normalisiert.
+Wie zum Beispiel die Mausposition und die Ausmaße des Rechtecks, welche schon im Host-Code der paintGL() Methode normalisiert wurden, sowie die IDs der Work-Items im Kernel.
+
+Das Zusammenfügen der Bilder wurde im OpenGL Fragment Shader durchgeführt.
+Der Fragment Shader hat dafür die selben Parameter übergeben bekommen, wie der OpenCL Kernel.
+Eine normalisierte Texturkoordinate wurde dann wie eine normalisierte Work-Item ID behandelt und je nach dem ob sich die Texturkoordinate innerhalb des Quadrats befunden hat oder nicht, wurde der Farbwert in der entsprechenden Textur ausgelesen.
 
 \subsection{DDC Implementierung}
 % Die Integration von diesem Arbeitspaket erfordert die Berechnung der mindestens benötigten Anzahl an Work-Items, das Unterteilen in einen x- und y-Wert für die Dimensionen der Work-Items, zur Ausführung durch den Kernel. - Impl.
