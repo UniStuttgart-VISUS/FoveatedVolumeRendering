@@ -519,13 +519,16 @@ Wird zusätzlich zu den verschiedenen Methoden eine variierte Strahlabtastrate v
 
 Hinsichtlich der wahrgenommenen Performanz, also der Ausführungszeiten inklusive des Overheads, schneidet der MDC Raycast trotz einer höheren durchschnittlichen Kernelausführungszeit aufgrund des geringeren Overheads besser ab, als der DDC Raycast.
 Da zusätzlich die Varianz des MDC Raycasts geringer ist und dies daher auch bei der Verwendung eines Eyetrackers zu weniger Verzögerungen führt, als beim DDC Raycasts sowie der MDC Raycast bei Mauspositionen, die sich innerhalb des Volumens befinden, sich besser verhält, ist aus Sicht der Performanz der MDC Raycast mit variierter Strahlabtastrate die beste Wahl.
-Da zusätzlich der MDC Raycast höherwertige Bilder als der DDC Raycast generiert, trotzdem der Verlust der Bildqualität bei der Verwendung eines Eyetrackers im Vergleich zum Standard Raycast nicht wahrnehmbar ist, schneidet der MDC Raycast mit variierter Strahlabtastrate von den verschiedenen Methoden her insgesamt am besten ab.
+Da zusätzlich der MDC Raycast höherwertige Bilder als der DDC Raycast generiert, trotzdem der Verlust der Bildqualität bei der Verwendung eines Eyetrackers im Vergleich zum Standard Raycast nicht wahrnehmbar ist, schneidet der MDC Raycast mit variierter Strahlabtastrate in Verbindung mit einem Eyetracker von den verschiedenen Methoden her insgesamt am besten ab.
 
-\todo{Diskussion und Bedeutung der Ergebnisse.}
-\todo{Technische Daten des Systems, mit dem das Eyetracking gemacht wurde, angeben. Zugehörig zur Diskussion der Ergebnisse; wie man die verschiedenen Methoden empfindet.}
-
-% Die Latenz des Eyetrackers ist sehr gut. ; Disk.
-% Eine merkbare Verzögerung zwischen realer Blickposition und der Blickposition des aktuell berechneten Bildes, tritt nur dann auf, falls die Berechnungsdauer eines Bildes zu lange dauert. ; Disk
-% Dies hängt aber auch von der Größe und Auflösung des verwendeten Volumens ab. ; Disk.
-% In dem Fall von Abbildung \ref{fig::res::bon_st} ist dies nicht der Fall. ; Disk.
-% Da das Volumen mit einer Auflösung von $256\times256\times256$\,Voxel im Vergleich zu anderen recht klein ist, .. ; Disk.
+Dass der MDC Raycast von der Performanz her besser abschneidet als der DDC Raycast liegt an unterschiedlichen Faktoren.
+So ist wie genannt, der Overhead ein wichtiger Faktor, der die wahrnehmbare Performanz des DDC Raycasts im Vergleich zum MDC Raycast beeinträchtigt.
+Ein weiterer Faktor ist die Umsetzung des Index-Mappings.
+Aufgrund dessen, dass dieses versucht wurde variabel zu halten, wurden viele Berechnungen für das Abbilden der Indizes durchgeführt, bevor der eigentliche Raycast beginnt.
+Die Work-Items werden hier anhand ihrer globalen ID auf völlig unterschiedliche Bildkoordinaten abgebildet.
+Dies passiert unabhängig davon, in welcher Work-Group sie sich befinden, wodurch unter Umständen sehr unterschiedliche Bereiche durch eine Work-Group berechnet werden und die gesamte Work-Group immer auf das langsamste Work-Item warten muss.
+Eine Änderung der Implementierung dahingehend, dass die Work-Items nicht anhand der globalen ID sondern anhand der Work-Group ID mit der gesamten Work-Group auf einen zusammen liegenden Block von Bildkoordinaten abgebildet werden, würde die Ausführungszeit vieler Work-Groups verbessern.
+Ein anderer Faktor ist die Art und Weise, wie die NDRange des Kernels festgelegt wird.
+Eine Anpassung dieser, dass sie in mindestens eine Dimension ein Vielfaches der Work-Group Größe ist, würde die Anzahl zu startender Work-Groups reduzieren und die Ausführungszeit des Kernels weiter verbessern.
+Die hohe Varianz des DDC Raycasts liegt vermutlich also vor allem an der Art der Implementierung.
+Eine Optimierung dieser Implementierung würde sowohl die Ausführungszeit des Kernels, als auch den Overhead reduzieren, so dass der DDC Raycast insgesamt eine bessere Performanz als der MDC Raycast hat.
