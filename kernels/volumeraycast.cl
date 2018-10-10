@@ -900,7 +900,7 @@ __kernel void interpolateTexelsFromDDC(   __read_only image2d_t inData  // data 
 	/*{ // debug
 		write_imagef(outData, globalId, read_imagef(inData, nearestIntSmp, globalId));
 		return;
-	}*/
+    }*/
 
 	if(checkPointInEllipse(cursorPos, ell1_div_2.x, ell1_div_2.y, globalId_f)){	// Area A
 		write_imagef(outData, globalId, read_imagef(inData, nearestIntSmp, globalId));
