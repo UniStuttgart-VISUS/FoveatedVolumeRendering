@@ -10,3 +10,7 @@ größe: 1087, 815
 mdc:
 pos: 592, 307
 größe: 1087, 815
+
+Das zugeschnitte Bild von DDC wurde weiter zugeschnitten mit:
+pos: 486, 142
+größe: 274, 205
