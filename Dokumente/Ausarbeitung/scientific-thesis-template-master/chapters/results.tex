@@ -449,7 +449,7 @@ Dadurch fallen auch weniger Strahlen des hoch aufgelösten Bereichs außerhalb d
 \begin{figure}
 	\centering
 	\includegraphics[width=1\textwidth]{../../Neue_Messungen/Chameleon/boxplots.png}
-	\caption{Boxplots der Ausführungszeiten des Kernels der verschiedenen Verfahren bei der Verwendung des Volumen Chameleon.}
+	\caption{Boxplots der Ausführungszeiten des Kernels der verschiedenen Verfahren bei der Verwendung des Volumen Chameleon. Die Box reicht von den unteren Viertel bis zu den oberen Viertel der Werte und der Median ist orange eingezeichnet.}
 	\label{fig::res::pf::bp}
 \end{figure}
 
@@ -496,6 +496,7 @@ Das Supernova Volumen hingegen ist relativ rund und hat eine einheitlich Slice-D
 % Verknüpfung mit Eyetracker
 % Tradeoff Bildqualität MDC DDC Standard, MDC insgesamt am besten
 % Transferfunktion parameter, Interpolationparameter
+% DDC optimierbar
 Betrachtet man rückblickend auf die Ergebnisse die unterschiedlichen Bildabtastraten, so ist es offensichtlich, dass der Standard Raycast von den unterschieldichen Methoden her, die beste Bildqualität erzeugt.
 Trotzdem kann durch das Ausnutzen der Limitierungen des visuellen Wahrnehmungssystems des Menschen bei der Verwendung eines Eyetrackers annähernd der Effekt erzeugt werden, dass die Raycast Methoden MDC und DDC das Bild in voller Auflösung berechnen, obwohl dies nicht der Fall.
 Da die Auflösung beim MDC Raycast im äußeren Bereich im Vergleich zum DDC Raycast immer noch deutlich höher ist, ist dieser Effekt für den MDC Raycast viel realistischer und kaum wahrnehmbar während beim DDC Raycast noch Artefakte des am niedrigsten aufgelösten Bereichs wahrnehmbar sind.
@@ -508,7 +509,17 @@ Während einer Fixation verblassen diese Artefakte und sind wie bei einem statis
 Die Ergebnisse scheinen anzudeuten, dass die Strahlabtastrate im äußeren Bereich noch weiter reduziert werden könnte, da diese bisher nur auf ein Minimum von ein Viertel der normalen Strahlabtastrate nach außen hin fallen kann.
 In weiteren Tests hat das Reduzieren des Limits auf ein Fünftel schon deutlich Artefakte der Unterabtastung ergeben, die dafür aber auch nur an den vom Blickpunkt entferntesten Stellen aufgetreten sind und daher nicht so aufgefallen sind.
 Weiter wäre es denkbar, die Funktion, die die Strahlabtastrate abhängig von der Distanz zur Mausposition anpasst, abzuändern, so dass diese schon bei einer geringeren Entfernung stärker abnimmt und früher das Limit erreicht.
-Da selbst bei nur einem Viertel der maximalen Strahlabtastrate kaum Artefakte wahrnehmbar sind, sollte dies ohne eine wahrnehmbare Reduzierung der Bildqualität möglich sein.
+Da selbst bei nur einem Viertel der maximalen Strahlabtastrate im äußeren Bereich kaum Artefakte wahrnehmbar sind, sollte dies ohne eine wahrnehmbare Reduzierung der Bildqualität möglich sein.
+
+Hinsichtlich der Ausführungszeit des Kernels zeigen die Ergebnisse deutlich, dass der Standard Raycast ohne variierter Strahlabtastrate am schlechtesten abschneidet.
+Der MDC Raycast ohne variierter Strahlabtastrate ist hier besser und hat aber eine höhere Varianz.
+Der DDC Raycast ebenfalls ohne variierter Strahlabtastrate erreicht deutlich geringere Kernelausführungszeiten als der MDC Raycast und hat einen niedrigeren Median und Durchschnitt.
+Dafür erreicht der DDC Raycast im Vergleich zum MDC Raycast aber auch deutlich höhere Kernelausführungszeiten und hat daher auch eine deutlich höhere Varianz.
+Wird zusätzlich zu den verschiedenen Methoden eine variierte Strahlabtastrate verwendet, so verringert sich bei allen Methoden die Kernelausführungszeiten und bis auf den DDC Raycast, bei dem sich die Varianz dadurch ein wenig verringert hat, hat sich beim Standard und MDC Raycast die Varianz dadurch erhöht.
+
+Hinsichtlich der wahrgenommenen Performanz, also der Ausführungszeiten inklusive des Overheads, schneidet der MDC Raycast trotz einer höheren durchschnittlichen Kernelausführungszeit aufgrund des geringeren Overheads besser ab, als der DDC Raycast.
+Da zusätzlich die Varianz des MDC Raycasts geringer ist und dies daher auch bei der Verwendung eines Eyetrackers zu weniger Verzögerungen führt, als beim DDC Raycasts sowie der MDC Raycast bei Mauspositionen, die sich innerhalb des Volumens befinden, sich besser verhält, ist aus Sicht der Performanz der MDC Raycast mit variierter Strahlabtastrate die beste Wahl.
+Da zusätzlich der MDC Raycast höherwertige Bilder als der DDC Raycast generiert, trotzdem der Verlust der Bildqualität bei der Verwendung eines Eyetrackers im Vergleich zum Standard Raycast nicht wahrnehmbar ist, schneidet der MDC Raycast mit variierter Strahlabtastrate von den verschiedenen Methoden her insgesamt am besten ab.
 
 \todo{Diskussion und Bedeutung der Ergebnisse.}
 \todo{Technische Daten des Systems, mit dem das Eyetracking gemacht wurde, angeben. Zugehörig zur Diskussion der Ergebnisse; wie man die verschiedenen Methoden empfindet.}
