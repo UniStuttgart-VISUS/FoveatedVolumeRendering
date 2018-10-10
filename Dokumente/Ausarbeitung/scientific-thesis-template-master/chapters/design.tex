@@ -138,18 +138,6 @@ Ein äußerer Bereich und zwei innere Bereiche.
 Die inneren Bereiche sollen die Form von Ellipsen haben, werden also durch Ellipsen beschränkt.
 Der Mittelpunkt der beiden Ellipsen soll dem Blickpunkt entsprechen, so dass die Auflösung in der Fovea am besten ist und nach außen hin abnimmt.
 Die drei Bereiche werden jeweils interpoliert und ergeben dann das gesamte Bild.
-% Die erste Überlegung für diesen Ansatz war es, auch hier drei Mal eine Berechnung für das gesamte Bild zu starten, aber jeweils die Work-Items für Strahlen, die außerhalb des jeweiligen Bereichs der aktuellen Berechnung liegen, frühzeitig abzubrechen. Res.
-% Ein früher erster Test von diesem Ansatz hat gezeigt, dass die Performanz deutlich schlechter war, als bei der vorherigen Methode. - Res.
-% Trotzdem zeigten die aufaddierten Ausführungszeiten der Kernels gute Werte. - Res.
-% Ein mögliches Problem dafür ist, dass der Overhead für das Starten der Kernels bei drei verschiedenen Ausführungen doch einen Einfluss auf die Performanz nimmt. - Res.
-% Da bis zu drei Ausführungen des Raycast Kernels hintereinander nicht die gewünschte Performanz erbrachten, wurde dies verworfen und eine weitere Möglichkeit, das oben genannte Ziel zu erreichen, überlegt. - Res.
-% In der zweiten Überlegung ging es nun darum, mit nur einem Raycast Kernel Aufruf eine Berechnung für das ganze Bild zu starten. - Res.
-% Jedoch werden in den äußeren zwei Bereichen nur in x- und y-Richtung nur jede dritte beziehungsweise jede zweite Berechnung eines Work-Items ausgeführt. -Res.
-% Die anderen Work-Items werden entsprechend früh discarded. - Res.
-% Ein zweiter Kernel soll die fehlenden Bildpunkte durch bipolare Interpolation der umliegenden Bildpunkte ausfüllen, so dass ein einzelnes Bild mit normaler Auflösung entsteht. - Res. / Impl.
-% Hier hat ein erster Test, bei dem lediglich ein Raycast Kernel aufgerufen wurde aber in x- und y-Richtung jedes zweite Work-Item discarded wurde gezeigt, dass dies keinerlei Performanz bringt. - Res.
-% Dies liegt daran, dass durch die Anordnung der Work-Groups keine Work-Group existierte, die nur aus Work-Items bestand, die discarded wurden. - Disc. / Res.
-% Da vermutlich eine Work-Group auf einen Thread-Block abgebildet wird und ein Thread-Block so lange ausführt, bis alle seine Thread terminiert sind, wurde bei diesem Ansatz zwar nur ein viertel der Berechnungen ausgeführt aber trotzdem konnte kein Thread-Block schneller seine Arbeit verrichten, wodurch die Ausführungszeit des Kernels gleich blieb. - Disc. / Res.
 
 Dies motivierte das nächste Arbeitspaket.
 Das Berechnen des Bildes mit einer sehr niedrigen Hintergrundauflösung und einer mittleren und normalen Auflösung innerhalb einer mittelgroßen und kleinen Ellipse um dem Blickpunkt.
@@ -166,9 +154,9 @@ Anschließend sollen die erhaltenen Eyetrackingdaten in Blickpositionen innerhal
 Die Auswahl lag in diesem Fall zwischen einer Eyetracking-Brille und dem an einem Monitor angebrachten Tobii Pro Spectrum Eyetracker.
 Da die Eyetracking-Brille eine deutlich geringere Abtastrate und Präzision als der Tobii Pro Spectrum, welcher mit bis zu 1200\,Hz und hoher Qualität Blickbewegungen erfassen kann, fiel die Entscheidung hier auf den monitorbasierten Eyetracker Tobii Pro Spectrum.
 Die Tobii Pro SDK erlaubte eine einfache Integration des Eyetrackers in das Projekt.
-% Die Daten des Eyetrackers wurden dem Volumerenderwidget über eine Callback-Funktion zur Verfügung gestellt, welches immer die zuletzt erhaltene gültige Blickposition für die Berechnung des nächsten Bildes verwendet hat. - Impl.
+Die Daten des Eyetrackers wurden dem Volumerenderwidget über eine Callback-Funktion zur Verfügung gestellt, welche immer die zuletzt erhaltene Blickposition für die Berechnung des nächsten Bildes liefert.
+Bevor diese in einer globalen Variable abgespeichert wurde, wurde sie anhand der Validity-Codes auf ihre Gültigkeit überprüft.
 Die Blickposition wird von dem Eyetracker normiert in $[0,1]^2$ angegeben und musste daher zuvor in die Bildkoordinaten des Volumerenderwidgets umgerechnet werden.
-% Nun kann aktiviert werden, dass Eyetracking verwendet wird. - Impl.
 Wird nun der Eyetracker verwendet, wird bei der Berechnung eines Bildes statt der letzten Mausposition die letzte Blickposition verwendet.
 
 \subsection{Testen der Implementierungen und verschiedener Parameter}
@@ -195,14 +183,10 @@ Trotzdem beeinflusst der Overhead der Verfahren bei der Ausführung der \texttt{
 
 Dies ist der Hintergrund für das nächste Arbeitspaket, welches die Integration von Möglichkeiten, um reproduzierbare Messwerte der unterschiedlichen Verfahren \emph{MDC}, \emph{DDC} und des Standard Raycasts zu erstellen, beinhaltet.
 
-% Für die Umsetzung des Arbeitspaket wurde eine Klasse erstellt, welche für eine Berechnung eines Bildes verschiedene Messwerte speichert. - Impl.
-% Für jeden Aufruf der \texttt{paintGL()} Methode wurde ein solches Objekt erstellt und gespeichert. - Impl.
-% Ein solches Objekt hält unter Anderem die gesamte Ausführungszeit der Kernels einer Bildberechung, welche mit Hilfe des \texttt{volumerendercl} Objektes berechnet werden kann, die ungefähre Ausführungszeit der \texttt{paintGL()} Methode selbst, welche mit Hilfe eines \texttt{Qt Qtime} Objektes ausgegeben werden kann und bei der Berechnung durch die \emph{MDC} oder \emph{DDC} Variante, wird auch die verwendete Position für den Blickpunkt gespeichert. - Impl.
 Für die Erstellung der Messwerte wurde eine Mausbewegung über das aktuell angezeigte Bild aufgenommen und diese für die unterschiedlichen Varianten mit jeweils unterschiedlichen Volumen und Transferfunktionen wieder abgespielt.
 Dabei wurde für jede aufgenommene Mausposition eine Messung vorgenommen und gespeichert.
 Um nicht unnötig viele Messwerte zu erstellen, wurde das Bild in $10\times10$ Felder unterteilt und immer nur dann eine Mausposition für die Messung verwendet, falls diese in einem anderen Feld war, als die vorhergegangene.
 Die Speicherung aller relevanten Parameter einer Messung, inklusive der Mausbewegungen, soll möglichst reproduzierbare Messungen ermöglichen.
-% -> Messen der Auslastung der GPU, wie Warps und Speicherbanks, mit CodeXL (gab aber Probleme und hat schließlich nicht funktioniert.)
 
 \subsection{Darstellen der Messwerte}
 Für die gemessenen Messwerte ist es nun notwendig, diese in eine geeignete Darstellung zu bringen.
@@ -210,10 +194,7 @@ Das Ziel war es hier, die Mauspositionen und die jeweils gemessene Ausführungsz
 Hier wurde sich für eine Repräsentation mittels einer Heatmap entschieden.
 Das letzte Arbeitspaket umfasste daher die Aufgabe, die Messwerte je Volumen, verwendeter Transferfunktion und verwendetem Verfahren für die Bildberechnung, in einer verständlichen Form darzustellen.
 Dies wurde in Form von Heatmaps, Boxplots und einer Tabelle umgesetzt.
-% Für die Erstellung der Heatmaps wurde \emph{pyplot} aus der Python Bibliothek \emph{matplotlib} verwendet. - Impl.
 Für die Heatmap sollte das Bild, welches mit der Standardvariante und einer bestimmten Transferfunktion erstellt wurde, als Hintergrund des Plots dienen.
 Die entsprechenden Mausposition sollen über das Bild als Punkte mit bestimmten Farben eingezeichnet werden.
 Die Farbe eines Punktes soll angeben, wie lange der Kernel ausgeführt wurde, um das Bild mit der Mausposition an dieser Stelle zu berechnen.
 Für ein Volumen und einer bestimmten Transferfunktion soll ein solcher Plot jeweils für die Messwerte von \emph{MDC} und \emph{DDC} erstellt werden.
-% Kernelzeiten sind am wichtigsten, da diese die eigentliche Ausführungszeit der unterschiedlichen Methoden repräsentieren.
-% Overhead muss nicht extra dargestellt werden, da relativ Konstant.

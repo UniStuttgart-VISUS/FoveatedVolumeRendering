@@ -154,3 +154,23 @@ Der Kernel für die Interpolation der Werte wurde für die gesamte Auflösung de
 Dafür ist es hier nicht notwendig, die Indize umzurechnen, da die IDs der Work-Items schon Bildkoordinaten entsprechen und die Mausposition sowie die Ausmaße der Ellipsen dem Kernel übergeben werden.
 Mit der Information, in welchem Bereich sich ein Work-Item befindet und welche G-Werte und Ausmaße die unterschiedlichen Bereiche haben, wurden für ein Work-Item vier umliegende Werte des zuvor berechneten Raycasts ausfindig gemacht und bipolar interpoliert.
 Die Ausgabetextur der Interpolation wird durch den Fragmentshader anschließend auf das Full-Screen Quad gezeichnet.
+
+\section{Erstellen und Darstellen von Messwerten}
+Für die Umsetzung des Arbeitspakets aus Abschnitt \ref{sec::workpacks::evm}, wurde eine Klasse erstellt, welche für eine Berechnung eines Bildes verschiedene Messwerte speichert.
+Diese sind unter Anderem die gesamte Ausführungszeit des Kernels (bei mehreren Ausführungen innerhalb einer Methode wurden diese addiert), die Ausführungszeit der paintGL() Methode und die Mausposition, die in der letzten Ausführung der paintGL() Methode für die Berechnung des Bildes verwendet wurde.
+Für jeden Aufruf der \texttt{paintGL()} Methode wurde ein solches Objekt erstellt und gespeichert.
+Die letzte Ausführungszeit eines Kernels konnte mit Hilfe des \texttt{volumerendercl} Objektes berechnet werden kann, welches dafür \emph{OpenCL Profiling} Methoden verwendet hat.
+Die ungefähre Ausführungszeit der \texttt{paintGL()} Methode selbst wurde mit Hilfe eines \emph{Qt QTime} Objektes berechnet.
+
+Um eine Mausbewegung abzuspeichern wurden globale Variablen erstellt, die den aktuellen Zustand des Volumerenderwidgets bezüglich der Messungen angeben.
+Über Tastatureingaben können diese Variablen verändert werden.
+Wurde in den Zustand für die Aufzeichnung einer Mausbewegung gewechselt, so hat die Callback-Methode für die Mausbewegungen nicht nur die aktuelle Position in eine globale Variable geschrieben, sondern auch in einen c++ Vektor abgespeichert.
+Dies passierte aber nur, falls die zuletzt gespeicherte Position sich um mindestens 10 Pixel von der aktuellen gemessenen Position unterscheidet.
+Während Mausbewegungen aufgenommen wurden, wurden die Ausführung der Raycasts blockiert.
+Nachdem eine Mausbewegung aufgenommen wurde, konnten die gesammelten Daten gespeichert und wieder geladen.
+Falls es eine gespeicherte Mausbewegung gab, konnte über eine Tastatureingabe in den Replay-Zustand gewechselt werden.
+In diesem Zustand wurden alle Tastatur- und Mauseingaben bis auf eine Taste, um das Replay vorzeitig abzubrechen, ignoriert.
+Wurde in den Replay-Zustand gewechselt, wurde die paintGL() Methode für jede gespeicherte Mausposition in dem c++ Vektor einmal ausgeführt und die dabei gesammelten Messwerte in lesbarer Form in eine \texttt{.txt}-Datei geschrieben.
+
+Mit Hilfe eines Python Scripts konnten die gespeicherten Messwerte geladen und verwertet werden.
+Für die Erstellung der Heatmaps und Boxplots wurde \emph{pyplot} aus der Python Bibliothek \emph{matplotlib} verwendet.
