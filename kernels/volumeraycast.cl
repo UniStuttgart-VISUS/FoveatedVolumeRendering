@@ -501,10 +501,10 @@ __kernel void volumeRender(  __read_only image3d_t volData
                 }
 
                 globalId = mapped_2d_index_from_1d(index_1d - index_offset, m + g, g);
-                globalId += area_offset_needed * (convert_int2_rtz(cursorPos) - (int2)(0.5f * area_offset.x, 0.5f * area_offset.y)); // create always a grid
+                globalId += area_offset_needed * (convert_int2_rtz(cursorPos) - (int2)(0.5f * area_offset.x, 0.5f * area_offset.y));
 
                 if(index_1d < inverts.y){
-                    globalId = (int2)(globalId.x - (convert_int(globalId.x) % g), globalId.y - (convert_int(globalId.y) % g));
+                    globalId = (int2)(globalId.x - (convert_int(globalId.x) % g), globalId.y - (convert_int(globalId.y) % g)); // create always a grid
                 }
 
                 if(index_1d < inverts.x){

@@ -127,18 +127,30 @@ Das heißt, ein G-Wert von $1$ entspricht der normalen Auflösung.
 
 Die G-Werte der unterschiedlichen Bereiche wurde vor dem Start des Raycasts festgelegt, da diese notwendig sind, um die benötigte Anzahl an Work-Items zu bestimmen.
 Um die Anzahl der insgesamt benötigten Work-Items abzuschätzen, wurden die Ellipsen als Rechtecke betrachtet.
-Für die drei Bereiche ergab sich die abgeschätzte Anzahl benötigter Work-Items dann aus $\frac{Anzahl_der_Pixel_des_Bereichs}{G-Wert_des_Bereichs}$.
+Für die drei Bereiche ergab sich die abgeschätzte Anzahl benötigter Work-Items dann aus $\frac{AnzahlDerPixelDesBereichs}{GWertDesBereichs}$.
 Für jeden Bereich wurde diese Anzahl anschließend mit einem geringen Offset erhöht, damit später keine Work-Items fehlen.
+Die Anzahl der Work-Items der Bereiche wurde zusätzlich ohne den Offset dem Raycast Kernel als Parameter übergeben.
 Die Summe dieser Werte ergab die abgeschätzte gesamte Anzahl an Work-Items, mit welcher der Raycast Kernel gestartet wurde.
 
 Im Raycast Kernel wurden die zweidimensionalen globalen IDs der Work-Items auf eine eindeutige eindimensionale ID abgebildet.
-Diese waren dem Bereich von $0$ bis zur maximalen Anzahl an $gestarteten Work-Items - 1$ zugeordnet.
+Diese waren dem Bereich von $0$ bis zur maximalen Anzahl an $gestarteteWorkItems-1$ zugeordnet.
+Ist $m$ die Größe der x-Dimension des Kernels und $xId$ und $yId$ die globale ID des Work-Items, so berechnete sich die neue ID mit: $nId = yId * m + xId$.
+Mit der neuen ID $nId$ und den übergebenen Werten für die maximale Anzahl der Work-Items in den unterschiedlichen Bereichen konnte für jedes Work-Item festgelegt werden, welchem Bereich es zugeordnet werden soll.
+Da nun der Bereich in welchem sich ein Work-Item befindet, bekannt war, konnte für dieses Work-Item der G-Wert $g$ sowie die ursprüngliche Bereite des Bereiches $m$ bestimmt werden.
+Das heißt für ein Work-Item, welches im inneren Bereich liegt, galt $g=1$ und $m=BreiteDerInnerenEllipse$.
+Ein Work-Item welches im äußeren Bereich lag, hat einen höheren G-Wert zugewiesen bekommen und für $m$ die Breite der Ausgangstextur.
+Für die Messungen im Abschnitt \ref{chap::resdisc} wurde für den äußeren Bereich ein G-Wert von $7$ und für den mittleren Bereich ein G-Wert von $2$ verwendet.
+Mithilfe der bekannten Werte $m$ und $g$ sowie dem Wissen, wie viele Work-Items den unterschiedlichen Bereichen zugeorndet wurden, wurde die $nId$ mit ein paar kleinen Anpassungen wieder zurück in eine zweidimensionale ID überführt, die nun einer Bildkoordinate entspricht.
+Mit der neuen Work-Item ID kann ein Work-Item die Berechnung eines Strahls, wie bei dem ursprünglichen Raycast ganz normal fortsetzen.
+Abbildung \ref{fig::imp::ddc_o_ip} zeigt einen Ausschnitt der berechneten Textur des DDC Raycasts ohne eine anschließende Interpolation der Werte.
+Man kann erkennen, dass im äußeren Bereich der Abstand zwischen den Strahlen deutlich größer ist, als in dem mittleren und inneren Bereich.
+Man sieht auch, dass die unterschiedlichen Bereiche sich gegenseitig überlappen.
+Dies ist für die anschließende Interpolation notwendig, da sonst zwischen den Bereichen schwarze Punkte entstehen können.
 
-
-
-
-Um zu unterscheiden, in welchem Bereich sich ein Work-Item befinden soll, wurde die An
-
-% Die Integration von diesem Arbeitspaket erfordert die Berechnung der mindestens benötigten Anzahl an Work-Items, das Unterteilen in einen x- und y-Wert für die Dimensionen der Work-Items, zur Ausführung durch den Kernel. - Impl.
-% Anschließend muss der Raycast-Kernel mit der zuvor berechneten Anzahl an Work-Items in x- und y-Richtung gestartet werden sowie danach der Kernel für die Interpolation. - Impl.
-% Der Interpolation Kernel wird aber mit den Dimensionen des zu berechnenden Bildes für die Dimension der Work-Items gestartet. - Impl.
+Abbildung \ref{fig::imp::ddc_m_ip} zeigt das in Abbildung \ref{fig::imp::ddc_o_ip} dargestellte Bild nachdem es interpoliert wurde.
+Die Interpolation wurde für den DDC Raycast in einem eigenen Kernel implementiert und nicht wie beim MDC Raycast durch den Fragmentshader realisiert.
+Der Kernel für die Interpolation der Werte wurde für die gesamte Auflösung des Bildes gestartet.
+Ähnlich wie beim DDC Raycast bestimmt jedes Work-Item den Bereich, in welchem es sich befindet.
+Dafür ist es hier nicht notwendig, die Indize umzurechnen, da die IDs der Work-Items schon Bildkoordinaten entsprechen und die Mausposition sowie die Ausmaße der Ellipsen dem Kernel übergeben werden.
+Mit der Information, in welchem Bereich sich ein Work-Item befindet und welche G-Werte und Ausmaße die unterschiedlichen Bereiche haben, wurden für ein Work-Item vier umliegende Werte des zuvor berechneten Raycasts ausfindig gemacht und bipolar interpoliert.
+Die Ausgabetextur der Interpolation wird durch den Fragmentshader anschließend auf das Full-Screen Quad gezeichnet.
