@@ -309,10 +309,9 @@ Dieser Wert gibt an, ob eine Messung mit hoher Wahrscheinlichkeit richtige Daten
 So können potentiell fehlerhafte Daten ignoriert werden.
 
 \section{GPU Architektur}\label{sec::gpuarc}
-Ein wichtiger Faktor, wenn es um interaktive Anwendungen geht, ist die Performanz.
-Viele Algorithmen haben essentielle Bestandteile welche ihre Komplexität nach unten beschränken.
-Die Einführung von Parallelität ist ein wichtiger Ansatz, um die Performanz von Anwendungen beziehungsweise ihrer Algorithmen weiter zu verbessern.
-Gerade Algorithmen in der Bildberechnung und -Verarbeitung eignen sich besonders um diese zu parallelisieren.
+Ein wichtiger Gesichtspunkt bei interaktiven Anwendungen ist die Performanz.
+Parallelisierung ist ein wichtiger Ansatz, um die Performanz von Anwendungen beziehungsweise ihrer Algorithmen weiter zu verbessern.
+Gerade Algorithmen in der Bildberechnung und -Verarbeitung eignen sich besonders, um diese zu parallelisieren.
 In der Bildverarbeitung werden viele gleiche Berechnungen auf unterschiedlichen Daten ausgeführt.
 \emph{Graphics Processing Units (GPUs)} oder auch Grafikkarten sind für diese Art von Berechnungen optimiert.
 \begin{figure}
@@ -322,45 +321,46 @@ In der Bildverarbeitung werden viele gleiche Berechnungen auf unterschiedlichen 
 	\label{fig::ga01}
 \end{figure}
 % GPU vs CPU
-Im Vergleich zu \emph{Central Processing Units (CPUs)} besitzen GPUs eine deutlich höhere Anzahl an Prozessoren, siehe Abbildung \ref{fig::ga01}.
-Aktuell besitzen Prozessoren meist vier oder acht Rechenkerne und eine Taktfrequenz von ca. 4\,Ghz.
-GPUs hingegen haben mehrere tausend Berechnungseinheiten die gleichzeitig Berechnungen durchführen können, dafür aber bei ca. einem drittel der Taktfrequenz von CPUs.
+Im Vergleich zu \emph{Central Processing Units (CPUs)} besitzen GPUs eine deutlich höhere Anzahl an Prozessoren (siehe Abbildung \ref{fig::ga01}).
+Aktuell besitzen Prozessoren meist vier oder acht Rechenkerne und eine Taktfrequenz von circa 4\,Ghz.
+GPUs hingegen haben mehrere tausend Berechnungseinheiten die gleichzeitig Berechnungen durchführen können.
+Die Taktfrequenz ist jedoch deutlich geringer.
 
-Fast jeder Computer besitzt heutzutage hochparallele Einheiten, meist eine GPU.
-In den Anfängen waren GPUs sehr eng mit grafischen Berechnungen verbunden um die Berechnung der Farbwerte von Pixeln zu beschleunigen.
+Fast jeder Computer besitzt heutzutage hoch parallele Einheiten, meist eine GPU.
+Bis vor kurzem waren GPUs meist eng mit grafischen Berechnungen verbunden, um die Berechnung der Farbwerte von Pixeln zu beschleunigen.
 Heute werden GPUs zur Beschleunigung von fast beliebigen Anwendungen genutzt.
-Programmierschnittstellen wie OpenCL oder CUDA ermöglichen die Nutzung von GPUs für allgemeine Berechnungen, oder auch \emph{General Purpose Computation on Graphics Processing Unit (GPGPU)}.
+Programmierschnittstellen wie \emph{OpenCL} oder \emph{CUDA} ermöglichen die Nutzung von GPUs für allgemeine Berechnungen, daher werden diese heutzutage auch als \emph{General Purpose Computation on Graphics Processing Unit (GPGPU)} bezeichnet und verwendet.
 
 \subsection*{OpenCL}
-\emph{OpenCL (Open Computing Language)} ist ein Standard für das allgemeine Programmieren für parallele CPU- oder GPU-Platformen.
-Dabei stellt OpenCL eine Programmierschnittstelle für das koordinieren paralleler Berechnungen auf unterschiedlichen Platformen zur Verfügung sowie eine Programmiersprache für die eigentliche Programmierung von Programmen, die auf parallelen Platformen wie einer GPU ausgeführt werden sollen.
+Die \emph{OpenCL (Open Computing Language)} ist ein Standard für das allgemeine Programmieren für parallele CPU- oder GPU-Plattformen.
+Dabei stellt OpenCL eine Programmierschnittstelle für das Koordinieren paralleler Berechnungen auf unterschiedlichen Plattformen zur Verfügung sowie eine spezielle Programmiersprache für die Programmierung von Programmen, die auf der GPU ausgeführt werden.
 
 Eine OpenCL Anwendung ist die Kombination des Codes eines Programms, das auf dem Host und den OpenCL Devices ausgeführt wird.
 Der Host ist dabei der Teil der Anwendung, der mit dem OpenCL Kontext über die OpenCL API kommuniziert.
-Ein Kontext ist die Umgebung, in der ein OpenCL Kernel ausgeführt wird und weitere Eigenschaften definiert sind.
-Der Kernel ist eine Funktion die in einem OpenCL Programm geschrieben wurde und durch ein OpenCL Device ausgeführt wird.
-Ein Device entspricht meistens eine GPU oder CPU, die OpenCL implementiert. % bzw. deren Treiber OpenCL implementieren
+Ein Kontext ist die Umgebung, in welche ein OpenCL Kernel ausgeführt wird und weitere für die Ausführung relevante Eigenschaften definiert sind.
+Der Kernel ist eine Funktion, die in einem OpenCL Programm geschrieben wurde und auf einem OpenCL Device ausgeführt wird.
+Ein Device entspricht meistens einer GPU oder CPU, die OpenCL implementiert.
 
-\subsubsection*{OpenCL Platform Modell}
+\subsubsection*{OpenCL Plattform Modell}
 \begin{figure}
 	\centering
 	\includegraphics[width=0.5\textwidth]{../../Grafiken/OpenCL_PlatformModel.png}
-	\caption{OpenCL Platform Modell. Ein Host, mehrere Compute Devices mit je einer oder mehreren Compute Units. \cite{OCLSPC}}
+	\caption{OpenCL Plattform Modell. Ein Host, mehrere Compute Devices mit je einer oder mehreren Compute Units. \cite{OCLSPC}}
 	\label{fig::ga02}
 \end{figure}
-Das Platform Modell von OpenCL, dargestellt in Abbildung \ref{fig::ga02}, ist eine Abstraktion davon, wie OpenCL die Hardware sieht.
+Das Plattform Modell von OpenCL, dargestellt in Abbildung \ref{fig::ga02}, ist eine Abstraktion davon, wie OpenCL die Hardware sieht.
 Die Beziehung zwischen seinen Einheiten und der Hardware ist dabei größtenteils von der verwendeten Hardware und der entsprechenden Implementierung von OpenCL abhängig.
-Es besteht aus einem Host, welcher mit ein oder mehreren Devices verbunden ist.
+Das Modell besteht aus einem Host, welcher mit ein oder mehreren Devices verbunden ist.
 Diese sind unterteilt in \emph{Compute Units (CUs)}, welche weiter in \emph{Processing Elements (PEs)} unterteilt sind.
 Berechnungen auf einem solchen Device werden in Processing Elements ausgeführt.
 Die Host-Anwendung gibt den Start des Kernel-Codes in Auftrag.
-Das OpenCL Device führt dann den Kernel Code auf den Processing Elements des Devices aus und hat dabei eine große Freiheit darüber, wie die Berechnungen auf den Processing Elements abgebildet werden.
+Das OpenCL Device führt dann den Kernel Code auf den Processing Elements des Devices aus und hat dabei eine große Freiheit darüber, wie die Berechnungen auf die Processing Elements abgebildet werden.
 Falls die Processing Elements innerhalb einer Compute Unit die gleiche Folge von Befehlen ausführen, bezeichnet man ihren Befehlsfluss als konvergiert, sonst als divergiert.
 
 \subsubsection*{OpenCL Ausführungsmodell}
-Der Host kann über Funktionen der OpenCL API mit einem Device über eine Command-Queue interagieren.
+Der Host kann über Funktionen der OpenCL API mit einem Device über eine \emph{Command-Queue} interagieren.
 Eine Command-Queue ist mit maximal einem Device verknüpft.
-Über die Command-Queue können Befehle zum starten eines Kernels, Transferieren von Daten zwischen Host und Device und Befehle zur Synchronisation ausgeführt werden.
+Über die Command-Queue können Befehle zum Starten eines Kernels, zum Transferieren von Daten zwischen Host und Device und Befehle zur Synchronisation ausgeführt werden.
 Ein Befehl durchläuft dabei immer sechs Zustände: \emph{Queued (Eingereiht)}, \emph{Submitted (Übermittelt)}, \emph{Ready (Bereit)}, \emph{Running (Ausführend)}, \emph{Ended (Beendet)} und \emph{Complete (Abgeschlossen)}.
 Wird ein Kernel für die Ausführung übermittelt, wird für diesen ein Index-Raum definiert.
 Der Kernel selbst, die zugehörigen Parameter und die Parameter, die seinen Index-Raum definieren, definieren eine Kernel Instanz.
@@ -375,7 +375,7 @@ Diese Gruppen heißen Work-Groups.
 	\caption{OpenCL NDRange-Mapping mit 2 Dimensionen. \cite{OCLSPC}}
 	\label{fig::ga03}
 \end{figure} 
-Der Index-Raum ist durch eine NDRange definiert, wobei ein Index-Raum immer N-dimensional ist, wobei N die Werte 1, 2 oder 3 annehmen kann.
+Der Index-Raum ist durch eine \emph{NDRange} definiert, wobei ein Index-Raum immer $N$-dimensional ist und $N$ die Werte 1, 2 oder 3 annehmen kann.
 Eine NDRange wird dementsprechend durch drei Integer-Arrays der Länge N definiert: Die Ausdehnung des Index-Raums, ein Offset der Indices an dem sie starten und die Größe der Work-Groups, jeweils in N Dimensionen.
 
 Jedes Work-Item hat ein N-Dimensionales Tupel, welches seine globale ID repräsentiert.
@@ -385,8 +385,8 @@ Work-Items sind je einer Work-Group zugewiesen und haben eine loakle ID innerhal
 Dadurch sind Work-Items eindeutig auf zwei verschiedene Arten definiert: Durch die globale ID beziehungsweise den globalen Index und durch die ID ihrer Work-Group zusammen mit ihrer lokalen ID in dieser Work-Group.
 Abbildung \ref{fig::ga03} illustriert diesen Sachverhalt bei einem zweidimensionalen Index-Raum.
 
-Wird die Ausführung einer Kernel-Instanz gestartet, werden die damit assoziierten Work-Groups in einen Work-Pool platziert und sind damit ausführungsbereit.
-Das Device entnimmt aus dem Work-Pool nach und nach Work-Groups und führt ein oder mehrere gleichzeitig aus.
+Wird die Ausführung einer Kernel-Instanz gestartet, werden die damit assoziierten Work-Groups in einem Work-Pool platziert und sind somit ausführungsbereit.
+Das Device entnimmt aus dem Work-Pool nach und nach Work-Groups und führt ein oder mehrere davon gleichzeitig aus.
 Da die Work-Groups aus dem Work-Pool in jeglicher Reihenfolge ausgeführt werden können, gibt es keinen sicheren Weg, verschiedene Ausführungen von Work-Groups zu synchronisieren.
 
 \subsubsection*{Hardware Mapping}
@@ -408,38 +408,39 @@ Da die Work-Groups aus dem Work-Pool in jeglicher Reihenfolge ausgeführt werden
 \end{figure}
 
 In der GPU Architektur gibt zwei große Konzepte, \emph{globalen Speicher} und \emph{Streaming Multiprozessoren (SM)}.
-Globaler Speicher auf der GPU ist analog zu RAM für die CPU.
+Der globale Speicher einer GPU entspricht dem RAM einer CPU.
 Auf diesen kann von den Recheneinheiten der GPU und auch durch die Host-Anwendung auf der CPU zugegriffen werden. 
 Eine GPU hat mehrere Streaming Multiprozessoren.
-Streaming Multiprozessoren führen die eigentlichen Berechnungen aus und haben je eigene Control Units, Register (lokaler Speicher), Ausführungs Pipelines und Caches.
-Ein Streaming Multiprozessor besitzt viele Skalare Recheneinheiten, die ähnlich zu einer ALU Berechnungen ausführen.
+Streaming Multiprozessoren führen die eigentlichen Berechnungen aus und haben jeweils eigene Control Units, Register (lokaler Speicher), Ausführungs-Pipelines und Caches.
+Ein Streaming Multiprozessor besitzt viele Skalare Recheneinheiten die, ähnlich einer ALU, Berechnungen ausführen.
 
-Im GPU Ausführungsmodell, siehe Abbildung \ref{fig::ga04} werden \emph{Threads} von Skalaren Prozessoren ausgeführt.
+Im GPU Ausführungsmodell (siehe Abbildung \ref{fig::ga04}), werden \emph{Threads} von Skalaren Prozessoren ausgeführt.
 Ein \emph{Thread Block} ist eine Gruppe von Threads und wird auf einem Streaming Multiprozessor ausgeführt.
-Dabei werden Threads innerhalb eines Thread Blocks ausschließlich innerhalb eines Streaming Multiprozessors ausgeführt.
+Dabei werden Threads innerhalb eines Thread Blocks ausschließlich von dem selben Streaming Multiprozessors ausgeführt.
 Es könnenn aber auch mehrere Thread Blöcke gleichzeitig auf einem Streaming Multiprozessor ausgeführt werden.
 Dies ist aber durch die verfügbaren Ressourcen limitiert.
 Abbildung \ref{fig::ga05} stellt den Zusammenhang zwischen Threads und Speicher in CUDA dar.
 
 Ein Thread Block besteht meistens aus 32 Threads und wird in einer NVIDIA Architektur \emph{Warp} und in einer AMD Architektur \emph{Wavefront} genannt.
 Ein solcher Thread Block wird physisch parallel auf einem Streaming Multiprozessor als \emph{Single Instruction Multiple Thread (SIMT)} Ausführung ausgeführt.
-Die Ausführung eines Thread Blocks wird durch einen Warp- beziehungsweise Thread-Block Scheduler geregelt.
+Die Ausführung eines Thread Blocks wird durch einen Warp-, beziehungsweise Thread-Block Scheduler, geregelt.
 Da Threads innerhalb eines Thread Blocks differenziert werden können, ermöglicht dies eine \emph{Single Instruction Mutlitple Data (SIMD)} Ausführung.
 Ein Programm (Kernel) auf der GPU wird als Gitter aus Thread Blöcken gestartet.
 
-OpenCL sieht die Hardware aus abstrakter Sicht und die exakte Beziehung des Platform Modells zu der Hardware wird von OpenCL nicht festgelegt.
-Das Platform Modell besteht aus einem Host, OpenCL Devices mit je mehreren Compute Units die jeweils ein oder mehreren Processing Elements enthalten.
+OpenCL sieht die Hardware aus abstrakter Sicht und die exakte Beziehung des Plattform Modells zu der Hardware wird von OpenCL nicht festgelegt.
+Das Plattform Modell besteht aus einem Host und OpenCL Devices mit je mehreren Compute Units die jeweils ein oder mehreren Processing Elements enthalten.
 In der Realität entspricht der Host in der Regel dem Teil der Anwendung, der auf der CPU ausgeführt wird.
 Das OpenCL Device entspricht meist einer GPU und eine Compute Unit kann als Streaming Multiprozessor gesehen werden wobei die Processing Elements dementsprechend den Skalaren Prozessoren innerhalb eines Multiprozessors entsprechen.
 
 Nach OpenCL entspricht eine Work-Group einer Menge von verwandten Work-Items, die alle innerhalb der selben Compute Unit arbeiten.
 Ein Work-Item kann von einem oder mehreren Processing Units als Teil einer Work-Group verarbeitet werden.
 Sie führen die selbe Kernel Instanz aus und haben gemeinsamen lokalen Speicher und Work Group Funktionen, wie in Abbildung \ref{fig::ga06} dargestellt ist.
-Daher ist es naheliegend, das Work-Groups in Thread Blöcke unterteilt werden und alle Thread-Blöcke einer Work-Group auf dem selben Streaming Multiprozessor ausgeführt werden.
+Daher ist es naheliegend, dass Work-Groups in Thread Blöcke unterteilt werden und alle Thread-Blöcke einer Work-Group auf dem selben Streaming Multiprozessor ausgeführt werden.
+
 In OpenCL können Work-Groups weiter in Sub-Groups unterteilt werden.
 Eine OpenCL Sub-Group ist eine implementationsabhängige Gruppierung von Work-Items innerhalb einer Work-Group.
-Diese sind eindimensional und haben, bis auf die letzte Sub-Group einer solchen Unterteilung, alle dieselbe Größe.
-Es ist ebenfalls naheliegend, dass eine solche Sub-Group einem Thread block entspricht.
+Diese sind eindimensional und haben immer, mit Ausnahme der letzten Sub-Group, dieselbe Größe.
+Es ist ebenfalls naheliegend, dass eine solche Sub-Group einem Thread Block entspricht.
 
 Threads innerhalb eines Thread Blocks können also ausschließlich die selben Instruktionen ausführen.
 Müssen einige Threads innerhalb eines Thread Blocks aufgrund ihrer ID unterschiedliche Statements ausführen, resultiert dies darin, dass unter Umständen der gesamte Block alle Statements ausführt und am Ende der Berechnung die richtigen Ergebnisse auswählt.
@@ -456,9 +457,9 @@ Ansonsten kann es passieren, dass Thread Blöcke zur Ausführung gestartet werde
 	\caption{OpenCL Speicher Modell. \cite{OCLSPC}}
 	\label{fig::ga06}
 \end{figure} 
-Ein weiteres Problem sind Speicher Konflikte bei der Ausführung eines Kernels.
-Lokaler Speicher von Multiprozessoren ist in Speicher Bänke unterteilt.
-Versuchen Threads eines Thread Blocks auf verschiedene Adressen innerhalb der selben Speicher Bank zuzugreifen, entstehen Speicher Konflikte, da eine Speicher Bank nur eine ihrer Adressen gleichzeitig adressieren kann.
+Ein weiteres Problem sind Speicherkonflikte bei der Ausführung eines Kernels.
+Der Lokale Speicher von Multiprozessoren ist in Speicherbänke unterteilt.
+Versuchen Threads eines Thread Blocks auf verschiedene Adressen innerhalb der selben Speicherbank zuzugreifen, entstehen Speicher Konflikte, da eine Speicherbank nur eine ihrer Adressen gleichzeitig adressieren kann.
 Ausführungen eines Thread Blocks mit Speicher Konflikten müssen serialisiert werden und dauern daher deutlich länger.
-Eine Ausnahme ist es, falls die Threads eines Blocks alle auf dieselbe Adresse innerhalb einer Speicher Bank lesend zugreifen.
+Ein Sonderfall liegt vor, wenn alle Threads eines Blocks auf dieselbe Adresse innerhalb einer Speicherbank lesend zugreifen.
 In diesem Fall wird der gelesene Wert an alle Threads gleichzeitig übertragen.
