@@ -6,7 +6,7 @@ In den Ergebnissen werden die verschiedenen Raycast Methoden auf Bildqualität u
 Anschließend folgt eine Diskussion bezüglich der verschiedenen Ergebnissen.
 
 \section{Ergebnisse}\label{sec::results}
-Der erste Abschnitt beinhaltet Ergebnisse der Implementierungen des Standard Raycasts, \emph{MDC} \ref{ss::MDC} und \emph{DDC} \ref{ss::DDC} sowie der Implementierung der Variierung der Strahlabtastrate \ref{sec::workpacks::ors}.
+Der erste Abschnitt beinhaltet Ergebnisse der Implementierungen des Standard Raycasts, \emph{MDC} (Abschnitt \ref{ss::MDC}) und \emph{DDC} (Abschnitt \ref{ss::DDC}) sowie der Implementierung der Variierung der Strahlabtastrate (Abschnitt \ref{sec::workpacks::ors}).
 Dabei liegt der Fokus auf die Beschreibung der wahrgenommenen Bildqualität der verschiedenen Methoden.
 Der zweite Abschnitt beinhaltet gemessene Performanzleistungen der jeweiligen Implementierungen bei der Verwendung unterschiedlicher Transferfunktionen und Volumendaten.
 Die verschiedenen Methoden werden hier im Hinblick auf die benötigten Ausführungszeiten bei Berechnungen mit verschiedenen Volumen verglichen.
@@ -94,8 +94,8 @@ Damit wird einer leichten Verschiebung des Bildes, aufgrund der zwei unterschied
 Die Anpassung der Bildabtastrate ist abhängig von der Auflösung des Bildes.
 
 In diesem Fall, beim \emph{MDC} Raycast, wurden zwei Bilder berechnet, welche anschließend passend zusammengefügt wurden.
-Das erste Bild wurde mit nur einem viertel der Auflösung berechnet, also der halben Bildabtastrate, und anschließend auf die ursprüngliche Auflösung interpoliert.
-Das zweite Bild wurde mit der ursprünglichen Auflösung berechnet, dafür aber nur ein rechteckiger Ausschnitt an der Mausposition.
+Das erste Bild wurde mit nur einem Viertel der Auflösung berechnet, also der halben Bildabtastrate, und anschließend auf die ursprüngliche Auflösung interpoliert.
+Das zweite Bild wurde mit der ursprünglichen Auflösung berechnet, dafür aber nur ein rechteckiger Ausschnitt um die Mausposition.
 Anschließend wurde das zweite Bild an der Mausposition in das auf die normale Auflösung interpolierte erste Bild eingefügt.
 
 An den Konturen der Abbildung \ref{fig::res::bon_mdc} ist ein leichter Abfall der Auflösung des Bildes zu erkennen.
@@ -110,7 +110,7 @@ An dem Übergang des normal aufgelösten Bereichs zu dem Bereich mit der halben 
 Diese können die Aufmerksamkeit auf sich ziehen und daher auffallen.
 
 Obwohl der Bereich außerhalb des Rechtecks mit nur einem Viertel der Auflösung innerhalb des Rechtecks berechnet wurde, ist die Bildqualität in diesem Bereich noch recht gut.
-Da die Sehschärfe mit zunehmenden Winkel von der Fovea weg immer weiter abnimmt, könnte die Bildabtastrate außerhalb des Rechtecks vermutlich weiter gesenkt werden, ohne dass dies die Bildqualität bei der Verwendung eines Eye-Trackers beeinträchtigt.
+Da die Sehschärfe mit zunehmenden Winkel von der Fovea weg immer weiter abnimmt, könnte die Bildabtastrate außerhalb des Rechtecks vermutlich weiter gesenkt werden, ohne dass dies die Bildqualität bei der Verwendung eines Eyetrackers beeinträchtigt.
 
 Abbildung \ref{fig::res::bon_mdc_ors} zeigt die selbe Berechnung wie Abbildung \ref{fig::res::bon_mdc} aber mit einer variierten Strahlabtastrate.
 Anders als in Abbildung \ref{fig::res::bon_st_ors}, in welcher ebenfalls die Strahlabtastrate auf die gleiche Weise über das Bild hinweg variiert wurde, macht sich in Abbildung \ref{fig::res::bon_mdc_ors} an zum Beispiel den Ästen, die geringere Strahlabtastrate bemerkbar.
@@ -398,7 +398,7 @@ Für die Messungen der Performanz wurde kein Eyetracking verwendet, da dies ledi
 Auch sollten, bei den Messungen mit den verschiedenen Methoden, möglichst die selben Mauspositionen verwendet werden, um vergleichbare Ergebnisse zu erhalten.
 Die Verwendung eines Eyetrackers würde es fast unmöglich machen, die selben Blickpunkte in einem gewissen Zeitraum zu fokussieren.
 
-Für die Messergebnisse selbst wurde ein spiegelverkehrtes \emph{S} mit dem Mauszeiger auf einem Bild nachgefahren und dabei die Mauspositionen abgespeichert.
+Für die Messergebnisse selbst wurde ein spiegelverkehrtes \emph{S} mit dem Mauszeiger auf einem Bild geformt und dabei die Mauspositionen abgespeichert.
 Insgesamt wurden hier 584 Mauspositionen aufgezeichnet.
 Es wurden anschließend verschiedene Volumendaten mit jeweils drei verschiedenen Transferfunktionen für die drei verschiedenen Implementierungen, den Standard-, \emph{MDC}- und \emph{DDC}-Raycast sowie jeweils einmal mit konstanter und einmal mit variierter Strahlabtastrate für die Messungen verwendet.
 Bei jeder dieser Messung wurde dabei für jede der Mauspositionen des gespeicherten Mausverlaufs ein Bild berechnet und zu dieser Berechnung die Mausposition, die Ausführungszeit des Kernels und die Ausführungszeit der \emph{paintGL()}-Methode gespeichert.
@@ -460,7 +460,7 @@ Die Ausführungszeiten für den Standard Raycast mit variierter Strahlabtastrate
 Für den MDC Raycast sieht es ähnlich aus.
 Ohne variierter Strahlabtastrate sind die Werte ein wenig höher und dafür kompakter.
 Mit einer variierten Strahlabtastrate sind sind die Werte niedriger aber weiter verteilt.
-Anders wie bei den vorherigen Raycast Methoden sind die Ausführungszeiten des DDC Raycast mit variierter Strahlabtastrate ein wenig kopakter, als ohne variierter Strahlabtastrate.
+Anders wie bei den vorherigen Raycast Methoden sind die Ausführungszeiten des DDC Raycast mit variierter Strahlabtastrate ein wenig kompakter, als ohne variierter Strahlabtastrate.
 Mit variierter Strahlabtastrate sind die Werte insgesamt aber trotzdem niedriger.
 
 \begin{table}
@@ -491,7 +491,7 @@ Daher terminieren die Strahlen von der Seite früher.
 Das Supernova Volumen hingegen ist relativ rund und hat eine einheitlich Slice-Dicke.
 
 \section{Diskussion}\label{sec::disc}
-Betrachtet man rückblickend auf die Ergebnisse die unterschiedlichen Bildabtastraten, so ist es offensichtlich, dass der Standard Raycast von den unterschieldichen Methoden her, die beste Bildqualität erzeugt.
+Betrachtet man rückblickend auf die Ergebnisse die unterschiedlichen Bildabtastraten, so ist es offensichtlich, dass der Standard Raycast von den unterschiedlichen Methoden her, die beste Bildqualität erzeugt.
 Trotzdem kann durch das Ausnutzen der Limitierungen des visuellen Wahrnehmungssystems des Menschen bei der Verwendung eines Eyetrackers annähernd der Effekt erzeugt werden, dass die Raycast Methoden MDC und DDC das Bild in voller Auflösung berechnen, obwohl dies nicht der Fall.
 Da die Auflösung beim MDC Raycast im äußeren Bereich im Vergleich zum DDC Raycast immer noch deutlich höher ist, ist dieser Effekt für den MDC Raycast viel realistischer und kaum wahrnehmbar während beim DDC Raycast noch Artefakte des am niedrigsten aufgelösten Bereichs wahrnehmbar sind.
 Um die Bildqualität des DDC Raycasts weiter zu verbessern, könnte die Bildabtastrate des äußersten Bereichs angehoben und oder der Radius des mittleren Bereichs vergrößert werden, so dass die reduzierte Auflösung noch weniger auffällt.
