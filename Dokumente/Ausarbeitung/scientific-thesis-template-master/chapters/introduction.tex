@@ -1,37 +1,37 @@
 % Einleitung - Motivation - Problemstellung / Aufgabenstellung - Zeitplanung %
 \chapter{Einleitung}\label{chap::intro}
-Moderne Bildschirme werden immer größer, haben höhere Pixeldichten und können immer mehr Bilder pro Sekunde Anzeigen.
-Besonders Virtual-Reality Technologien benötigen immer größere Bildschirmflächen und höhere Auflösungen um eine möglichst gute Nutzererfahrung zu erzeugen.
+Moderne Bildschirme werden immer größer, haben höhere Pixeldichten und können immer mehr Bilder pro Sekunde anzeigen.
 Dadurch erhöht sich die Anzahl der zu berechnenden Pixel einer Anwendung pro Sekunde immens, wodurch immer höhere Anforderungen an die Hardware gestellt werden und die Performanz der Anwendungen unter den Grenzen der Hardware leiden. 
 Methoden des wahrnehmungsorientierten Renderings können hier weiterhelfen. 
 
 Das visuelle Wahrnehmungssystem des Menschen hat einige Limitierungen, die im wahrnehmungsorientierten Rendering gezielt ausgenutzt werden können.
 So kann die visuelle Wahrnehmung des Menschen grob in foveales und peripheres Sehen unterteilt werden.
-Das foveale Sehen ist im Zentrum des Blickpunkts und umfasst nur einen sehr kleinen Bereich, in dem man scharf und detailliert sehen kann.
-Das periphere Sehen hingegen ist unscharf und eher ungenau, wobei die Sehschärfe mit der Distanz zum Zentrum  des Blickpunkts immer weiter abnimmt.
-Im wahrnehmungsorientierten Rendering wird sich unter Anderem diese Eigenschaft zu Nutze gemacht, um das Leistungsverhalten von bilderzeugenden Anwendungen zu verbessern.
+Das foveale Sehen ist im Zentrum des Blickpunkts und umfasst nur einen sehr kleinen Bereich in dem man scharf und detailliert sehen kann.
+Das periphere Sehen hingegen ist unscharf und eher ungenau, wobei die Sehschärfe mit der Distanz zum Zentrum des Blickpunkts immer weiter abnimmt.
+Im wahrnehmungsorientierten Rendering wird sich unter anderem diese Eigenschaft zu Nutze gemacht, um das Leistungsverhalten von bilderzeugenden Anwendungen zu verbessern.
 Dafür wird die Bildqualität im peripheren Bereich gesenkt, wodurch die Berechnungsdauer eines Bildes reduziert wird.
-Da die visuelle Wahrnehmungsmöglichkeiten im peripheren Bereich sowieso abnehmen, wird die Reduzierte Bildqualität im besten Fall von dem Nutzer nicht wahrgenommen.
+Da die visuelle Wahrnehmungsmöglichkeiten im peripheren Bereich sowieso abnehmen, wird die reduzierte Bildqualität im besten Fall von dem Nutzer nicht wahrgenommen.
 
 Um wahrnehmungsorientierte Rendering Methoden verwenden zu können ist es notwendig, die visuelle Wahrnehmung des Nutzers zu kennen.
 Ein Eyetracker ermöglicht es, die aktuelle Blickposition des Nutzers auf dem betrachteten Bildschirm zu messen und der wahrnehmungsorientierten Anwendung zur Verfügung zu stellen.
-Daher sind wahrnehmungsorientierte Anwendungen oft mit Eyetracker verknüpft.
+Wahrnehmungsorientierte Anwendungen werden deshalb oft mit zusammen mit einem Eyetracker verwendet.
 
-Wahrnehmungsorientierte Renderin Methoden sind nicht auf Anwendungen beschränkt, die ihre Bilder mit einer Grafikpipeline berechnen.
+Wahrnehmungsorientierte Rendering Methoden sind nicht auf Anwendungen beschränkt, die ihre Bilder mit einer Grafikpipeline berechnen.
 Besonders das Volumenrendering mit Hilfe eines Raycasts ermöglicht unterschiedliche Ansatzpunkte, um wahrnehmungsorientierte Methoden zu implementieren.
-Da das Rendern von Volumen aufgrund der Komplexität von Volumendaten auch sehr berechnungsaufwändig sein kann, müsste sich durch die Implementierung von wahrnehmungsorientierte Volumenrendering Methoden, die Performanz und Nutzbarkeit von interaktiven Volumenrenderern deutlich verbessern lassen.
+Da das Rendern von Volumen aufgrund der Komplexität der Volumendaten auch sehr berechnungsaufwändig sein kann, müsste sich durch die Implementierung von wahrnehmungsorientierten Volumenrendering Methoden, die Performanz und Nutzbarkeit von interaktiven Volumenrenderern deutlich verbessern lassen.
 
 Diese Arbeit befasst sich hauptsächlich mit dieser These.
-Es soll mit Hilfe eines Eye-Trackers die foveale Region auf dem Bildschirm erfasst und zusätzlich eine Möglichkeit geschaffen werden, diese mit der Maus zu simulieren.
+Es soll mit Hilfe eines Eyetrackers die foveale Region auf dem Bildschirm erfasst und zusätzlich eine Möglichkeit geschaffen werden, diese mit der Maus zu simulieren.
 Ausgehend einer existierenden Volumenrendering-Anwendung, welche für diese Arbeit zur Verfügung gestellt wurde, sollen unterschiedliche Methoden implementiert werden, um abhängig zu der Blick- beziehungsweise Mausposition die Bildqualität des Volumenrenderings im peripheren Bereich des Auges zu reduzieren.
-Anschließend sollen die unterschiedlichen Methoden anhand ihrer Bildqualität und Performanz und der Wahrnehmung bei der Verwendung der Eyetracking-Daten untersucht und diskutiert werden
+Anschließend sollen die unterschiedlichen Methoden anhand ihrer Bildqualität und Performanz und der Wahrnehmung bei der Verwendung von Eyetrackingdaten untersucht und diskutiert werden.
 
-Die Arbeit beschäftigt sich dafür zu Beginn mit einigen Grundlagen bezüglich verwandter Arbeiten, dem visuellen Sehapparates des Menschen und der Architektur von GPUs, die unter Anderem für die Implementierungen dieser Arbeit wichtig waren.
-Im folgenden werden einige Arbeitspakete, die im Laufe dieser Arbeit entstanden sind und umgesetzt wurden, im Entwurf vorgestellt.
-Dort wurde sich drei Methoden überlegt, wie die Performanz des Volumenrenderings durch die Verwendung eines Eyetrackers, verbessert werden kann.
+Die Arbeit beschäftigt sich dafür zu Beginn mit einigen Grundlagen. 
+Diese sind unter anderem relevante Aspekte verwandter Arbeiten, des visuellen Sehapparates des Menschen und der Architektur von GPUs.
+Im folgenden werden Arbeitspakete, die im Laufe dieser Arbeit entstanden sind und umgesetzt wurden, im Entwurf vorgestellt.
+Die Arbeitspakete beschäftigten sich unter anderem mit drei Methoden, mit denen die Performanz des Volumenrenderings durch die Verwendung eines Eyetrackers verbessert werden kann.
 Eine dieser Methode hat die Strahlabtastrate abhängig zum Blickpunkt des Nutzers variiert.
 Die zwei anderen Methoden veränderten abhängig zur Distanz des Blickpunkts die Anzahl der Strahlen und damit die Auflösung des berechneten Bildes.
-Die Methode zur Veränderung der Strahlabtastrate konnte dabei mit den unterschiedlichen Methoden, die die Auflösung des Bildes angepasst haben, kombiniert werden.
+Die Methode zur Veränderung der Strahlabtastrate konnte dabei mit den anderen beiden Methoden, die die Auflösung des Bildes angepasst haben, kombiniert werden.
 Die Integration und Implementierung der Arbeitspakete einschließlich der unterschiedlichen Methoden in die bestehende Volumerender-Anwendung wird im anschließenden Kapitel genauer beschrieben.
 Für die verschiedenen möglichen Kombinationen der Methoden wurden hinsichtlich ihrer Bildqualität und Performanz Messungen erstellt und diese verglichen.
-Die Resultate sind im Ergebniskapitel vorgestellt und werden anschließend diskutiert.
+Die Resultate sind im Ergebniskapitel vorgestellt und werden dort anschließend diskutiert.
