@@ -17,7 +17,14 @@ Ein Eyetracker ermöglicht es, die aktuelle Blickposition des Nutzers auf dem be
 Wahrnehmungsorientierte Anwendungen werden deshalb oft mit zusammen mit einem Eyetracker verwendet.
 
 Wahrnehmungsorientierte Rendering Methoden sind nicht auf Anwendungen beschränkt, die ihre Bilder mit einer Grafikpipeline berechnen.
-Besonders das Volumenrendering mit Hilfe eines Raycasts ermöglicht unterschiedliche Ansatzpunkte, um wahrnehmungsorientierte Methoden zu implementieren.
+Besonders das Volumenrendering mit Hilfe eines Raycasts, ermöglicht unterschiedliche Ansatzpunkte, um wahrnehmungsorientierte Methoden zu implementieren.
+Raycasting ist ein Verfahren um Volumendaten abzutasten und auf eine 2D Rastergrafik zu projizieren.
+Wie beim Raytracing werden beim Raycasting auch Sichtstrahlen verfolgt.
+Dabei wird in der Regel für jeden Pixel ein Sichtstrahl, ausgehend von einer virtuellen Kamera im Raum, in das Volumen gesendet und in bestimmten Abständen abgetastet.
+Das Volumen ist aus Voxeln aufgebaut, die dreidimensionale Boxen entsprechen.
+Wird ein Voxel von einem Sichtstrahl abgetastet, so wird ausgehend von dem Dichtewert des Voxels und einer Transferfunktion ein Farbwert berechnet und dem Sichtstrahl hinzugefügt.
+Alle abgetasteten Farbwerte eines Sichtstrahls resultieren in einem endgültigen Farbwert für den jeweiligen Pixel.
+Die Transferfunktion ermöglicht auch eigentlich verdeckte Strukturen innerhalb des Volumens sichtbar zu machen, indem Voxel mit bestimmten Dichtewerten nicht zur Farbwertberechnung beitragen und dadurch ausgeblendet werden.
 Da das Rendern von Volumen aufgrund der Komplexität der Volumendaten auch sehr berechnungsaufwändig sein kann, müsste sich durch die Implementierung von wahrnehmungsorientierten Volumenrendering Methoden, die Performanz und Nutzbarkeit von interaktiven Volumenrenderern deutlich verbessern lassen.
 
 Diese Arbeit befasst sich hauptsächlich mit dieser These.
