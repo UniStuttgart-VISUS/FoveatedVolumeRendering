@@ -1,54 +1,51 @@
 % % Fazit der Arbeit
 \chapter{Fazit}\label{chap:zusfas}
-Die Einarbeitung in das Projekt war relativ aufwendig und es hat daher eine gewisse Zeit gebraucht, bis sich ein Überblick über die Struktur des Projektes gebildet werden konnte.
-Dies ist im Hinblick auf ein umfangreiches Projekt nicht verwunderlich, wurde aber auch dadurch erschwert, dass unter Anderem mit verschiedenen ungewohnten Programmiersprachen, Programmierumgebungen und Programmierbibliotheken sich auseinander gesetzt werden musste.
-Die Auseinandersetzung mit diesen hat aber viele neue Einblicke in unterschiedliche Bereiche ermöglicht, die sich im Laufe dieser Arbeit sich als sehr hilfreich repräsentiert haben und als Grundlage für neue Arbeiten dienen werden.
-So haben sich vor allem Einblicke in die GPU Architektur als sehr interessant und hilfreich bei der Implementierung der Implementierung der Raycasts, besonders des DDC Raycasts erwiesen.
-Zum Beispiel wurde aufgrund der Einblicke in die Grundlagen der GPU Architektur im Laufe dieser Arbeit die Implementierung des DDC Raycasts strukturell verändert, wodurch sich die Performanz weiter verbesserte.
-Trotzdem, wie in der Diskussion (Abschnitt \ref{sec::disc}) sich schon herausgestellt hat, muss man bei der Programmierung für die GPU auf bestimmte Aspekte achten und meistens ist eine Optimierung immer noch möglich.
+Die Einarbeitung in das Projekt war aufwändig und es hat daher eine gewisse Zeit gebraucht, bis sich ein Überblick über die Struktur des Projektes gebildet werden konnte.
+Dies ist im Hinblick auf ein umfangreiches Projekt nicht verwunderlich, wurde aber dadurch erschwert, dass unter anderem die Einarbeitung in ungewohnte Programmiersprachen, Programmierumgebungen und Programmierbibliotheken erforderlich waren.
+Die Auseinandersetzung mit diesen hat aber viele neue Einblicke in bisher unbekannte Bereiche ermöglicht, die im Laufe dieser Arbeit sich als sehr hilfreich präsentiert haben.
+So haben sich vor allem Einblicke in die GPU Architektur als sehr interessant und hilfreich für die Implementierung der Raycasts, besonders des DDC Raycasts, erwiesen.
+Zum Beispiel wurde aufgrund dieser Einblicke im Verlauf der Arbeit die Implementierung des DDC Raycasts strukturell verändert, wodurch sich die Performanz weiter verbesserte.
+Trotzdem, wie in der Diskussion (Abschnitt \ref{sec::disc}) dargestellt, muss bei der Programmierung für die GPU bestimmte Aspekte beachtet werden.
 Die Auseinandersetzung mit den Grundlagen und Limitierungen des Sehapparates (Abschnitt \ref{sec::eye}) war für das Verständnis des Hauptziels dieser Arbeit und für die Umsetzung der Implementierungen wichtig und hat die Art und Weise, wie die Implementierungen entworfen wurden, beeinflusst.
-Allerdings wurden die Parameter, wie die unterschiedlichen Auflösungen und die unterschiedlichen Ausmaße der Bereiche in den verschiedenen Raycast Methoden, nach der eigenen Wahrnehmung eingestellt.
-Diese Parameter könnten für weitere Arbeiten genauer untersucht werden, um die optimalen Werte zu finden.
-Zum Beispiel die könnte untersucht werden, wie es sich auswirkt, wenn die Größe der inneren Ellipse des DDC Raycasts auf die genaue Größe der Fovea auf dem Bildschirm angepasst wird und wie es wahrgenommen wird, wenn die innere Ellipse stattdessen kleiner oder größer dargestellt wird.
+Allerdings wurden die Parameter, wie die unterschiedlichen Auflösungen und die unterschiedlichen Ausmaße der Bereiche in den verschiedenen Raycastmethoden, nach der eigenen Wahrnehmung eingestellt.
+Diese Parameter könnten für weitere Arbeiten genauer untersucht werden, um optimale Werte zu finden.
+Zum Beispiel könnte untersucht werden, wie es sich auswirkt, wenn die Größe der inneren Ellipse des DDC Raycasts auf die genaue Größe der Fovea auf dem Bildschirm angepasst und wie es wahrgenommen wird, wenn die innere Ellipse kleiner oder größer dargestellt wird.
 
-Im Verlauf der Arbeit wurde klar, dass die Umsetzung des Volumenrenderings durch einen Raycast sehr gut möglich ist und auch viele Erweiterungen und Modifikationen des Volumenrenderings, wie das Anwenden einer Tranferfunktion oder auch insbesondere wahrnehmungsorientierte Methoden, zum Beispiel das Reduzierung der Strahlabtastrate im peripheren Bereich, dadurch einfach umgesetzt werden können.
+Im Verlauf der Arbeit wurde klar, dass die Umsetzung des Volumenrenderings durch einen Raycast sehr gut möglich ist und auch viele Erweiterungen und Modifikationen des Volumenrenderings, wie das Anwenden einer Tranferfunktion und insbesondere wahrnehmungsorientierte Methoden, zum Beispiel das Reduzierung der Strahlabtastrate im peripheren Bereich, umgesetzt werden können.
 Wahrnehmungsorientiertes Rendering ist aber nicht auf das Volumenrendering und Raycasts beschränkt.
 Die Referenzliteratur in Abschnitt \ref{ss::pfwov} zeigte diesbezüglich Arbeiten, die wahrnehmungsorientierte Methoden in Anwendungen anwenden, die eine Grafikpipeline zur Berechnung verwenden.
-Die vorgestellten Methoden MDC und DDC können an sich auch in Anwendungen, die eine Grafikpipeline verwenden, umgesetzt werden.
+Die vorgestellten Methoden MDC und DDC können prinzipiell auch in Anwendungen, die eine Grafikpipeline verwenden, umgesetzt werden.
 
-Die Anfertigung von Arbeitspaketen hat die Strukturierung der Arbeit erleichtert und erwies sich auch für die Implementierungen der Arbeit als hilfreich, da diese unter Anderem gewisse Vorgaben repräsentierten und eine ungefähre Einschätzung des Zeitaufwandes ermöglichten.
+Die Anfertigung von Arbeitspaketen hat die Strukturierung der Arbeit erleichtert und erwies sich auch für die Implementierungen der Arbeit als hilfreich, da diese unter anderem gewisse Vorgaben repräsentierten und eine ungefähre Einschätzung des Zeitaufwandes ermöglichten.
 
 Die Arbeit hat gezeigt, dass wahrnehmungsorientierte Methoden durchaus einen Performanzgewinn erbringen können ohne die Bildqualität wahrnehmbar zu beeinträchtigen.
 Alleine die Verwendung einer varrierten Strahlabtastrate für den Standard Raycast hat selbst bei genauer Betrachtung eines statischen Bildes einer Berechnung kaum wahrnehmbare Veränderungen der Bildqualität nach sich gezogen und trotzdem die Ausführungszeit spürbar verbessert.
-Die Anpassungen der Bildabtastrate wurde jeweils durch die Raycast Methoden MDC und DDC umgesetzt und hat jeweils einen noch größeren Performanzgewinn ermöglicht.
-Dabei hat sich die Implementierung des MDC Raycasts als vergleichsweise einfach erwiesen und war mit wenigen Änderungen zu dem ursprünglichen Raycast-Verhaltens implementierbar.
-Erstaunlicherweise lieferte der MDC Raycast im späteren Vergleich mit dem DDC Raycast sowohl eine bessere Bildqualität, als auch eine bessere Performanz, wodurch dieser durch eine schnelle Ausführung mit wenig Varianz für die Verwendung eines Eyetrackers gut geeignet war.
-Trotzdem gibt es weitere Möglichkeiten diesen zu verbessern. 
-Zum Beispiel kann die Bildabtastrate im äußeren Bereich weiter verringert werden oder auch noch ein dritter Bereich eingefügt werden, solange der Overhead dadurch nicht die Berechnung eines Bildes zu sehr beeinträchtigt.
-Der DDC Raycast war deutlich zeitaufwendiger zu implementieren.
-Die Indizes mussten vergleichsweise aufwändig auf Bildkoordinaten abgebildet werden und anschließend war es noch notwendig, diese zu interpolieren.
+Die Anpassungen der Bildabtastrate wurde jeweils durch die Raycastmethoden MDC und DDC umgesetzt und hat jeweils einen noch größeren Performanzgewinn ermöglicht.
+Dabei hat sich die Implementierung des MDC Raycasts als vergleichsweise einfach erwiesen und war mit wenigen Änderungen des ursprünglichen Raycasts implementierbar.
+Erstaunlicherweise lieferte der MDC Raycast im späteren Vergleich mit dem DDC Raycast sowohl eine bessere Bildqualität, als auch eine bessere Performanz.
+Dieser ist aufgrund der schnellen Ausführung und geringen Varianz für die Verwendung eines Eyetrackers gut war.
+Trotzdem gibt es weitere Möglichkeiten, diesen zu verbessern. 
+Zum Beispiel kann die Bildabtastrate im äußeren Bereich weiter verringert werden oder auch noch ein dritter Bereich eingefügt werden, solange der Overhead dadurch die Ausführungszeit der Berechnung eines Bildes nicht zu sehr beeinträchtigt.
+Der DDC Raycast war deutlich zeitaufwändiger zu implementieren.
+Die Indizes mussten vergleichsweise aufwändig auf Bildkoordinaten abgebildet werden und anschließend war es notwendig, diese zu interpolieren.
 Dafür erreichte der DDC Raycast bessere Spitzenwerte, ist aber von der Gesamtperformanz her aufgrund des Overheads und der deutlich größeren Varianz der Ausführungszeiten schlechter als der MDC Raycast.
 Auch die Bildqualität ist im äußeren Bereich deutlich geringer.
-Dies wird aber aufgrund der Limitationen des visuellen Wahrnehmungssystems bei der Verwendung eines Eyetrackers lange nicht so wahrgenommen, wie wenn man nur das statische Bild ohne einen Eyetracker betrachtet.
-Auch der DDC Raycast ist wie im Diskussionsabschnitt (Abschnitt \ref{sec::disc}) schon erwähnt wurde, ausbaufähig und kann vermutlich bei einer besseren Umsetzung deutlich effizienter werden.
-Im Vergleich zur Referenzliteratur, in welcher höhere Faktoren in der Performanzgewinnung durch die Implementation von wahrnehmungsorientierten Verfahren erzielt wurden, liegt dies hier unter anderem auch daran, dass die Raycast Methoden, vor allem der DDC Raycast, in der Implementierung möglichst variabel gehalten wurde.
+Aufgrund der Limitationen des visuellen Wahrnehmungssystems, wird dies bei der Verwendung eines Eyetrackers nur geringfügig wahrgenommen.
+Auch der DDC Raycast ist wie im Diskussionsabschnitt (Abschnitt \ref{sec::disc}) schon erwähnt wurde, ausbaufähig und kann vermutlich durch eine bessere Implementierung deutlich effizienter werden.
+Im Vergleich zur Referenzliteratur, in welcher durch die Implementierung von wahrnehmungsorientierten Verfahren Peformanzgewinnungen um den Faktor $6$ möglich waren, wurde hier lediglich ein Faktor um $2$ erzielt.
+Dies liegt unter anderem daran, dass die Raycastmethoden, vor allem der DDC Raycast, in der Implementierung möglichst variabel gehalten wurde.
 Eine Festlegung auf bestimmte Parameter würde es ermöglichen, die Implementierung des DDC Raycasts anders und effizienter umzusetzen.
 
-Wie in Abschnitt \ref{ss::MDC} kurz erwähnt wurde, wäre ein interessanter Ansatz für die Zukunft, eine Implementierung die wie eine Art Linse die Strahldichte gleichmäßig reduzieren kann.
-
-Die Verwendung eines Eyetrackers und die Arbeit damit war sehr interessant.
-Dass die Eyetracker API eine Validierung der Augen-Messdaten zur Verfügung stellt, verbesserte die Nutzungserfahrung deutlich. 
-Insgesamt ist aber bei der Arbeit mit dem Eyetracker aufgefallen, dass es entweder durch die Tremor-Bewegungen des Auges oder durch Messungenauigkeiten des Eyetrackers, die gemessenen Blickpositionen kleine kurze Variationen enthalten. 
-Da das Bild bei aktivem Eyetracking auf das Flackern reagiert und sich dadurch verändert, ziehen diese Änderungen teilweise die Aufmerksamkeit auf sich und wirken störend.
+Bei der Arbeit mit dem Eyetracker ist aufgefallen, dass es durch Tremor-Bewegungen des Auges oder durch Messungenauigkeiten des Eyetrackers, zu vielen kleinen Differenzen in den gemessenen Blickpositionen kam. 
+Da das Bild bei aktivem Eyetracking auf diese Differenzen reagiert und sich dadurch verändert hat, ziehen diese Änderungen teilweise die Aufmerksamkeit auf sich und wirken störend.
 Daher sollten die Eyetracking Daten vor der Verwendung gefiltert oder geglättet werden.
 
-Die Erstellung und Darstellung der Messwerte hat sich als einen erheblichen Aufwand herausgestellt.
 Die Umsetzung der Messmethoden in dem Projekt und besonders die Erstellung leicht verständlicher grafischer Repräsentationen hat viel Zeit benötigt.
 Schlussendlich konnten die Messmethoden aber so implementiert werden, dass diese reproduzierbar sind.
-Für die Messungen wurden die Eyetracking-Daten, die die Blickposition liefern, durch eine Mausbewegung simuliert und damit Messungen für die verschiedenen Raycast Methoden und für verschiedene Volumen erstellt.
+Für die Messungen wurden die Eyetrackingdaten, die die Blickposition liefern, durch eine Mausbewegung simuliert und damit Messungen für die verschiedenen Raycastmethoden und für verschiedene Volumen erstellt.
 Die Darstellung durch Heatmaps veranschaulichte die Vor- und Nachteile der Methoden DDC und MDC indem die benötigte Ausführungszeiten für unterschiedliche Mauspositionen für das Volumen dargestellt wurden.
 Die Darstellung der Messwerte durch Boxplots ermöglichte einen noch genaueren und verständlicheren Vergleich.
 
-Abschließend ist zu sagen, dass sowohl die vorgestellten Methoden als auch allgemein wahrnehmungsorientiertes Rendering hohes Potential hat.
+Abschließend ist zu sagen, dass wahrnehmungsorientiertes Volumenrendering hohes Potential hat.
 Die Bildschirme und Pixeldichten werden immer größer, vor allem auch in VR-Anwendungen, da diese selten in Verbindung mit High-End Hardware berechnet werden und eine große und hoch aufgelöste Bildfläche bieten.
 Dadurch werden Berechnungen für Bilder dieser Auflösungen immer aufwendiger und Methoden, die die Performanz ohne Einbußen in der Bildqualität verbessern, mehr benötigt denn je.
