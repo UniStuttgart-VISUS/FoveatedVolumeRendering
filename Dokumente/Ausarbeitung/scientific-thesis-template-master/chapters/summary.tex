@@ -12,22 +12,30 @@ Allerdings wurden die Parameter, wie die unterschiedlichen Auflösungen und die 
 Diese Parameter könnten für weitere Arbeiten genauer untersucht werden, um die optimalen Werte zu finden.
 Zum Beispiel die könnte untersucht werden, wie es sich auswirkt, wenn die Größe der inneren Ellipse des DDC Raycasts auf die genaue Größe der Fovea auf dem Bildschirm angepasst wird und wie es wahrgenommen wird, wenn die innere Ellipse stattdessen kleiner oder größer dargestellt wird.
 
-Im Verlauf der Arbeit wurde klar, dass die Umsetzung des Volumenrenderings durch einen Raycast sehr gut möglich ist und auch viele Erweiterungen und Modifikationen des Volumenrenderings, wie wahrnehmungsorientierte Methoden, zum Beispiel das Reduzierung der Strahlabtastrate im peripheren Bereich, oder das Anwenden einer Tranferfunktion, dadurch einfach umgesetzt werden kann.
+Im Verlauf der Arbeit wurde klar, dass die Umsetzung des Volumenrenderings durch einen Raycast sehr gut möglich ist und auch viele Erweiterungen und Modifikationen des Volumenrenderings, wie das Anwenden einer Tranferfunktion oder auch insbesondere wahrnehmungsorientierte Methoden, zum Beispiel das Reduzierung der Strahlabtastrate im peripheren Bereich, dadurch einfach umgesetzt werden können.
 Wahrnehmungsorientiertes Rendering ist aber nicht auf das Volumenrendering und Raycasts beschränkt.
 Die Referenzliteratur in Abschnitt \ref{ss::pfwov} zeigte diesbezüglich Arbeiten, die wahrnehmungsorientierte Methoden in Anwendungen anwenden, die eine Grafikpipeline zur Berechnung verwenden.
-% Einen Entwurf anzufertigen mit Arbeitspaketen, die durchgesetzt werden sollen, war hilfreich da man sich daran halten konnte und ermöglichte eine gewisse einteilung der arbeit
-% Bezogen auf die Ergebnisse hat es gezeigt, dass wahrnehmungsorientierte methoden durchaus einen performanzgewinn bringen können ohne die bildqualität zu beeinträchtigen.
-% Alleine die Anpassung der Strahlabtastrate hat kaum wahrnehmbare Bildqualitative Veränderungen nach sich gezogen und trotzdem die Ausführungszeit spürbar verbessert.
-% Die anpassungen der Bildabtastrate gab es zwei Methoden, mdc ddc
-% mdc der einfachere umgesetzte ansatz und ging von der implementierung her auch deutlich schneller
-% trotzdem mdc it sar insgesamt am besten abgeschnitten, sowohl performanz als auch deutlich besser in der bildqualität als ddc
-% den ansatz, der bei mdc gegangen wurde könnte man daher weiter ausbauen, z.B. bildabtastrate im äußeren bereich weiter verringern und u.U. einen dritten bereich einfügen, solange der Overhead dadurch nicht zu groß wird, da bisher im vergleich mdc hauptsächlich wegem dem overhead bessere werte gezeigt hat
-% ddc war deutlich zeitaufwendiger zu implementieren, da index hinund her gemappt wurden und anschließend noch eine interpolation benötigt wurde
-% ddc hat bessere spitzenwerte aber ist von der Performanz her aufgrund des overheads schlechter als mdc
-% auch die Bildqualität leidet unter der niedrigen Bildabtastrate, wird aber aufgrund der limitationen des visuellen wahrnehmungssystems bei der verwendung eines eyetrackers lange nicht so wahrgenommen, wie wenn man nur das statische Bild betrachtet, ohne einen Eyetracker
-% ddc ist wie in diskussion schon erwähnt ausbaufähig und kann vermutlich bei einer besseren umsetzung deutlich effizienter werden und aufgrund des einzelnen raycasts auch vom overhead schneller werden.
-% Im Vergleich zur Referenzliteratur, in welcher deutlich höhere Faktoren in der Performanzgewinnung erfahren wurden, liegt dies unter anderem auch daran, dass die raycast methoden vor allem die ddc methode in der implementierung möglichst variabel gehalten wurde und auch daran, dass wie schon erwähnt in den implementierungen hier noch genügend verbesserungsmöglichkeiten existieren.
-% Ein interessanter Ansatz für die Zukunft, wäre eine implementierung die wie eine Art Linse (verweis überlegung im arbeitspaket), die die Strahldichte gleichmäßig reduzieren kann
+Die vorgestellten Methoden MDC und DDC können an sich auch in Anwendungen, die eine Grafikpipeline verwenden, umgesetzt werden.
+
+Die Anfertigung von Arbeitspaketen hat die Strukturierung der Arbeit erleichtert und erwies sich auch für die Implementierungen der Arbeit als hilfreich, da diese unter Anderem gewisse Vorgaben repräsentierten und eine ungefähre Einschätzung des Zeitaufwandes ermöglichten.
+
+Die Arbeit hat gezeigt, dass wahrnehmungsorientierte Methoden durchaus einen Performanzgewinn erbringen können ohne die Bildqualität wahrnehmbar zu beeinträchtigen.
+Alleine die Verwendung einer varrierten Strahlabtastrate für den Standard Raycast hat selbst bei genauer Betrachtung eines statischen Bildes einer Berechnung kaum wahrnehmbare Veränderungen der Bildqualität nach sich gezogen und trotzdem die Ausführungszeit spürbar verbessert.
+Die Anpassungen der Bildabtastrate wurde jeweils durch die Raycast Methoden MDC und DDC umgesetzt und hat jeweils einen noch größeren Performanzgewinn ermöglicht.
+Dabei hat sich die Implementierung des MDC Raycasts als vergleichsweise einfach erwiesen und war mit wenigen Änderungen zu dem ursprünglichen Raycast-Verhaltens implementierbar.
+Erstaunlicherweise lieferte der MDC Raycast im späteren Vergleich mit dem DDC Raycast sowohl eine bessere Bildqualität, als auch eine bessere Performanz, wodurch dieser durch eine schnelle Ausführung mit wenig Varianz für die Verwendung eines Eyetrackers gut geeignet war.
+Trotzdem gibt es weitere Möglichkeiten diesen zu verbessern. 
+Zum Beispiel kann die Bildabtastrate im äußeren Bereich weiter verringert werden oder auch noch ein dritter Bereich eingefügt werden, solange der Overhead dadurch nicht die Berechnung eines Bildes zu sehr beeinträchtigt.
+Der DDC Raycast war deutlich zeitaufwendiger zu implementieren.
+Die Indizes mussten vergleichsweise aufwändig auf Bildkoordinaten abgebildet werden und anschließend war es noch notwendig, diese zu interpolieren.
+Dafür erreichte der DDC Raycast bessere Spitzenwerte, ist aber von der Gesamtperformanz her aufgrund des Overheads und der deutlich größeren Varianz der Ausführungszeiten schlechter als der MDC Raycast.
+Auch die Bildqualität ist im äußeren Bereich deutlich geringer.
+Dies wird aber aufgrund der Limitationen des visuellen Wahrnehmungssystems bei der Verwendung eines Eyetrackers lange nicht so wahrgenommen, wie wenn man nur das statische Bild ohne einen Eyetracker betrachtet.
+Auch der DDC Raycast ist wie im Diskussionsabschnitt (Abschnitt \ref{sec::disc}) schon erwähnt wurde, ausbaufähig und kann vermutlich bei einer besseren Umsetzung deutlich effizienter werden.
+Im Vergleich zur Referenzliteratur, in welcher höhere Faktoren in der Performanzgewinnung durch die Implementation von wahrnehmungsorientierten Verfahren erzielt wurden, liegt dies hier unter anderem auch daran, dass die Raycast Methoden, vor allem der DDC Raycast, in der Implementierung möglichst variabel gehalten wurde.
+Eine Festlegung auf bestimmte Parameter würde es ermöglichen, die Implementierung des DDC Raycasts anders und effizienter umzusetzen.
+
+Wie in Abschnitt \ref{}Ein interessanter Ansatz für die Zukunft, wäre eine implementierung die wie eine Art Linse (verweis überlegung im arbeitspaket), die die Strahldichte gleichmäßig reduzieren kann
 % Bezogen Auf die Arbeit mit dem Eyetracker war es sehr interessant damit zu arbeiten.
 % Dass die api eine validierung der augendaten zur verfügung stellt hat sehr geholfen. Insgesamt ist aber bei der Arbeit mit dem Eyetracker noch aufgefallen, dass es entweder durch die Tremor-Bewegungen des Auges oder durch Messungenauigkeiten des Eyetrackers zu einem Flackern kommt. Da das Bild auf das Flackern reagiert ziehen sich veränderte Eigenschaften die Aufmerksamkeit auf sich und dadurch wirkt das Bild ein wenig störend. Für eine weitere Arbeit mit Eyetracking Daten sollten diese gefiltert oder geglättet werden.
 % Bezogen auf die Erstellung und Darstellung der Messwerte kann man sagen, dass dies doch noch ein erheblicher Aufwand war, die Messungen in dem Projekt umzusetzen und aus den Messdaten grafische repräsentationen zu bilden, die verständlich sind.
