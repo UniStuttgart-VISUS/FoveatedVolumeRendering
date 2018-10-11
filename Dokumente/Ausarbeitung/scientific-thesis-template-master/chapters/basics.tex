@@ -4,80 +4,76 @@
 \label{chap:k2}
 Abschnitt \ref{sec::relwo} dieses Kapitels beschäftigt sich mit verwandten Arbeiten zum Thema Wahrnehmungsorientiertes Volumenrendering.
 In Abschnitt \ref{sec::eye} werden Grundlagen des menschlichen Sehapparates behandelt.
-Hier werden unter Anderem die Fähigkeiten und Limitierungen der visuellen Wahrnehmung des Menschen diskutiert.
-Abschnitt \ref{sec::voltff} behandelt einige Grundlagen zum Volumenrendering, wie Raycasting und das Verwenden einer Transferfunktion.
+Hier werden unter anderem die Fähigkeiten und Limitierungen der visuellen Wahrnehmung des Menschen diskutiert.
+Abschnitt \ref{sec::voltff} behandelt Grundlagen zum Volumenrendering, wie Raycasting und die Funktionsweise einer Transferfunktion.
 Das Implementieren unterschiedlicher Methoden des Raycastings und die Wahl von geeigneten Transferfunktionen wird Teil dieser Arbeit sein.
-Anschließend befasst sich Abschnitt \ref{sec::eyetr} mit einigen Grundlagen bezüglich das Erfassen der visuellen Wahrnehmung mit Hilfe von Eyetracking.
-Der Raycast wird in der Regel auf einer GPU ausgeführt.
-Dabei sind einige Eigenschaften der GPU Architektur besonders zu beachten.
-Diese Thematik wird in Abschnitt \ref{sec::gpuarc} behandelt.
+Anschließend befasst sich Abschnitt \ref{sec::eyetr} mit dem Erfassen der visuellen Wahrnehmung mit Hilfe von Eyetracking.
+Der Raycast wird in der Regel auf einer GPU ausgeführt, dabei sind einige Eigenschaften der GPU Architektur besonders zu beachten.
+Dies wird in Abschnitt \ref{sec::gpuarc} beschrieben.
 
 \section{Related Work}\label{sec::relwo}
 Wahrnehmungsorientiertes Volumenrendering ist kein neues Arbeitsgebiet und war schon Teil verschiedener wissenschaftlicher Arbeiten.
-Der Hauptteil dieser Arbeit bezieht sich auf den Aspekt der Performanz im Wahrnehmungsorientierten Volumenrendering.
-Abschnitt \ref{ss::pfwov} behandelt daher verwandte Arbeiten bezüglich des wahrnehmungsorientierten Volumenrenderings unter dem Aspekt der Performanz.
-Die Ansätze hier beziehen sich meist darauf, dass die Qualität der Darstellung im peripheren Bereich der visuellen Wahrnehmung, gesenkt wird und so für die Berechnung eines Bildes weniger Rechenleistung aufgewendet werden muss.
+Abschnitt \ref{ss::pfwov} behandelt daher verwandte Arbeiten bezüglich des wahrnehmungsorientierten Volumenrenderings unter dem Aspekt der Performanz, da sich der Hauptteil dieser Arbeit sich auf diesen Aspekt bezieht.
+Die Ansätze hier beziehen sich meist darauf, dass die Qualität der Darstellung im peripheren Bereich der visuellen Wahrnehmung gesenkt wird und so für die Berechnung eines Bildes weniger Rechenleistung aufgewendet werden muss.
 
-Abschnitt \ref{ss::wovrzq} bezieht sich auf Arbeiten zu wahrnehmungsorientiertem Volumenrendering, mit dem Ziel, die Qualität der Darstellung zu erhöhen.
-Dabei werden vor allem Ansätze zur geschickten Anpassung von Parametern einer Transferfunktion vorgestellt, die dem Betrachter ein insgesamt besseres Verständnis der Volumendaten ermöglichen soll.
+Abschnitt \ref{ss::wovrzq} bezieht sich auf Arbeiten zum wahrnehmungsorientierten Volumenrendering mit dem Ziel, die Qualität der Darstellung zu erhöhen.
+Dabei werden vor allem Ansätze zur geschickten Anpassung von Parametern einer Transferfunktion vorgestellt, die dem Betrachter ein insgesamt besseres Verständnis der Volumendaten ermöglichen sollen.
 \subsection{Performanz- und Wahrnehmungsorientiertes Volumenrendering}\label{ss::pfwov}
 Marc Levoy und Ross Whitaker \cite{Levoy:1990:GVR:91385.91449} erforschen in ihrer Arbeit, wie Eyetracking-Daten in Rendering-Algorithmen eingesetzt werden könnnen.
-Das Ziel ihrer Forschung war es, dem Nutzer einen Arbeitsplatz für Echtzeit-Volumen-Rendering, mit der Illusion eines hochauflösendes Bildes über den gesamten Bildschirm, zu präsentieren, welches durch Eyetracking unterstützten Verfahren einen geringeren Berechnungsaufwand als herkömmliche Volumenrenderer hat.
+Ziel ihrer Forschung war es, dem Nutzer einen Arbeitsplatz für Echtzeit-Volumen-Rendering, mit der Illusion eines hochauflösenden Bildes über den gesamten Bildschirm zu präsentieren.
+Dadurch sollte das durch Eyetracking unterstützte Verfahren einen geringeren Berechnungsaufwand als herkömmliche Volumenrenderer haben.
 Dafür stellten sie eine Implementierung eines Raycasters für Volumendaten vor, in welcher mit Hilfe der Eyetrackingdaten der Blickfokus auf dem Bildschirm berechnet wurde und die Anzahl der Strahlen und die Samples pro Strahl, abhängig von der Distanz zum Blickfokus, angepasst wurden.
-Die Implementierung basierte darauf, dass der Detaillgrad der visuellen Wahrnehmung des menschlichen Auge nur in einem kleinen, zentralen Bereich, der Fovea am höchsten ist und zu den Rändern des Blickfelds hin stark abnimmt.
-Ausgehend davon berechneten sie in dem von dem Nutzer fokussierten Bereich, das Bild mit der vollen Auflösung und einer hohen Abtastrate der Strahlen.
+Die Implementierung basierte darauf, dass der Detaillgrad der visuellen Wahrnehmung des menschlichen Auges nur in einem kleinen, zentralen Bereich, der Fovea, am höchsten ist und zu den Rändern des Blickfelds hin stark abnimmt.
+Ausgehend davon berechneten sie in dem von dem Nutzer fokussierten Bereich das Bild mit der vollen Auflösung und einer hohen Abtastrate der Strahlen.
 In dem restlichen Bereich reduzierten sie die Auflösung des Bildes und abhängig von dem Abstand eines Pixels zum Blickfokus, die Abtastrate eines Strahls.
-In ihrer Implementierung verwendeten sie 2D und 3D mip maps, einen Eye Tracker und die Pixel-Planes 5 rendering engine, ein hoch paralleles Raster Display System.
+In ihrer Implementierung verwendeten sie 2D und 3D mip maps, einen Eye Tracker und die \emph{Pixel-Planes 5 rendering engine}, ein hoch paralleles Raster Display System.
 Um die geringere Abtastung in der Peripherie gut nutzen zu können, wurde aus den 3D Volumendaten eine 3D mip map erstellt.
-Die 3D mip map wurde durch den Raycasting Algorithmus abgetastet wodurch anschließend mit trilinearer Interpolation eine 2D mip map erstellt wurde.
+Die 3D mip map wurde durch den Raycasting Algorithmus abgetastet, wodurch anschließend mit trilinearer Interpolation eine 2D mip map erstellt wurde.
 Die 2D mip map war Grundlage für die Erstellung des endgültigen Bildes.
-In ihren Ergebnissen konnten sie die Rendering Kosten für ein teilweise hochauflösendes Bild im Vergleich zu einem vollständig hochauflösenden Bildes, um bis einen Faktor von fünf senken.
+In ihren Ergebnissen konnten sie die Berechnungsaufwand für ein teilweise hochauflösendes Bild im Vergleich zu einem vollständig hochauflösenden Bild, um bis einen Faktor von fünf senken.
 
-Guenter et. al. \cite{foveated-3d-graphics} behandelt, ähnlich zu dem Paper von Levoy und Whitaker, wie der Abfall der visuellen Auflösung des Auges außerhalb des visuellen Zentrums ausgenutzt werden kann, um eine beschleunigte Berechnung des Bildes zu ermöglichen.
-Im Gegensatz zu der davor genannten Arbeit, war das darunterliegende System hier kein Raycaster für Volumendaten, sondern eine Grafikpipeline für die Rasterung von 3D Szenen.
-Das Bild wurde hier aus drei Teilbilder zusammengesetzt, welche jeweils mit unterschiedlichen Auflösungen berechnet wurden und wie Schichten übereinander gelegt werden.
+Guenter et. al. \cite{foveated-3d-graphics} untersuchte, ähnlich zu dem Paper von Levoy und Whitaker, wie der Abfall der visuellen Auflösung des Auges außerhalb des visuellen Zentrums ausgenutzt werden kann, um eine beschleunigte Berechnung des Bildes zu ermöglichen.
+Im Gegensatz zu der davor genannten Arbeit war das darunterliegende System hier kein Raycaster für Volumendaten, sondern eine Grafikpipeline für die Rasterung von 3D Szenen.
+Das Bild wurde hier aus drei Teilbilder zusammengesetzt, welche jeweils mit unterschiedlichen Auflösungen berechnet wurden und wie Schichten übereinander gelegt wurden.
 Die drei Schichten waren: innere Schicht, mittlere Schicht und äußere Schicht.
 Die innere Schicht hatte ungefähr die Größe des fovealen Bereichs auf dem Bildschirm und wurde in der maximalen Auflösung berechnet.
 Ihr Mittelpunkt war der Blickfokus des Betrachters.
-Die mittlere Schicht war ein bisschen größer als die innere Schicht und wurde mit einer niedrigeren Auflösung berechnet. 
+Die mittlere Schicht war ein wenig größer als die innere Schicht und wurde mit einer niedrigeren Auflösung berechnet. 
 Sie wurde ebenfalls auf den Blickfokus des Betrachters zentriert.
 Die äußerste Schicht überdeckte den gesamten Bildbereich und wurde in der niedrigsten Auflösung berechnet.
 Um die Schichten zusammensetzen zu können, wurden die mittlere und äußere Schicht jeweils zur nativen Auflösung des Bildschirms, die gleiche Auflösung wie die innere Schicht, interpoliert.
-Scharfe Kanten zwischen den Schichten wurden dadurch vermieden, dass diese sich gegenseitig leicht überdeckten und spezielle Blend-Masken verwendet wurden, um die verschiedenen Schichten glatt übereinander zu blenden.
-In ihrer Arbeit nahmen sie sich auch das Problem an, dass das starke Unterabtasten, um bis zu dem Faktor sechs in jede Dimension, in der mittleren und äußeren Schicht zu störenden Artefakten führen kann.
-Um dies entgegen zu wirken, verwendeten sie drei Antialiasing Techniken: Hardware Multi-Sample Antialiasing (MSAA), \emph{Temporal Reprojection} und \emph{whole frame jitter sampling}.
-Um die Blickposition zu erfassen nutzten sie den Tobii Tx 300 Eye Tracker mit einer Worst-Case Latency von 10\,ms.
-Das Bild wurde auf einem Computer mit Intel Xeon CPU (E5640 mit 2.67\,GHz) und einer NVidia GeForce GTX 580 GPU berechnet.
-Dargestellt wurde es auf einem 23 Zoll $1920\times1080$ LCD Monitor mit einer Bildwiederholungsrate von 120\,Hz.
-Mit ihrem System und Techniken erlangten sie eine Performanz-Verbesserung von einem Faktor zwischen fünf und sechs auf einem Monitor mit HD Auflösung.
+Scharfe Kanten zwischen den Schichten wurden dadurch vermieden, dass diese sich gegenseitig leicht überdeckten und spezielle \emph{Blend-Masks} verwendet wurden, um die verschiedenen Schichten glatt übereinander zu legen.
+In ihrer Arbeit nahmen sie sich auch des Problems an, dass das starke Unterabtasten um bis zu dem Faktor sechs in jede Dimension, in der mittleren und äußeren Schicht zu störenden Artefakten führen konnte.
+Um dem entgegen zu wirken, verwendeten sie drei Antialiasing Techniken: \emph{Hardware Multi-Sample Antialiasing (MSAA)}, \emph{Temporal Reprojection} und \emph{whole frame jitter sampling}.
+Um die Blickposition zu erfassen nutzten sie den \emph{Tobii Tx 300 Eye Tracker} mit einer Worst-Case Latenz von 10\,ms.
+Das Bild wurde auf einem Computer mit einer \emph{Intel Xeon CPU (E5640 mit 2.67\,GHz)} und einer \emph{NVidia GeForce GTX 580 GPU} berechnet.
+Dargestellt wurde es auf einem 23\,Zoll $1920\times1080$ LCD Monitor mit einer Bildwiederholungsrate von 120\,Hz.
+Mit ihrem System und ihren Techniken erlangten sie eine Performanz-Verbesserung um den Faktor fünf bis sechs auf einem Monitor mit HD Auflösung.
 Dabei erreichten sie eine Darstellungsqualität, die vergleichbar mit dem Rendern eines hochauflösenden Bildes über den gesamten Bildschirm ist.
 
 \subsection{Wahrnehmungsorientiertes Volumenrendering zur Qualitätssteigerung}\label{ss::wovrzq}
-R. Englund und T. Ropinski \cite{doi:10.1111/cgf.13320} stellten verschiedene Techniken, zur Verbesserung der Wahrnehmung von komplexen volumetrischen Daten, vor.
-In einer Studie mit über 300 Teilnehmern untersuchten sie, wie diese Techniken zur verbesserten Wahrnehmung von Volumen beitragen und verglichen die verschiedenen Ansätze miteinander.
-Dabei mussten die Teilnehmer jeweils kleine Aufgaben absolvieren, so dass Rückschlüsse darauf geschlossen werden können, wie sehr eine gewisse Technik dem Teilnehmer bei der Erkennung von Form und Tiefe eines Objekts in einem Volumen beiträgt.
-Um eine bessere direkte Erforschung der Volumendaten später ermöglichen zu können, wurden Techniken, die automatisch Renderingparameter angepasst haben, hier ausgelassen.
-Nur wenn der Nutzer selbst interaktiv ist, also die Parameter des Volumenrenderings, wie die Transferfunktion und Kamera selbst anpassen kann, ermöglicht dies eine direkte Erforschung.
-In ihrer Studie haben sie sechs Techniken ausgewertet.
-Darunter \emph{Direct Volume Raytracing} (DVR) als grundlegende Technik und \emph{Depth Darkening}, wobei Tiefeneffekte ähnlich zu \emph{Ambient Occlusion} dadurch hervorgerufen werden, dass tiefere Objekte dunkler gezeichnet werden. 
-In ihrer Auswertung kamen sie unter Anderem dazu, dass Techniken, die natürliche Lichteffekte in den Volumendaten simulieren, deutliche Vorteile gegenüber die anderen getesteten Ansätze gezeigt haben.
+R. Englund und T. Ropinski \cite{doi:10.1111/cgf.13320} untersuchten verschiedene Techniken zur Verbesserung der Wahrnehmung von komplexen volumetrischen Daten.
+In einer Studie mit über 300 Teilnehmern erforschten sie, wie diese Techniken zur verbesserten Wahrnehmung von Volumen beitragen und verglichen die verschiedenen Ansätze miteinander.
+Dabei mussten die Teilnehmer jeweils kleine Aufgaben absolvieren, so dass darauf geschlossen werden konnten, wie sehr eine bestimmte Technik den Teilnehmer bei der Erkennung von Form und Tiefe eines Objekts in einem Volumen unterstützt.
+Um eine bessere direkte Analyse der Volumendaten später ermöglichen zu können, wurden Techniken, die automatisch Renderingparameter angepasst haben, ausgelassen.
+In ihrer Studie haben sie sechs Techniken ausgewertet, darunter \emph{Direct Volume Raytracing (DVR)} und \emph{Depth Darkening}.
+In ihrer Auswertung kamen sie unter anderem dazu, dass Techniken, die natürliche Lichteffekte in den Volumendaten simulieren, deutliche Vorteile gegenüber anderen getesteten Ansätzen gezeigt haben.
 
-Anders als zu den untersuchten Techniken von Englund und Ropinski \cite{doi:10.1111/cgf.13320} präsentieren Aidong Lu et. al. \cite{Lu:2006:VCU:2384796.2384814} eine Methode für automatisierte Parameterauswahl bei der Betrachtung von Volumendaten mit Hilfe eines Eye Tracking Gerätes.
-Das Ziel, welches sie mit dieser Methode verfolgten, war die Vereinfachung der mühsamen Nutzerinteraktionen bei der Auswahl der Parameter, um somit die Nutzbarkeit des Darstellungssystems zu verbessern.
+Anders als zu den untersuchten Techniken von Englund und Ropinski \cite{doi:10.1111/cgf.13320} präsentierten Aidong Lu et. al. \cite{Lu:2006:VCU:2384796.2384814} eine Methode für die automatisierte Parameterauswahl bei der Betrachtung von Volumendaten.
+Das Ziel welches sie mit dieser Methode verfolgten, war die Vereinfachung der mühsamen Nutzerinteraktionen bei der Auswahl der Parameter, um somit die Nutzbarkeit des Darstellungssystems zu verbessern.
 
-Volumendaten können sehr komplex sein.
-Daher ist es oft schwierig herauszufinden, was der Nutzer in dem Volumen betrachten möchte und was dahingehend hervorgehoben werden soll.
+Volumendaten können sehr komplex sein, daher ist es oft schwierig herauszufinden, was der Nutzer in dem Volumen betrachten möchte und was dahingehend hervorgehoben werden soll.
 Eigenschaften der Volumendaten, wie konstante Größen, Formen und Positionen der Objekte ermöglichen aber Methoden für eine automatische Anpassung der Parameter.
 
-Aidong Lu et. al. nutzten einen Eyetracker, um die Bereiche, die für den Nutzer von Interesse sind, zu bestimmen.
+Aidong Lu et. al. nutzten einen Eyetracker, um die Bereiche, die für den Nutzer von Interesse waren, zu bestimmen.
 Dieser maß die Augenbewegungen und die Blickposition auf dem Bildschirm.
-Es wurde zwischen zwei Hauptsächlichen Augenbewegungen unterschieden, einer Sakkade und einer Fixation.
+Es wurde zwischen zwei hauptsächlichen Augenbewegungen unterschieden: Einer Sakkade und einer Fixation.
 Eine Sakkade ist eine schnelle Augenbewegung von einem Punkt zu einem anderem.
 Bei einer Fixation ruht das Auge auf einem Punkt.
-Punkte, die fixiert werden, sind für den Nutzer meist von Interesse.
-Da die Blickposition durch den Eye Tracker nur auf einer 2D-Ebene bestimmt werden konnte, wurde durch ein konstantes Rotieren des Volumenobjekts und der parallelen Aufzeichnung der Augenbewegung versucht, die 3D Position des fixierten Objektes zu rekonstruieren.
-Aus den Eyetracking und Volumendaten bestimmenten sie dann mit Hilfe mehrerer Clustering-Methoden Gewichte für die einzelnen Voxel des Volumens und berechneten so einen Wichtigkeitswert für die verschiedenen Objekte innerhalb des Volumens.
-Entsprechend dieser Ergebnisse wurden die Renderingparameter angepasst, um die für den Nutzer am interessantesten Objekte hervorzuheben und anzuzeigen.
+Punkte die fixiert werden sind für den Nutzer meist von höherem Interesse.
+Da die Blickposition durch den Eye Tracker nur auf einer 2D-Ebene bestimmt werden konnte, wurde durch ein konstantes Rotieren des Volumenobjektes und der dazu parallelen Aufzeichnung der Augenbewegungen versucht, die 3D Position des fixierten Objektes zu rekonstruieren.
+Aus den Eyetracking- und Volumendaten bestimmten sie dann mit Hilfe mehrerer Clustering-Methoden Gewichte für die einzelnen Voxel des Volumens und berechneten so einen Wichtigkeitswert für die verschiedenen Objekte innerhalb des Volumens.
+Entsprechend dieser Ergebnisse wurden die Renderingparameter angepasst, um die für den Nutzer interessantesten Objekte hervorzuheben und anzuzeigen.
 Aidong Lu et. al. kamen zu dem Schluss, dass die präsentierte Methode den Aufwand für den Nutzer, die Render Parameter anzupassen, signifikant reduzieren kann.
 Trotzdem konnte ein solcher regelbasierter Ansatz nicht mit der manuellen Einstellung der Renderingparameter mithalten.
 
