@@ -35,12 +35,21 @@ Auch der DDC Raycast ist wie im Diskussionsabschnitt (Abschnitt \ref{sec::disc})
 Im Vergleich zur Referenzliteratur, in welcher höhere Faktoren in der Performanzgewinnung durch die Implementation von wahrnehmungsorientierten Verfahren erzielt wurden, liegt dies hier unter anderem auch daran, dass die Raycast Methoden, vor allem der DDC Raycast, in der Implementierung möglichst variabel gehalten wurde.
 Eine Festlegung auf bestimmte Parameter würde es ermöglichen, die Implementierung des DDC Raycasts anders und effizienter umzusetzen.
 
-Wie in Abschnitt \ref{}Ein interessanter Ansatz für die Zukunft, wäre eine implementierung die wie eine Art Linse (verweis überlegung im arbeitspaket), die die Strahldichte gleichmäßig reduzieren kann
-% Bezogen Auf die Arbeit mit dem Eyetracker war es sehr interessant damit zu arbeiten.
-% Dass die api eine validierung der augendaten zur verfügung stellt hat sehr geholfen. Insgesamt ist aber bei der Arbeit mit dem Eyetracker noch aufgefallen, dass es entweder durch die Tremor-Bewegungen des Auges oder durch Messungenauigkeiten des Eyetrackers zu einem Flackern kommt. Da das Bild auf das Flackern reagiert ziehen sich veränderte Eigenschaften die Aufmerksamkeit auf sich und dadurch wirkt das Bild ein wenig störend. Für eine weitere Arbeit mit Eyetracking Daten sollten diese gefiltert oder geglättet werden.
-% Bezogen auf die Erstellung und Darstellung der Messwerte kann man sagen, dass dies doch noch ein erheblicher Aufwand war, die Messungen in dem Projekt umzusetzen und aus den Messdaten grafische repräsentationen zu bilden, die verständlich sind.
-% Schlussendlich konnten die Messmethoden so implementiert werden, dass diese reproduzierbar sind.
-% Für die Messung war es auch sinnvoll, verschiedene Mauspositionen bei der Darstellung eines Volumens zu betrachten.
-% Die Darstellung durch Heatmaps veranschaulicht die vor- und nachteile der methoden ddc und mdc bei der betrachtung eines volumens und die darstellung der boxplots ermöglichte einen noch genaueren und verständlicheren vergleich.
-% Abschließend ist zu sagen, dass sowohl die vorgestellten Methoden als auch wahrnehmungs-orientiertes Rendering hohes Potential hat und aufgrund der größeren Bildschirme und Pixeldichten vor allem auch in VR-Anwendungen, die nicht immer mit high-end hardware ausgestattet sind, dies auch in zukunft einen wichtigen aspekt haben wird.
-% Ausserdem ist die Performanz nicht der einzige Grund für wahrnehmungsorientiertes Rendering. Wie auch in der Referenzliteratur beschrieben, kann dieses auch für Informativere Darstellungen sorgen. Oder auch die Augenbewegungen für die Steuerung von Anwendungen verwenden.
+Wie in Abschnitt \ref{ss::MDC} kurz erwähnt wurde, wäre ein interessanter Ansatz für die Zukunft, eine Implementierung die wie eine Art Linse die Strahldichte gleichmäßig reduzieren kann.
+
+Die Verwendung eines Eyetrackers und die Arbeit damit war sehr interessant.
+Dass die Eyetracker API eine Validierung der Augen-Messdaten zur Verfügung stellt, verbesserte die Nutzungserfahrung deutlich. 
+Insgesamt ist aber bei der Arbeit mit dem Eyetracker aufgefallen, dass es entweder durch die Tremor-Bewegungen des Auges oder durch Messungenauigkeiten des Eyetrackers, die gemessenen Blickpositionen kleine kurze Variationen enthalten. 
+Da das Bild bei aktivem Eyetracking auf das Flackern reagiert und sich dadurch verändert, ziehen diese Änderungen teilweise die Aufmerksamkeit auf sich und wirken störend.
+Daher sollten die Eyetracking Daten vor der Verwendung gefiltert oder geglättet werden.
+
+Die Erstellung und Darstellung der Messwerte hat sich als einen erheblichen Aufwand herausgestellt.
+Die Umsetzung der Messmethoden in dem Projekt und besonders die Erstellung leicht verständlicher grafischer Repräsentationen hat viel Zeit benötigt.
+Schlussendlich konnten die Messmethoden aber so implementiert werden, dass diese reproduzierbar sind.
+Für die Messungen wurden die Eyetracking-Daten, die die Blickposition liefern, durch eine Mausbewegung simuliert und damit Messungen für die verschiedenen Raycast Methoden und für verschiedene Volumen erstellt.
+Die Darstellung durch Heatmaps veranschaulichte die Vor- und Nachteile der Methoden DDC und MDC indem die benötigte Ausführungszeiten für unterschiedliche Mauspositionen für das Volumen dargestellt wurden.
+Die Darstellung der Messwerte durch Boxplots ermöglichte einen noch genaueren und verständlicheren Vergleich.
+
+Abschließend ist zu sagen, dass sowohl die vorgestellten Methoden als auch allgemein wahrnehmungsorientiertes Rendering hohes Potential hat.
+Die Bildschirme und Pixeldichten werden immer größer, vor allem auch in VR-Anwendungen, da diese selten in Verbindung mit High-End Hardware berechnet werden und eine große und hoch aufgelöste Bildfläche bieten.
+Dadurch werden Berechnungen für Bilder dieser Auflösungen immer aufwendiger und Methoden, die die Performanz ohne Einbußen in der Bildqualität verbessern, mehr benötigt denn je.
