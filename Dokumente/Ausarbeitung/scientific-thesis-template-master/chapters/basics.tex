@@ -79,9 +79,9 @@ Trotzdem konnte ein solcher regelbasierter Ansatz nicht mit der manuellen Einste
 
 \section{Sehapparat}\label{sec::eye}
 Wahrnehmungsorientiertes Rendering nutzt gezielt Eigenschaften der visuellen Wahrnehmung des Menschen aus.
-Dafür ist es notwendig, ein gutes Verständnis des menschlichen visuellen Wahrnehmungsapparates zu besitzen.
-M. Weier et. al. \cite{doi:10.1111/cgf.13150} befassten sich unter Anderem mit diesen Eigenschaften des menschlichen Sehapparates.
-Einige davon werden im Folgenden vorgestellt.
+Dafür ist ein gutes Verständnis des menschlichen visuellen Wahrnehmungsapparates notwendig.
+M. Weier et. al. \cite{doi:10.1111/cgf.13150} befassten sich unter anderem mit den Fähigkeiten und Limitierungen des menschlichen Sehapparates.
+Die für diese Arbeit relevanten Eigenschaften und Limitierungen werden im Folgenden vorgestellt.
 \begin{figure}
 	\centering
 	\includegraphics[width=0.5\textwidth]{../../Grafiken/HVS-model_from-star-report.png}
@@ -92,29 +92,26 @@ Abbildung \ref{fig::eye01} ist ein Modell des visuellen Wahrnehmungsapparates de
 Das Modell unterteilt den Sehapparat des Menschen in Optik, Sensorik, Motorik, Verarbeitung, Speicherung und Aufmerksamkeit.
 Licht trifft auf die Augen und wird durch die Optik auf die Retina beziehungsweise die Sensorik, weitergeleitet.
 Hier wird der visuelle Input abgetastet und gefiltert.
-Dabei entstehen zwei Datenströme welche die Verarbeitung stereoskopischer Bilder über einen großen Blickwinkel mit unterschiedlichen räumlich unterschiedlicher Auflösungen ermöglichen.
+Dabei entstehen zwei Datenströme welche die Wahrnehmung stereoskopischer Bilder über einen großen Blickwinkel mit unterschiedlichen Auflösungen ermöglichen.
 Die Retina ist mit dem visuellen Kortex verbunden.
 Die Signale werden über die visuellen Nerven komprimiert und zum visuellen Kortex transportiert.
 Dort werden sie von verschiedenen Bereichen im Gehirn verarbeitet.
-Die Speicherung der Signale und die aktuelle Aufmerksamkeit spielen dabei eine wesentliche Rolle.
+Die Speicherung der Signale und die aktuelle Aufmerksamkeit spielen dabei eine große Rolle.
 
 Das visuelle Wahrnehmungssystem des Menschen hat wesentliche Limitierungen, die bei der Darstellung von Bildern gezielt genutzt werden können.
 Die Sehschärfe ist ungleich auf der Retina verteilt und nur in in einem kleinen, zentralen Bereich ist die Sehschärfe maximal.
 Dieser Bereich wird Fovea genannt.
 Je weiter man sich auf der Retina von der Fovea nach außen hin entfernt, desto mehr nimmt die Sehschärfe ab.
 Der Bereich außerhalb der Fovea ist der periphere Bereich des Auges.
-% Eine Verringerung der Bildqualität ist daher im äußeren Bereich möglicherweise nicht wahrnehmbar. ; Einleitung
-% Diese Eigenschaft motiviert den Versuch, die Bildqualität im peripheren Bereich zu reduzieren, um ohne merkliche Verluste in der visuellen Wahrnehmung des Betrachters den Rechenaufwand des Renderings zu reduzieren. ; Einleitung
-Das Sichtfeld des visuellen Wahrnehmungsapparates des Menschen ist bei gerade gerichteten Blick horizontal bis circa 190\,\textdegree{} und mit Augenrotation bis zu 290\,\textdegree{} weit.
+
+Das Sichtfeld des visuellen Wahrnehmungsapparates des Menschen ist bei einem gerade gerichteten Blick horizontal bis circa 190\,\textdegree{} und mit Augenrotationen bis zu 290\,\textdegree{} weit.
 Visuelle Reize werden über das gesamte Sichtfeld wahrgenommen.
-Abhängig von dem zuständigen Bereich auf der Retina gibt es starke Unterschiede, wie die visuellen Reize über das Sichtfeld verteilt verarbeitet werden.
-% Durch das Verkleinern und Vergrößern der Pupille wird die Menge des einfallenden Lichts in das Auge gesteuert. ; Überflüssig
-% Die Pupille nimmt dabei Größen zwischen 2\,mm und 8\,mm Durchmesser an. ; Überflüssig
+Abhängig von dem zuständigen Bereich auf der Retina gibt es starke Unterschiede, wie die visuellen Reize verarbeitet werden.
 
 Die Retina ist die photosensitive Schicht des Auges und besteht aus zwei Typen von Photorezeptoren, aus Zapfen und Stäbchen.
 Es sind circa $6\times10^6$ Zapfen und ungefähr 20 mal so viele Stäbchen auf der Retina verteilt.
 Stäbchen sind für die Helligkeitswahrnehmung verantwortlich.
-Zapfen sind für die Farbwahrnehmung verantwortlich.
+Zapfen sind für die Farbwahrnehmung zuständig.
 Man unterscheidet zwischen drei Zapfentypen, die L-Zapfen für lange Wellenlängen, die M-Zapfen für mittlere Wellenlängen und die S-Zapfen für kurze Wellenlängen.
 
 Die Fovea ist der Bereich um circa 5,2\,\textdegree{} um das Zentrum der Retina und besteht fast ausschließlich aus Zapfen.
@@ -122,50 +119,51 @@ Die Anzahl der Zapfen nimmt nach außen hin stark ab.
 Der Bereich von circa 5,2\,\textdegree{} bis 9\,\textdegree{} wird als Parafovea bezeichnet.
 Der Bereich zwischen circa 9\,\textdegree{} bis 17\,\textdegree{} heißt Perifovea.
 Fovea, Parafovea und Perifovea sind für die zentrale Sicht verantwortlich.
-Alles außerhalb ist die periphere Sicht.
+Alles außerhalb der zentralen Sicht wird als periphere Sicht bezeichnet.
 \begin{figure}
 	\centering
 	\includegraphics[width=0.5\textwidth]{../../Grafiken/Retinal-photoreceptor-distr_from-star-report.PNG}
-	\caption{Verteilung der Photorezeptoren auf der Retina \cite{doi:10.1111/cfg.13150}}
+	\caption{Verteilung der Photorezeptoren auf der Retina. \cite{doi:10.1111/cfg.13150}}
 	\label{fig::eye02}
 \end{figure}
 Abbildung \ref{fig::eye02} zeigt die Dichteverteilung der Photorezeptoren auf der Retina.
 Die höchste Dichte der Stäbchen liegt bei circa 15\,\textdegree{} bis 20\,\textdegree{} um die Fovea herum.
 Ihre Anzahl verringert sich nach außen hin circa linear.
-Zapfen und Stäbchen sind sehr unterschiedlich auf der Reitna Verteilt.
+Zapfen und Stäbchen sind sehr unterschiedlich auf der Retina verteilt.
 Beide folgen aber einem Poisson-Disc Verteilungsmuster.
+
 Die Dichte der Zapfen ist direkt mit der Sehschärfe verknüpft.
 Daher fällt die Sehschärfe auch nach außen hin stark ab.
-Bei 6\,\textdegree{} weg vom Zentrum beträgt die Sehschärfe nur noch ein Viertel der maximalen Sehschärfe.
+Bei 6\,\textdegree{} außerhalb des Zentrums beträgt zum Beispiel die Sehschärfe nur noch ein Viertel der maximalen Sehschärfe im Zentrum.
 
 Die Sehschärfe hängt aber auch von der Kontraststärke der visuellen Reize ab.
 Dabei ist die Kontrastsensitivität von der Anzahl der auf den Reiz reagierenden neuronalen Zellen abhängig, welche ebenfalls nach außen hin stark abnimmt.
 Die Farbsensitivität ist von der Verteilung von Stäbchen und Zapfen abhängig.
 Die Zapfen zur Erkennung von grünem und rotem Licht sind vermehrt in der Fovea und eher weniger im peripheren Bereich verteilt.
 Insgesamt sind lediglich neun Prozent der Zapfen für die Wahrnehmung von blauem Licht verantwortlich.
-Diese sind vermehrt im peripheren Bereich verteilt als im Zentrum.
-% Rezeptoren im Auge passen sich deutlich schneller an die Helligkeit als an die Dunkelheit an. ; Überflüssig         
+Diese sind eher im peripheren Bereich verteilt als im Zentrum.
 
 Das Auge ist dauerhaft in Bewegung.
-Sechs externe Muskeln ermöglichen es verschiedene Objekte von Interesse (OvI) in die Fovea zu bringen und zu fokussieren.
-Die wichtigsten Arten von Augenbewegungen ist die Sakkade, der Vestibular-Okularer Reflex, die weiche Augenverfolgung \emph{Smooth pursuit eye motion (SPEM)} und \emph{coupled vergence-accommodation motion}.
-Der Vestibular-Okulare Reflex passiert relativ schnell mit einer Latenz von 7\,ms - 15\,ms und ermöglicht auch während schnellen Kopfbewegungen OvI zu fixieren.
-Die SPEM ermöglicht die weiche Verfolgung eines sich bewegendes Objektes und die \emph{coupled vergence-accomoodation motion} ist eine Augenbewegung die auftritt, wenn erst ein nahes Objekt und danach ein weit entferntes Objekt fokussiert wird.
+Sechs externe Muskeln ermöglichen es verschiedene Objekte von Interesse (OvI) zu fokussieren.
+Die wichtigsten Arten von Augenbewegungen ist die Sakkade, der Vestibular-Okularer Reflex, die \emph{Smooth pursuit eye motion (SPEM)} und \emph{coupled vergence-accommodation motion}.
+Der Vestibular-Okulare Reflex ist relativ schnell und hat eine Latenz von 7\,ms bis 15\,ms und ermöglicht dadurch auch während schnellen Kopfbewegungen OvI zu fixieren.
+Die SPEM ermöglicht die weiche Verfolgung eines sich bewegendes Objektes.
+Die \emph{coupled vergence-accomoodation motion} ist eine Augenbewegung, die auftritt, wenn erst ein nahes Objekt und danach ein weit entferntes Objekt fokussiert wird.
 
 Für das wahrnehmungsorientierte Rendering wird meist nur zwischen einer Sakkade und einer Fixation unterschieden.
-Eine Sakkade bezeichnet das schnelle springen von einem Ovi zu einem anderen.
+Eine Sakkade bezeichnet das schnelle Springen von einem Ovi zu einem anderen.
 Dabei erreicht das Auge Geschwindigkeiten von bis zu 900\,\textdegree/s.
-Die Sehsensivität ist während einer solchen Sakkade stark geschwächt.
+Die Sehsensitivität ist während einer solchen Sakkade stark geschwächt.
 Eine Fixation dauert zwischen 100\,ms - 1.5\,s.
 Sie tritt meist dann auf, wenn ein OvI genauer betrachtet wird und die Augen darauf ruhen.
-In natürlichen Szenen treten zwei bis drei Sakkaden pro Sekunde auf, mit jeweils einer durchschnittlich 250\,ms langen Fixationszeit.
+In natürlichen Szenen treten zwei bis drei Sakkaden pro Sekunde auf, mit jeweils einer durchschnittlichen Fixationszeit von 250\,ms.
 Der räumliche Abstand zwischen den Fixierungen beträgt dabei circa 7\,\textdegree{}.
-Ein Abstand von mehr als 30\,\textdegree{} wird als unangenehm empfunden und hat meist eine Kopfbewegung zur Folge.
+Ein Abstand von mehr als 30\,\textdegree{} wird als unangenehm empfunden und hat in der Regel eine Kopfbewegung zur Folge.
 Auch während einer Fixierung macht das Auge wichtige kleine Bewegungen, sogenannte Tremorbewegungen.
-Werden diese bewusst unterdrückt, resultiert dies in einem schwindenden Bild.
-Kleinere Augenbewegungen von bis zu 2.5\,\textdegree{}/s haben kaum einen Effekt auf die Sehschärfe.
+Werden diese bewusst unterdrückt, führt dies zu einem schwindenden Bild.
+Kleinere Augenbewegungen von bis zu 2.5\,\textdegree{}/s haben auf die Sehschärfe keinen Effekt.
 
-Das die Fovea einen sehr wichtigen Teil der visuellen Informationen liefert spiegelt sich auch darin wieder, dass über 30 Prozent des primären Sehverarbeitungsbereichs des Gehirns für die zentralen 5\,\textdegree{} des Sehfeldes, zuständig sind.
+Dass die Fovea einen sehr wichtigen Teil der visuellen Informationen liefert spiegelt sich auch darin wieder, dass über 30 Prozent des primären Sehverarbeitungsbereichs des Gehirns für die zentralen 5\,\textdegree{} des Sehfeldes, zuständig sind.
 Der periphere Bereich ist hier benachteiligt, liefert aber trotzdem wichtige kontextuelle Informationen und hilft bei der Wahrnehmung von Kontrasten, Objekten und Tieren.
 Die Bewegungserkennung ist sowohl in der Fovea als auch im peripheren Bereich ähnlich oder genauso gut.
 
