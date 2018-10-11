@@ -235,29 +235,29 @@ Strukturen mit einer geringeren Dichte könnten transparenter und weniger farbin
 
 \section{Eyetracking}\label{sec::eyetr}
 Für viele wahrnehmungsorientierte Methoden ist es notwendig, den aktuellen Blickpunkt des Betrachters auf dem Bildschirm zu kennen.
-Ein Eyetrackinggerät ermöglicht die Übermittlung der Bickposition des Betrachter auf einem Bildschirm in Realzeit und ist daher auch für interaktive Anwendungen geeignet.
+Ein Eyetrackinggerät ermöglicht die Berechnung der Bickposition des Betrachter auf einem Bildschirm in Realzeit und ist daher auch für interaktive Anwendungen geeignet.
 
 Eyetracking ist das Messen von Augenaktivitäten eines Betrachters.
-In der Regel betrachtet der Betrachter dabei einen Bildschirm und ein Eyetracker misst währenddessen seine Augenaktivitäten.
+In der Regel schaut der Betrachter dabei auf einen Bildschirm, währenddessen ein Eyetracker seine Augenaktivitäten misst.
 Aus den Augenaktivitäten können Informationen über den Blickverlauf und die Fixationsdauer bestimmter Punkte auf diesem Bildschirm berechnet werden.
-Diese Informationen ermöglichen es, Rückschlüsse über das betrachtete Bild zu ziehen, wie zum Beispiel, welche Objekte eines Bildes besonders interessant für den Betrachter sind.
-Eyetracking ermöglicht aber nicht nur das Messen von Daten, um diese im Nachhinein auszuwerten, sondern auch das Nutzen solcher Daten für interaktive Anwendungen in Echtzeit.
-Da in dieser Arbeit ein externer Tobii Eyetracker verwendet wurde, beziehen sich folgende Informationen hauptsächlich aber nicht ausschließlich auf Tobii Eyetracker.
-Die Firma \emph{Tobii AB} schreibt auf ihrer Webseite zum Thema: \emph{Was ist Eyetracking?}, dass Eyetracking eine Technologie ist, die es ermöglicht, ein Gerät durch die natürliche Bewegung der Augen zu steuern \cite{tobii}.
+Diese Informationen ermöglichen es, Rückschlüsse über das betrachtete Bild zu ziehen, wie zum Beispiel welche Objekte eines Bildes besonders interessant für den Betrachter sind.
+Eyetracking ermöglicht aber nicht nur das Messen von Daten, um diese im Nachhinein auszuwerten, sondern auch das Nutzen solcher Daten für interaktive Anwendungen.
+Da in dieser Arbeit ein externer \emph{Tobii Eyetracker} verwendet wurde, beziehen sich folgende Informationen auf \emph{Tobii Eyetracker}.
+Die Firma \emph{Tobii AB} beschreibt Eyetracking als eine Technologie, die es ermöglicht, ein Gerät durch die natürliche Bewegung der Augen zu steuern \cite{tobii}.
 \begin{figure}
 	\centering
 	\includegraphics[width=1\textwidth]{../../Grafiken/How-20DoesEyetrackingWork_ScreenBased.jpg}
 	\caption{Illustration der Funktionsweise von Tobii Pro Eyetracker. \cite{tobiipro}}
 	\label{fig::et01}
 \end{figure}
-Dabei werden vier grundlegende Bestandteile des Eyetracking genannt.
+Dabei werden vier grundlegende Bestandteile des Eyetrackings genannt.
 In der Regel benötigt man für das Messen von Augenaktivitäten zwei grundlegende Dinge, die auch in Abbildung \ref{fig::et01} dargestellt sind: Eine Lichtquelle (2) und eine Kamera (3).
 
 Es gibt verschiedene Möglichkeiten, die Augenaktivitäten zu messen.
-Die am häufigsten genutzte Technik, welche auch von den Tobii Eyetrackern genutzt wird, ist \emph{Pupil Centre Corneal Reflection (PCCR)}.
+Die am häufigsten genutzte Technik, welche auch von den \emph{Tobii Eyetrackern} genutzt wird, ist \emph{Pupil Centre Corneal Reflection (PCCR)}.
 Die Lichtquellen sind dabei auf die Augen gerichtet und erzeugen auf ihnen ein spezielles Reflektionsmuster.
 Die Kamera des Eyetrackers (3) nimmt mit einer hohen Abtastrate Bilder der Augen und ihrer Reflektionsmuster auf.
-Nun können spezielle Bildverarbeitungsalgorithmen (4) auf die erfassten Daten angewendet werden und die Reflektionspunkte auf den Bildern bestimmt werden.
+Nun können spezielle Bildverarbeitungsalgorithmen (4) auf die erfassten Daten angewendet und die Reflektionspunkte auf den Bildern bestimmt werden.
 Anhand dieser Punkte und eines Modells des Auges kann die Blickrichtung der Augen, die Position der Augen im Raum und die Blickpunkte der Augen auf dem Bildschirm berechnet werden (4 + 5).
 
 \begin{figure}[]
@@ -277,10 +277,10 @@ Anhand dieser Punkte und eines Modells des Auges kann die Blickrichtung der Auge
 	\end{minipage}
 \end{figure}
 
-Die Position eines Auges im Raum wird als \emph{Gaze origin} bezeichnet und wird bei Tobii Pro Eyetrackern im Nutzer Koordinatensystem angegeben, siehe Abbildung \ref{fig::et02}.
+Die Position eines Auges im Raum wird als \emph{Gaze origin} bezeichnet und wird bei \emph{Tobii Pro Eyetrackern} im Nutzer Koordinatensystem angegeben, siehe Abbildung \ref{fig::et02}.
 Der Blickpunkt des Auges auf dem Bildschirm ist in der Regel das, was von größtem Interesse ist und wird als \emph{Gaze point} bezeichnet.
-Der \emph{Gaze point} wird im \emph{Aktiven Display Koordinatensystem} angegeben, siehe Abbildung \ref{fig::et03}.
-Dieses Koordinatensystem hat den Ursprung an der Position oben links des aktiven Bildschirmbereichs, und der Punkt (1,1) ist an der Position rechts unten des aktiven Bildschirmbereichs.
+Der \emph{Gaze point} wird im \emph{Aktiven Display Koordinatensystem} angegeben ( siehe Abbildung \ref{fig::et03}).
+Dieses Koordinatensystem hat den Ursprung an der Position oben links des aktiven Bildschirmbereichs und der Punkt (1,1) ist an der Position rechts unten des aktiven Bildschirmbereichs.
 
 Die Umrechnung in Bildschirmkoordinaten funktioniert durch die Multiplikation mit der Breite und Höhe des Bildschirms in Pixel.
 Die Koordinaten sind dann relativ zu dem aktiven Display.
@@ -292,20 +292,21 @@ Bei der Analyse der visuellen Wahrnehmung des Menschen ergeben die Daten der Fix
 Bei einer Fixation fixieren die Augen einen gewissen Punkt für eine vergleichsweise lange Zeit (100\,ms - 1.5\,s) und können dadurch viele Informationen des fixierten Objekts erfassen.
 Sakkaden hingegen sind kurze (20\,ms - 40\,ms) und schnelle Augenbewegungen zwischen zwei Fixationen.
 Für wahrnehmungsorientierte interaktive Anwendungen ist es daher wichtig, eine hohe Abtastrate und niedrige Latenz bei der Erfassung der Augenaktivitäten zu haben.
-Dies ermöglicht es, schnell zwischen einer Sakkade und Fixation zu unterscheiden und das nächste Bild, ohne eine merkbare Verzögerung und entsprechend des zuletzt gemessenen Blickpunktes, darzustellen.
-So sollte bei einer Methode des wahrnehmungsorientierten Renderings, wobei nur in dem fovealen Bereich das Bild mit hoher Auflösung dargestellt wird, ein Update ca. zwischen 5\,ms bis 60\,ms nach der Augenbewegung gestartet worden sein, um eine Bildveränderung nicht zu bemerken.
-Diese Zeit ist dabei abhängig davon, wie weit die unscharfe Fläche von der Fovea entfernt ist \cite{doi:10.1111/cgf.13150}.
+Dies ermöglicht es ohne einer merkbaren Verzögerung das Bild entsprechend des zuletzt gemessenen Blickpunktes darzustellen.
+So sollte beim wahrnehmungsorientierten Renderings, wobei nur im fovealen Bereich das Bild mit hoher Auflösung dargestellt wird, ein Update circa zwischen 5\,ms bis 60\,ms nachdem die Augenbewegung gestartet wurde, ausgeführt werden, damit eine Bildveränderung nicht wahrgenommen wird.
+Diese Zeit ist davon abhängig, wie weit die unscharfe Fläche von der Fovea entfernt ist \cite{doi:10.1111/cgf.13150}.
 
-Der in dieser Arbeit verwendete Tobii Pro Eyetracker hat eine Abtastfrequenz von über 600\,Hz.
-Dies entspricht einem Abtastintervall von 1.67\,ms und ist vergleichsweise zu anderen aktuellen Eyetrackern recht hoch.
+Der in dieser Arbeit verwendete \emph{Tobii Pro Eyetracker} hat eine Abtastfrequenz von über 600\,Hz.
+Dies entspricht einem Abtastintervall von 1.67\,ms und ist verglichen zu anderen aktuellen Eyetrackern sehr gut.
 Diese haben oft eine Abtastfrequenz von 60\,Hz oder 120\,Hz.
-Geräte mit Abtastraten im Frequenzbereich von 600\,Hz und höher sind ausreichen schnell um Sakkaden messen zu können und haben eine entsprechend niedrige Latenz.
-Hohe Abtastraten heißt aber auch viele Daten pro Sekunde.
+Geräte mit Abtastraten im Frequenzbereich von 600\,Hz und höher sind ausreichen schnell um Sakkaden messen zu können und haben eine auch eine entsprechend niedrige Latenz.
+Hohe Abtastraten bedeuten aber auch viele Daten pro Sekunde.
+
 Für die Anwendung in dieser Arbeit ist es wichtig, den aktuellsten Blickpunkt des Auges zu kennen.
 Daher wird der letzte gültige gemessene \emph{gaze point} des Eyetrackers für das Berechnen des nächsten Bildes verwendet.
-Die Daten, die über die Tobii Pro SDK durch den Eyetracker geliefert werden, enthalten dafür einen Validity Code.
-Dieser Wert gibt an, ob eine Messung mit hoher Wahrscheinlichkeit richtige Daten enthält, oder nicht.
-Dadurch können wahrscheinlich fehlerhafte Daten früh abgestoßen werden.
+Die Daten, die über die \emph{Tobii Pro SDK} durch den Eyetracker geliefert werden, enthalten dafür einen Validity Code.
+Dieser Wert gibt an, ob eine Messung mit hoher Wahrscheinlichkeit richtige Daten enthält.
+So können potentiell fehlerhafte Daten ignoriert werden.
 
 \section{GPU Architektur}\label{sec::gpuarc}
 Ein wichtiger Faktor, wenn es um interaktive Anwendungen geht, ist die Performanz.
