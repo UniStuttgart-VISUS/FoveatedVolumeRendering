@@ -1,7 +1,24 @@
 % % Fazit der Arbeit
-% Ausblick: Mögliche Nutzung - Kritik - Mögliche Verbesserungen
-\chapter{Fazit und Ausblick}\label{chap:zusfas}
+\chapter{Fazit}\label{chap:zusfas}
 \todo{Fazit wertend (was hat gut und schlecht funktioniert aber auf den gesamten Zeitverlauf der Arbeit bezogen).}
-
-\section*{Ausblick}
-\todo{...und anschließend einen Ausblick}
+% Einarbeitung in das Projekt aufwendig, da die programmiersprache(n)-, umgebung und verwendeten bibliotheken unbekannt
+% Grundlagenteil, hilfreich, vor allem GPU Architketur sehr interessant und hilfreich bei der implementierung des raycasts. trotzdem wie in diskussion herausgestellt, kann man oft noch dinge optimieren und man muss auf bestimmte eigenschaften achten.
+% Die Auseinandersetzung mit den Eignschaften des Sehapparates war wichtig für das Grundlegende Verständniss, man könnte dahingehend aber noch genauere untersuchungen und messungen machen, z.b. die exakte größe des normal aufgelösten bereichs auf die refernenzwerte für die wahrnehmung anpassen
+% Volumenrendering mit Raycast gut möglich, ermöglicht auch viele erweiterungen und modifikationen des Volumenrenderings, wie wahrnehmungsorientierte eigenschaften, reduzierung der strahlabtastrate, aber im Referenzliteraturteil auch gesehen, dass wahrnehmungsorientiert auch mit Rastergrafik möglich ist und vll. Volumenrendering mit Rastergrafik auch durchfürbar
+% Einen Entwurf anzufertigen mit Arbeitspaketen, die durchgesetzt werden sollen, war hilfreich da man sich daran halten konnte und ermöglichte eine gewisse einteilung der arbeit
+% Bezogen auf die Ergebnisse hat es gezeigt, dass wahrnehmungsorientierte methoden durchaus einen performanzgewinn bringen können ohne die bildqualität zu beeinträchtigen.
+% Alleine die Anpassung der Strahlabtastrate hat kaum wahrnehmbare Bildqualitative Veränderungen nach sich gezogen und trotzdem die Ausführungszeit spürbar verbessert.
+% Die anpassungen der Bildabtastrate gab es zwei Methoden, mdc ddc
+% mdc der einfachere umgesetzte ansatz und ging von der implementierung her auch deutlich schneller
+% trotzdem mdc it sar insgesamt am besten abgeschnitten, sowohl performanz als auch deutlich besser in der bildqualität als ddc
+% den ansatz, der bei mdc gegangen wurde könnte man daher weiter ausbauen, z.B. bildabtastrate im äußeren bereich weiter verringern und u.U. einen dritten bereich einfügen, solange der Overhead dadurch nicht zu groß wird, da bisher im vergleich mdc hauptsächlich wegem dem overhead bessere werte gezeigt hat
+% ddc war deutlich zeitaufwendiger zu implementieren, da index hinund her gemappt wurden und anschließend noch eine interpolation benötigt wurde
+% ddc hat bessere spitzenwerte aber ist von der Performanz her aufgrund des overheads schlechter als mdc
+% auch die Bildqualität leidet unter der niedrigen Bildabtastrate, wird aber aufgrund der limitationen des visuellen wahrnehmungssystems bei der verwendung eines eyetrackers lange nicht so wahrgenommen, wie wenn man nur das statische Bild betrachtet, ohne einen Eyetracker
+% ddc ist wie in diskussion schon erwähnt ausbaufähig und kann vermutlich bei einer besseren umsetzung deutlich effizienter werden und aufgrund des einzelnen raycasts auch vom overhead schneller werden.
+% Im Vergleich zur Referenzliteratur, in welcher deutlich höhere Faktoren in der Performanzgewinnung erfahren wurden, liegt dies unter anderem auch daran, dass die raycast methoden vor allem die ddc methode in der implementierung möglichst variabel gehalten wurde und auch daran, dass wie schon erwähnt in den implementierungen hier noch genügend verbesserungsmöglichkeiten existieren.
+% Ein interessanter Ansatz für die Zukunft, wäre eine implementierung die wie eine Art Linse (verweis überlegung im arbeitspaket), die die Strahldichte gleichmäßig reduzieren kann
+% Bezogen Auf die Arbeit mit dem Eyetracker war es sehr interessant damit zu arbeiten.
+% Dass die api eine validierung der augendaten zur verfügung stellt hat sehr geholfen. Insgesamt ist aber bei der Arbeit mit dem Eyetracker noch aufgefallen, dass es entweder durch die Tremor-Bewegungen des Auges oder durch Messungenauigkeiten des Eyetrackers zu einem Flackern kommt. Da das Bild auf das Flackern reagiert ziehen sich veränderte Eigenschaften die Aufmerksamkeit auf sich und dadurch wirkt das Bild ein wenig störend. Für eine weitere Arbeit mit Eyetracking Daten sollten diese gefiltert oder geglättet werden.
+% Abschließend ist zu sagen, dass sowohl die vorgestellten Methoden als auch wahrnehmungs-orientiertes Rendering hohes Potential hat und aufgrund der größeren Bildschirme und Pixeldichten vor allem auch in VR-Anwendungen, die nicht immer mit high-end hardware ausgestattet sind, dies auch in zukunft einen wichtigen aspekt haben wird.
+% Ausserdem ist die Performanz nicht der einzige Grund für wahrnehmungsorientiertes Rendering. Wie auch in der Referenzliteratur beschrieben, kann dieses auch für Informativere Darstellungen sorgen. Oder auch die Augenbewegungen für die Steuerung von Anwendungen verwenden.
