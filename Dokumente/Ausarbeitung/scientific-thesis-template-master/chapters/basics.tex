@@ -193,12 +193,13 @@ Die Sichtstrahlen werden dabei ausgehend von einer virtuellen Kamera im Raum aus
 		\label{fig::rc02}
 	\end{minipage}
 \end{figure}
-Die virtuelle Kamera, siehe Abbildung \ref{fig::rc01}, ist im Raum an Position $\vec{e}$ positioniert, dies ist auch das Projektionszentrum, falls es keine orthogonale Projektion ist.
+Die virtuelle Kamera, siehe Abbildung \ref{fig::rc01}, ist im Raum an Position $\vec{e}$ positioniert.
+Dies ist auch das Projektionszentrum, falls es keine orthogonale Projektion ist.
 Die Position $\vec{e}$ entspricht relativ der Position des Betrachters vor dem Bildschirm.
 Mit $\vec{u}$, $\vec{v}$ und $\vec{w}$ wird die Ausrichtung der Kamera im Raum eindeutig bestimmt.
-In einer Entfernung \texttt{d} von $\vec{e}$ aus in Richtung $\vec{-w}$ ist die Bildebene \ref{fig::rc02} Positioniert.
+In einer Entfernung \texttt{d} von $\vec{e}$ aus in Richtung $\vec{-w}$ ist die Bildebene \ref{fig::rc02} positioniert.
 Die Größe der Bildebene wird durch \texttt{l}, \texttt{r}, \texttt{b} und \texttt{t} definiert.
-Abhängig von der Größe des Bildschirms oder der Größe der gewünschten Rastergrafik, wird die Bildebene virtuell in die gewünschte Anzahl an Pixel in die Breite und Höhe unterteilt.
+Abhängig von der Größe des Bildschirms oder der Größe der gewünschten Rastergrafik wird die Bildebene virtuell in die gewünschte Anzahl an Pixel in Breite und Höhe unterteilt.
 Jeder dieser Teile entspricht nun einem Pixel der Rastergrafik.
 Nun kann für jeden Pixel ein Strahl, ausgehend von $\vec{e}$, in Richtung des entsprechenden Punktes auf der Bildebene, ausgesendet und verfolgt werden.
 \begin{figure}
@@ -207,8 +208,8 @@ Nun kann für jeden Pixel ein Strahl, ausgehend von $\vec{e}$, in Richtung des e
 	\caption{Illustration der Projektion von Objekten auf die Bildebene mit Hilfe von Raytracing. \cite{Dr.MichaelKrone2016/2017}}
 	\label{fig::rc03}
 \end{figure}
-Trifft ein Strahl Objekte in der Szene, wird dadurch ein Farbwert ermittelt, den der entsprechende Pixel annehmen kann und die Szene dadurch auf den Bildschirm projiziert wird.
-Abbildung \ref{fig::rc03} skizziert die Projektion von Objekten in einer Szene auf eine Bildebene.
+Trifft ein Strahl Objekte in der Szene, wird dadurch ein Farbwert ermittelt, den der entsprechende Pixel annehmen kann.
+Dadurch wird die Szene auf den Bildschirm, wie in Abbildung \ref{fig::rc03} illustriert wird, projiziert.
 
 \subsection{Volumenrendering}
 \begin{figure}
@@ -218,19 +219,19 @@ Abbildung \ref{fig::rc03} skizziert die Projektion von Objekten in einer Szene a
 	\label{fig::rc04}
 \end{figure}
 Das Volumen ist ein dreidimensionales Bild und besteht aus 3D Voxel.
-Ein Voxel ist eine Box in dem Volumen, mit einer Position, einer Ausdehnung in drei Dimensionen und einer Dichte.
-Es kann mit Hilfe von Raycasting abgetastet und auf den Bildschirm projiziert werden.
+Ein Voxel ist eine Box mit einer Position, einer Ausdehnung in drei Dimensionen und einem Dichtewert.
+Ein Volumen kann mit Hilfe von Raycasting abgetastet und auf den Bildschirm projiziert werden.
 Dabei wird für jeden Pixel ein Strahl in die Szene gesendet und in Intervallen abgetastet.
 Abbildung \ref{fig::rc04} skizziert dies in einer 2D Ansicht.
 Für jeden Abtastpunkt kann mit Hilfe einer Transferfunktion ein Farbwert ermittelt werden.
-Zusammen ergeben die abgetasteten Werte einen Farbwert, der das Ergebnis des Raycasts für diesen Strahl repräsentiert und dem zugehörigen Pixel zugewiesen werden kann.
+Zusammen ergeben die abgetasteten Werte einen endgültigen Farbwert, der das Ergebnis des Raycasts für einen Strahl repräsentiert und dem zugehörigen Pixel zugewiesen werden kann.
 
 \subsection{Transferfunktion}
 Die Transferfunktion ist ein mächtiges Werkzeug für die Visualisierung von Volumendaten.
-Mit Hilfe einer Transferfunktion können bestimmte Bereiche des Volumen verschieden stark ausgeblendet, oder auch farbig dargestellt werden.
+Mit Hilfe einer Transferfunktion können bestimmte Bereiche des Volumens verschieden stark ausgeblendet oder auch farbig dargestellt werden.
 Die Transferfunktion bestimmt für einen Voxel, abhängig von seiner Dichte, einen Farb- und Opazitätswert.
-Dadurch können zum Beispiel Strukturen innerhalb des Volumens mit einer hohen Dichte farbig und kräftig hervorgehoben werden.
-Strukturen mit einer geringeren Dichte können transparent und weniger farblich dargestellt werden.
+Dadurch können zum Beispiel nur die Strukturen innerhalb des Volumens, die eine hohen Dichte haben, farbig und kräftig hervorgehoben werden.
+Strukturen mit einer geringeren Dichte könnten transparenter und weniger farbintensiv dargestellt werden.
 
 \section{Eyetracking}\label{sec::eyetr}
 Für viele wahrnehmungsorientierte Methoden ist es notwendig, den aktuellen Blickpunkt des Betrachters auf dem Bildschirm zu kennen.
