@@ -1,10 +1,20 @@
 % % Fazit der Arbeit
 \chapter{Fazit}\label{chap:zusfas}
-\todo{Fazit wertend (was hat gut und schlecht funktioniert aber auf den gesamten Zeitverlauf der Arbeit bezogen).}
-% Einarbeitung in das Projekt aufwendig, da die programmiersprache(n)-, umgebung und verwendeten bibliotheken unbekannt
-% Grundlagenteil, hilfreich, vor allem GPU Architketur sehr interessant und hilfreich bei der implementierung des raycasts. trotzdem wie in diskussion herausgestellt, kann man oft noch dinge optimieren und man muss auf bestimmte eigenschaften achten.
-% Die Auseinandersetzung mit den Eignschaften des Sehapparates war wichtig für das Grundlegende Verständniss, man könnte dahingehend aber noch genauere untersuchungen und messungen machen, z.b. die exakte größe des normal aufgelösten bereichs auf die refernenzwerte für die wahrnehmung anpassen
-% Volumenrendering mit Raycast gut möglich, ermöglicht auch viele erweiterungen und modifikationen des Volumenrenderings, wie wahrnehmungsorientierte eigenschaften, reduzierung der strahlabtastrate, aber im Referenzliteraturteil auch gesehen, dass wahrnehmungsorientiert auch mit Rastergrafik möglich ist und vll. Volumenrendering mit Rastergrafik auch durchfürbar
+% \todo{Fazit wertend (was hat gut und schlecht funktioniert aber auf den gesamten Zeitverlauf der Arbeit bezogen).}
+Die Einarbeitung in das Projekt war relativ aufwendig und es hat daher eine gewisse Zeit gebraucht, bis sich ein Überblick über die Struktur des Projektes gebildet werden konnte.
+Dies ist im Hinblick auf ein umfangreiches Projekt nicht verwunderlich, wurde aber auch dadurch erschwert, dass unter Anderem mit verschiedenen ungewohnten Programmiersprachen, Programmierumgebungen und Programmierbibliotheken sich auseinander gesetzt werden musste.
+Die Auseinandersetzung mit diesen hat aber viele neue Einblicke in unterschiedliche Bereiche ermöglicht, die sich im Laufe dieser Arbeit sich als sehr hilfreich repräsentiert haben und als Grundlage für neue Arbeiten dienen werden.
+So haben sich vor allem Einblicke in die GPU Architektur als sehr interessant und hilfreich bei der Implementierung der Implementierung der Raycasts, besonders des DDC Raycasts erwiesen.
+Zum Beispiel wurde aufgrund der Einblicke in die Grundlagen der GPU Architektur im Laufe dieser Arbeit die Implementierung des DDC Raycasts strukturell verändert, wodurch sich die Performanz weiter verbesserte.
+Trotzdem, wie in der Diskussion (Abschnitt \ref{sec::disc}) sich schon herausgestellt hat, muss man bei der Programmierung für die GPU auf bestimmte Aspekte achten und meistens ist eine Optimierung immer noch möglich.
+Die Auseinandersetzung mit den Grundlagen und Limitierungen des Sehapparates (Abschnitt \ref{sec::eye}) war für das Verständnis des Hauptziels dieser Arbeit und für die Umsetzung der Implementierungen wichtig und hat die Art und Weise, wie die Implementierungen entworfen wurden, beeinflusst.
+Allerdings wurden die Parameter, wie die unterschiedlichen Auflösungen und die unterschiedlichen Ausmaße der Bereiche in den verschiedenen Raycast Methoden, nach der eigenen Wahrnehmung eingestellt.
+Diese Parameter könnten für weitere Arbeiten genauer untersucht werden, um die optimalen Werte zu finden.
+Zum Beispiel die könnte untersucht werden, wie es sich auswirkt, wenn die Größe der inneren Ellipse des DDC Raycasts auf die genaue Größe der Fovea auf dem Bildschirm angepasst wird und wie es wahrgenommen wird, wenn die innere Ellipse stattdessen kleiner oder größer dargestellt wird.
+
+Im Verlauf der Arbeit wurde klar, dass die Umsetzung des Volumenrenderings durch einen Raycast sehr gut möglich ist und auch viele Erweiterungen und Modifikationen des Volumenrenderings, wie wahrnehmungsorientierte Methoden, zum Beispiel das Reduzierung der Strahlabtastrate im peripheren Bereich, oder das Anwenden einer Tranferfunktion, dadurch einfach umgesetzt werden kann.
+Wahrnehmungsorientiertes Rendering ist aber nicht auf das Volumenrendering und Raycasts beschränkt.
+Die Referenzliteratur in Abschnitt \ref{ss::pfwov} zeigte diesbezüglich Arbeiten, die wahrnehmungsorientierte Methoden in Anwendungen anwenden, die eine Grafikpipeline zur Berechnung verwenden.
 % Einen Entwurf anzufertigen mit Arbeitspaketen, die durchgesetzt werden sollen, war hilfreich da man sich daran halten konnte und ermöglichte eine gewisse einteilung der arbeit
 % Bezogen auf die Ergebnisse hat es gezeigt, dass wahrnehmungsorientierte methoden durchaus einen performanzgewinn bringen können ohne die bildqualität zu beeinträchtigen.
 % Alleine die Anpassung der Strahlabtastrate hat kaum wahrnehmbare Bildqualitative Veränderungen nach sich gezogen und trotzdem die Ausführungszeit spürbar verbessert.
@@ -20,5 +30,9 @@
 % Ein interessanter Ansatz für die Zukunft, wäre eine implementierung die wie eine Art Linse (verweis überlegung im arbeitspaket), die die Strahldichte gleichmäßig reduzieren kann
 % Bezogen Auf die Arbeit mit dem Eyetracker war es sehr interessant damit zu arbeiten.
 % Dass die api eine validierung der augendaten zur verfügung stellt hat sehr geholfen. Insgesamt ist aber bei der Arbeit mit dem Eyetracker noch aufgefallen, dass es entweder durch die Tremor-Bewegungen des Auges oder durch Messungenauigkeiten des Eyetrackers zu einem Flackern kommt. Da das Bild auf das Flackern reagiert ziehen sich veränderte Eigenschaften die Aufmerksamkeit auf sich und dadurch wirkt das Bild ein wenig störend. Für eine weitere Arbeit mit Eyetracking Daten sollten diese gefiltert oder geglättet werden.
+% Bezogen auf die Erstellung und Darstellung der Messwerte kann man sagen, dass dies doch noch ein erheblicher Aufwand war, die Messungen in dem Projekt umzusetzen und aus den Messdaten grafische repräsentationen zu bilden, die verständlich sind.
+% Schlussendlich konnten die Messmethoden so implementiert werden, dass diese reproduzierbar sind.
+% Für die Messung war es auch sinnvoll, verschiedene Mauspositionen bei der Darstellung eines Volumens zu betrachten.
+% Die Darstellung durch Heatmaps veranschaulicht die vor- und nachteile der methoden ddc und mdc bei der betrachtung eines volumens und die darstellung der boxplots ermöglichte einen noch genaueren und verständlicheren vergleich.
 % Abschließend ist zu sagen, dass sowohl die vorgestellten Methoden als auch wahrnehmungs-orientiertes Rendering hohes Potential hat und aufgrund der größeren Bildschirme und Pixeldichten vor allem auch in VR-Anwendungen, die nicht immer mit high-end hardware ausgestattet sind, dies auch in zukunft einen wichtigen aspekt haben wird.
 % Ausserdem ist die Performanz nicht der einzige Grund für wahrnehmungsorientiertes Rendering. Wie auch in der Referenzliteratur beschrieben, kann dieses auch für Informativere Darstellungen sorgen. Oder auch die Augenbewegungen für die Steuerung von Anwendungen verwenden.
