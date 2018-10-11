@@ -47,7 +47,7 @@ $t = 0,25$ hat sich als guter Schwellwert erwiesen, der auch bei großen Distanz
 Die Reduzierung der Strahldichte im peripheren Bereich wurde durch zwei verschiedene Methoden umgesetzt, die MDC Methode (Abschnitt \ref{ss::MDC}) und die DDC Methode (Abschnitt \ref{ss::DDC}).
 Im folgenden werden die Implementierungen beider Methoden getrennt voneinander beschrieben.
 
-\subsection{MDC Implementierung}
+\subsubsection{MDC Implementierung}
 \begin{figure}[]
 	\centering
 	\begin{minipage}[t]{0.49\textwidth}
@@ -92,7 +92,7 @@ Das Zusammenfügen der Bilder wurde im OpenGL Fragment Shader durchgeführt.
 Der Fragment Shader hat dafür die selben Parameter übergeben bekommen, wie der OpenCL Kernel.
 Eine normalisierte Texturkoordinate wurde dann wie eine normalisierte Work-Item ID behandelt und je nach dem ob sich die Texturkoordinate innerhalb des Quadrats befunden hat oder nicht, wurde der Farbwert in der entsprechenden Textur ausgelesen.
 
-\subsection{DDC Implementierung}
+\subsubsection{DDC Implementierung}
 \begin{figure}[]
 	\centering
 	\begin{minipage}[t]{0.49\textwidth}
@@ -155,7 +155,7 @@ Dafür ist es hier nicht notwendig, die Indize umzurechnen, da die IDs der Work-
 Mit der Information, in welchem Bereich sich ein Work-Item befindet und welche G-Werte und Ausmaße die unterschiedlichen Bereiche haben, wurden für ein Work-Item vier umliegende Werte des zuvor berechneten Raycasts ausfindig gemacht und bipolar interpoliert.
 Die Ausgabetextur der Interpolation wird durch den Fragmentshader anschließend auf das Full-Screen Quad gezeichnet.
 
-\section{Erstellen und Darstellen von Messwerten}
+\subsection{Erstellen und Darstellen von Messwerten}
 Für die Umsetzung des Arbeitspakets aus Abschnitt \ref{sec::workpacks::evm}, wurde eine Klasse erstellt, welche für eine Berechnung eines Bildes verschiedene Messwerte speichert.
 Diese sind unter Anderem die gesamte Ausführungszeit des Kernels (bei mehreren Ausführungen innerhalb einer Methode wurden diese addiert), die Ausführungszeit der paintGL() Methode und die Mausposition, die in der letzten Ausführung der paintGL() Methode für die Berechnung des Bildes verwendet wurde.
 Für jeden Aufruf der \texttt{paintGL()} Methode wurde ein solches Objekt erstellt und gespeichert.
