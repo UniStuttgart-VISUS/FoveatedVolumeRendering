@@ -11,11 +11,10 @@ Da die Raycasts durch einen OpenCL Kernel berechnet werden und nicht direkt gere
 Da die MDC Methode zwei verschiedene Texturen verwendet, wurde dementsprechend der Fragment-Shader durch ein switch-case ergänzt, welches für jede Raycast Methode unterschiedliche Anweisungen ausführen kann.
 
 Die Kernfunktion des Raycasts, die Strahlverfolgung, bleibt für alle Raycast Methoden die gleiche.
-Daher wurde dieses Prinzip im OpenCL Kernel auch angewandt.
 Ein switch-case, relativ am Anfang des Raycast Kernels, führt je nach aktueller Raycast Methode die entsprechenden Operationen aus.
 Dadurch konnte für alle Raycast Methoden der gleiche Raycast Kernel verwendet werden, welcher lediglich mit unterschiedlichen Parametern ausgeführt wurde.
 
-Die GUI des Projekts wurde mit einigen Funktionen ergänzt über die bestimmte Parameter verändert werden konnten.
+Die GUI des Projekts wurde mit einigen Funktionen ergänzt, über die bestimmte Parameter verändert werden konnten.
 Dies ermöglichte insbesondere die einfache Umstellung der Raycast Methoden zur Laufzeit des Projekts.
 
 \section{Implementierung der Arbeitspakte}\label{sec::ida}
@@ -25,7 +24,7 @@ Zusätzlich wird beschrieben, wie die Messungen im Projekt vorbereitet wurden, s
 \subsection{Simulieren der Blickposition}\label{sec::ida::sdb}
 Da die Einbindung des Eyetrackers für das oberflächliche Testen der Raycast Methoden nicht notwendig ist, wurde die Blickposition vorerst mit der Mausposition simuliert.
 Das Volumerenderwidget verfügt über eine Callback-Methode, die auf Mausbewegungen reagiert.
-Diese Methoden wurde sich zu Nutze gemacht, so dass durch einen Aufruf dieser Methode, aufgrund einer Veränderung in der Mausposition, sofort die aktuelle Position des Mauszeigers bezüglich des Volumerenderwidgets in einer globalen Variable abgespeichert wurde.
+Diese Methoden wurde sich zu Nutze gemacht, so dass durch einen Aufruf dieser Methode, aufgrund einer Veränderung in der Mausposition, sofort die aktuelle Position des Mauszeigers, bezüglich des Volumerenderwidgets, in einer globalen Variable abgespeichert wurde.
 Damit jede Raycast Methode diese auch zu Verfügung hat, wurde diese zu Beginn der paintGL() Methode dem OpenCL Raycast Kernel übergeben. (Arbeitspaket aus Abschnitt \ref{sec::workpacks::sdb})
 
 \subsection{Reduzierung der Strahlabtastrate im peripheren Bereich}\label{sec::ida::rdsifb}
@@ -40,7 +39,7 @@ Mit der Distanz $d$ zwischen einem Strahl und der Mausposition wurde ein Faktor 
 Hierbei bezeichnet $ib$ die maximale Distanz zwischen zwei Bildkoordinaten, also die Länge der Diagonale des Bildes.
 Ist $d < 10$ wird die Strahlabtastrate $sr$ nicht verändert.
 Ansonsten berechnet sich die neue Strahlabtastrate mit $sr = \texttt{max(}sf * sr,\,t\texttt{)}$, wobei die Funktion \texttt{max()} auch eine \emph{OpenCL Built-In Function} ist.
-Bei einer zu geringen Abtastrate kann es vorkommen, dass vor allem dünne Strukturen eines Volumens von einigen Strahlen gar nicht oder nur sehr geringfügig abgetastet werden und es so sich kleine bis große Löcher in diesen Flächen bilden können.
+Bei einer zu geringen Abtastrate kann es vorkommen, dass vor allem dünne Strukturen eines Volumens von einigen Strahlen gar nicht oder nur sehr geringfügig abgetastet werden und es so sich kleine bis große Löcher und Artefakte innerhalb dieser Strukturen bilden können.
 $t = 0,25$ hat sich als guter Schwellwert erwiesen, der auch bei großen Distanzen zwischen einem Strahl und der Mausposition kaum Artefakte generiert. (Arbeitspaket aus Abschnitt \ref{sec::workpacks::ors})
 
 \subsection{Reduzierung der Strahldichte im peripheren Bereich}
@@ -76,17 +75,17 @@ Die Ausmaße des Quadrat wurden dem Kernel als Parameter übergeben.
 Anschließend führte der Raycast Kernel den normalen Ablauf fort.
 Wurde nun die berechnete Textur auf das OpenGL Fullscreen-Quad projiziert, so sah das berechnete Bild ungefähr so aus, wie es in Abbildung \ref{fig::imp::mdc_ol} dargestellt ist.
 Der äußere Bereich des Bildes hat hier also nur ein Viertel der normalen Auflösung.
-Die Interpolation dieser niedrigen Auflösung auf die normale wurde dabei durch den OpenGL Fragment Shader beim Auslesen der Texturdaten geregelt.
+Die Interpolation dieser niedrigen Auflösung auf die normale Auflösung wurde dabei durch den OpenGL Fragment Shader beim Auslesen der Texturdaten geregelt.
 Der innere Bereich des Bildes entspricht den Work-Items, die frühzeitig im Raycast Kernel discarded wurden, wodurch die Textur an dieser Stelle schwarz ist.
 Bei der zweiten Ausführung wurde der Kernel mit der normalen Anzahl an Work-Items gestartet.
 Dafür wurde eine andere Textur verwendet, deren Größe der normalen Auflösung entspricht.
 Im Gegensatz zur ersten Ausführung wurde nun der äußere Bereich, also alle Work-Items, die sich außerhalb des Quadrat befanden, discarded.
 Entsprechend sah das Ergebnis dieser Ausführung in etwa so aus, wie in Abbildung \ref{fig::imp::mdc_il}.
-Hier wurde aber die Größe des Quadrats durch einen Offset ergänzt, wodurch bei der Zusammenfügung der Bilder keine schwarze Umrandung des Quadrat übrig bleibt.
+Hier wurde aber die Größe des Quadrats durch einen positiven Offset ergänzt, wodurch bei der Zusammenfügung der Bilder keine schwarze Umrandung des Quadrat übrig bleibt.
 
-Bei der Implementierung mussten beachtet werden, dass aufgrund dessen, das bei den verschiedenen Ausführungen verschieden Viele Work-Items gestartet wurden, die ID's der Work-Items nicht immer mit ihrer zugehörigen Bildkoordinate übereingestimmt haben.
+Bei der Implementierung mussten beachtet werden, dass aufgrund dessen, dass bei den verschiedenen Ausführungen verschieden viele Work-Items gestartet wurden, die ID's der Work-Items nicht immer mit ihrer zugehörigen Bildkoordinate übereingestimmt haben.
 Daher wurden alle Werte, die sich auf Bildpositionen beziehen, normalisiert.
-Wie zum Beispiel die Mausposition und die Ausmaße des Rechtecks, welche schon im Host-Code der paintGL() Methode normalisiert wurden, sowie die IDs der Work-Items im Kernel.
+Dies waren unter anderem die Mausposition und die Ausmaße des Rechtecks, welche schon im Host-Code der paintGL() Methode normalisiert wurden, sowie die IDs der Work-Items im Kernel.
 
 Das Zusammenfügen der Bilder wurde im OpenGL Fragment Shader durchgeführt.
 Der Fragment Shader hat dafür die selben Parameter übergeben bekommen, wie der OpenCL Kernel.
@@ -109,23 +108,23 @@ Eine normalisierte Texturkoordinate wurde dann wie eine normalisierte Work-Item 
 		\label{fig::imp::ddc_m_ip}
 	\end{minipage}
 \end{figure}
-Der DDC Raycast ist die Implementierung des Arbeitspakets in Abschnitt \ref{ss::DDC}.
+Der DDC Raycast ist die Implementierung des Arbeitspakets aus Abschnitt \ref{ss::DDC}.
 Wie für die Implementierung des MDC Raycasts wurde dafür eine eigene Methode geschrieben, die von der paintGL() Methode aufgerufen wird.
 Auch hier wurden die Funktionen des \texttt{volumerendercl} Objektes wiederverwendet und der Raycast über dieses Objekt gestartet.
-Anders als im ursprünglichen Raycast und MDC Raycast steht der Index eines Work-Items nicht mehr im direkten Zusammenhang mit einer Bildkoordinate, sondern die IDs wurden durch eine Funktion auf ganz unterschiedliche Bildkoordinaten zugewiesen.
-Daher war die Wahl des Verhältnisses der Anzahl der Work-Items in x- und y-Richtung nicht mehr wichtig, sondern ausschlaggebend war wie viele Work-Items insgesamt gestartet wurden.
+Anders als im ursprünglichen Raycast und MDC Raycast steht der Index eines Work-Items nicht mehr im direkten Zusammenhang mit einer Bildkoordinate, sondern die IDs wurden hier durch eine Funktion auf ganz unterschiedliche Bildkoordinaten zugewiesen.
+Daher war die Wahl des Verhältnisses der Anzahl der Work-Items in x- und y-Richtung nicht mehr wichtig, sondern ausschlaggebend war nur wie viele Work-Items insgesamt gestartet wurden.
 
 Die DDC Methode sollte drei Bereiche berechnen, die im Anschluss interpoliert werden.
 Der äußerste Bereich sollte die niedrigste Auflösung haben.
 Der mittlere Bereich sollte eine dazwischenliegende und der innere Bereich die normale Auflösung besitzen.
 Der mittlere und innere Bereich sollen dabei durch Ellipsen beschränkt werden und ihr Mittelpunkt liegt auf der Mausposition.
-Die Auflösung des mittleren Bereichs und des äußeren Bereichs wurde dafür mit einem Wert angegeben, der die $Anzahl der Texel - 1$ angibt, die je zwei Strahlen in x- und y-Richtung voneinander entfernt sind.
+Die Auflösungen des mittleren Bereichs und des äußeren Bereichs wurden dafür mit einem Wert angegeben, der die $Anzahl der Texel - 1$ angibt, die je zwei Strahlen in x- und y-Richtung voneinander entfernt sind.
 Dieser wert wurde \emph{G-Wert} genannt.
 Ein G-Wert von $1$ würde bedeuten, dass zwei Strahlen ein Texel voneinander entfernt sind.
 Also zwischen ihnen keine Lücke besteht.
 Das heißt, ein G-Wert von $1$ entspricht der normalen Auflösung.
 
-Die G-Werte der unterschiedlichen Bereiche wurde vor dem Start des Raycasts festgelegt, da diese notwendig sind, um die benötigte Anzahl an Work-Items zu bestimmen.
+Die G-Werte der unterschiedlichen Bereiche wurden vor dem Start des Raycasts festgelegt, da diese notwendig sind, um die benötigte Anzahl an Work-Items zu bestimmen.
 Um die Anzahl der insgesamt benötigten Work-Items abzuschätzen, wurden die Ellipsen als Rechtecke betrachtet.
 Für die drei Bereiche ergab sich die abgeschätzte Anzahl benötigter Work-Items dann aus $\frac{AnzahlDerPixelDesBereichs}{GWertDesBereichs}$.
 Für jeden Bereich wurde diese Anzahl anschließend mit einem geringen Offset erhöht, damit später keine Work-Items fehlen.
@@ -140,7 +139,7 @@ Da nun der Bereich in welchem sich ein Work-Item befindet, bekannt war, konnte f
 Das heißt für ein Work-Item, welches im inneren Bereich liegt, galt $g=1$ und $m=BreiteDerInnerenEllipse$.
 Ein Work-Item welches im äußeren Bereich lag, hat einen höheren G-Wert zugewiesen bekommen und für $m$ die Breite der Ausgangstextur.
 Für die Messungen im Abschnitt \ref{chap::resdisc} wurde für den äußeren Bereich ein G-Wert von $7$ und für den mittleren Bereich ein G-Wert von $2$ verwendet.
-Mithilfe der bekannten Werte $m$ und $g$ sowie dem Wissen, wie viele Work-Items den unterschiedlichen Bereichen zugeorndet wurden, wurde die $nId$ mit ein paar kleinen Anpassungen wieder zurück in eine zweidimensionale ID überführt, die nun einer Bildkoordinate entspricht.
+Mithilfe der bekannten Werte $m$ und $g$ sowie dem Wissen, wie viele Work-Items den unterschiedlichen Bereichen zugeordnet wurden, wurde die $nId$ mit ein paar kleinen Anpassungen wieder zurück in eine zweidimensionale ID überführt, die nun einer Bildkoordinate entspricht.
 Mit der neuen Work-Item ID kann ein Work-Item die Berechnung eines Strahls, wie bei dem ursprünglichen Raycast ganz normal fortsetzen.
 Abbildung \ref{fig::imp::ddc_o_ip} zeigt einen Ausschnitt der berechneten Textur des DDC Raycasts ohne eine anschließende Interpolation der Werte.
 Man kann erkennen, dass im äußeren Bereich der Abstand zwischen den Strahlen deutlich größer ist, als in dem mittleren und inneren Bereich.
@@ -148,18 +147,18 @@ Man sieht auch, dass die unterschiedlichen Bereiche sich gegenseitig überlappen
 Dies ist für die anschließende Interpolation notwendig, da sonst zwischen den Bereichen schwarze Punkte entstehen können.
 
 Abbildung \ref{fig::imp::ddc_m_ip} zeigt das in Abbildung \ref{fig::imp::ddc_o_ip} dargestellte Bild nachdem es interpoliert wurde.
-Die Interpolation wurde für den DDC Raycast in einem eigenen Kernel implementiert und nicht wie beim MDC Raycast durch den Fragmentshader realisiert.
+Die Interpolation wurde für den DDC Raycast in einem eigenem Kernel implementiert und nicht wie beim MDC Raycast durch den Fragmentshader realisiert.
 Der Kernel für die Interpolation der Werte wurde für die gesamte Auflösung des Bildes gestartet.
 Ähnlich wie beim DDC Raycast bestimmt jedes Work-Item den Bereich, in welchem es sich befindet.
 Dafür ist es hier nicht notwendig, die Indize umzurechnen, da die IDs der Work-Items schon Bildkoordinaten entsprechen und die Mausposition sowie die Ausmaße der Ellipsen dem Kernel übergeben werden.
 Mit der Information, in welchem Bereich sich ein Work-Item befindet und welche G-Werte und Ausmaße die unterschiedlichen Bereiche haben, wurden für ein Work-Item vier umliegende Werte des zuvor berechneten Raycasts ausfindig gemacht und bipolar interpoliert.
-Die Ausgabetextur der Interpolation wird durch den Fragmentshader anschließend auf das Full-Screen Quad gezeichnet.
+Die Ausgabetextur der Interpolation wird durch den Fragmentshader anschließend auf das Full-Screen Quad gerendert.
 
 \subsection{Erstellen und Darstellen von Messwerten}
 Für die Umsetzung des Arbeitspakets aus Abschnitt \ref{sec::workpacks::evm}, wurde eine Klasse erstellt, welche für eine Berechnung eines Bildes verschiedene Messwerte speichert.
-Diese sind unter Anderem die gesamte Ausführungszeit des Kernels (bei mehreren Ausführungen innerhalb einer Methode wurden diese addiert), die Ausführungszeit der paintGL() Methode und die Mausposition, die in der letzten Ausführung der paintGL() Methode für die Berechnung des Bildes verwendet wurde.
+Diese sind unter anderem die gesamte Ausführungszeit des Kernels (bei mehreren Ausführungen innerhalb einer Methode wurden diese addiert), die Ausführungszeit der paintGL() Methode und die Mausposition, die in der letzten Ausführung der paintGL() Methode für die Berechnung des Bildes verwendet wurde.
 Für jeden Aufruf der \texttt{paintGL()} Methode wurde ein solches Objekt erstellt und gespeichert.
-Die letzte Ausführungszeit eines Kernels konnte mit Hilfe des \texttt{volumerendercl} Objektes berechnet werden kann, welches dafür \emph{OpenCL Profiling} Methoden verwendet hat.
+Die letzte Ausführungszeit eines Kernels konnte mit Hilfe des \texttt{volumerendercl} Objektes berechnet werden, welches dafür \emph{OpenCL Profiling} Methoden verwendet hat.
 Die ungefähre Ausführungszeit der \texttt{paintGL()} Methode selbst wurde mit Hilfe eines \emph{Qt QTime} Objektes berechnet.
 
 Um eine Mausbewegung abzuspeichern wurden globale Variablen erstellt, die den aktuellen Zustand des Volumerenderwidgets bezüglich der Messungen angeben.
@@ -167,9 +166,9 @@ Um eine Mausbewegung abzuspeichern wurden globale Variablen erstellt, die den ak
 Wurde in den Zustand für die Aufzeichnung einer Mausbewegung gewechselt, so hat die Callback-Methode für die Mausbewegungen nicht nur die aktuelle Position in eine globale Variable geschrieben, sondern auch in einen c++ Vektor abgespeichert.
 Dies passierte aber nur, falls die zuletzt gespeicherte Position sich um mindestens 10 Pixel von der aktuellen gemessenen Position unterscheidet.
 Während Mausbewegungen aufgenommen wurden, wurden die Ausführung der Raycasts blockiert.
-Nachdem eine Mausbewegung aufgenommen wurde, konnten die gesammelten Daten gespeichert und wieder geladen.
-Falls es eine gespeicherte Mausbewegung gab, konnte über eine Tastatureingabe in den Replay-Zustand gewechselt werden.
-In diesem Zustand wurden alle Tastatur- und Mauseingaben bis auf eine Taste, um das Replay vorzeitig abzubrechen, ignoriert.
+Nachdem eine Mausbewegung aufgenommen wurde, konnten die gesammelten Daten gespeichert und wieder geladen werden.
+Falls es gespeicherte Mausbewegungen gab, konnte über eine Tastatureingabe in den Replay-Zustand gewechselt werden.
+In diesem Zustand wurden alle Tastatur- und Mauseingaben, bis auf eine Taste, um das Replay vorzeitig abzubrechen, ignoriert.
 Wurde in den Replay-Zustand gewechselt, wurde die paintGL() Methode für jede gespeicherte Mausposition in dem c++ Vektor einmal ausgeführt und die dabei gesammelten Messwerte in lesbarer Form in eine \texttt{.txt}-Datei geschrieben.
 
 Mit Hilfe eines Python Scripts konnten die gespeicherten Messwerte geladen und verwertet werden.

@@ -53,7 +53,7 @@ Der jeweilige Pixel erhält die berechnete Farbe des Work-Items.
 
 Durch die Interpolation der Voxel wird das Volumen mit weichen Konturen und Flächen gezeichnet.
 Die Transferfunktion hebt die Voxel mit etwas höherer Dichte farblich hervor.
-Dadurch sind farblich einheitliche und zusammenhängende Strukturen erkennbar, unter Anderem die Blätter, Äste und den Stamm.
+Dadurch sind farblich einheitliche und zusammenhängende Strukturen erkennbar, unter anderem die Blätter, Äste und den Stamm.
 Die Voxel, die nicht zu dem Bonsai Objekt gehören, zum Beispiel Leerräume, haben teilweise auch Dichtewerte größer null.
 Daher wurde die Transferfunktion so gewählt, dass diese ebenfalls vollständig ausgeblendet sind.
 Insgesamt werden die Flächen aber transparent gezeichnet, so dass auch eigentlich verdeckte Strukturen zu sehen sind.
@@ -403,7 +403,7 @@ Insgesamt wurden hier 584 Mauspositionen aufgezeichnet.
 Es wurden anschließend verschiedene Volumendaten mit jeweils drei verschiedenen Transferfunktionen für die drei verschiedenen Implementierungen, den Standard-, \emph{MDC}- und \emph{DDC}-Raycast sowie jeweils einmal mit konstanter und einmal mit variierter Strahlabtastrate für die Messungen verwendet.
 Bei jeder dieser Messung wurde dabei für jede der Mauspositionen des gespeicherten Mausverlaufs ein Bild berechnet und zu dieser Berechnung die Mausposition, die Ausführungszeit des Kernels und die Ausführungszeit der \emph{paintGL()}-Methode gespeichert.
 
-Die Hardware des Computers, mit welchem die Messungen durchgeführt wurden, besteht unter Anderem aus einem \emph{Intel Core i5 4670k bei $3,40$\,GHz} CPU und einer \emph{GIGABYTE AMD Radeon (TM) R9 390 Series} GPU.
+Die Hardware des Computers, mit welchem die Messungen durchgeführt wurden, besteht unter anderem aus einem \emph{Intel Core i5 4670k bei $3,40$\,GHz} CPU und einer \emph{GIGABYTE AMD Radeon (TM) R9 390 Series} GPU.
 Die Auflösung der zu berechnenden Bilder betrug immer $2263\times1306$\,Pixel.
 
 Die Messungen wurden mit den Volumen \emph{Bonsai}, \emph{Supernova} und \emph{Chameleon} durchgeführt.
