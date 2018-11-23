@@ -54,6 +54,8 @@ void StippleViewer::displayCells(const IndexMap &map)
         }
     }
     this->scene()->addPixmap(QPixmap::fromImage(image));
+    // TODO: Fix event handling
+    QCoreApplication::processEvents();
 }
 
 QPixmap StippleViewer::getImage() {

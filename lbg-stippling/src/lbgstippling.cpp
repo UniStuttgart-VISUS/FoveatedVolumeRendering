@@ -88,6 +88,7 @@ bool notFinished(const Status& status, const Params& params) {
 LBGStippling::LBGStippling() {
     m_statusCallback = [](const Status&) {};
     m_stippleCallback = [](const std::vector<Stipple>&) {};
+    m_cellCallback = [](const IndexMap&) {};
 }
 
 void LBGStippling::setStatusCallback(Report<Status> statusCB) {
@@ -103,7 +104,7 @@ void LBGStippling::setCellCallback(Report<IndexMap> cellCB)
     m_cellCallback = cellCB;
 }
 
-std::vector<Stipple> LBGStippling::stipple(const QImage& density, const Params& params) const {
+LBGStippling::Result LBGStippling::stipple(const QImage& density, const Params& params) const {
     QImage densityGray =
         density
             .scaledToWidth(params.superSamplingFactor * density.width(), Qt::SmoothTransformation)
@@ -112,6 +113,8 @@ std::vector<Stipple> LBGStippling::stipple(const QImage& density, const Params& 
     VoronoiDiagram voronoi(densityGray);
 
     std::vector<Stipple> stipples = randomStipples(params.initialPoints, params.initialPointSize);
+
+    IndexMap indexMap;
 
     Status status = {0, 0, 1, 1};
 
@@ -126,7 +129,7 @@ std::vector<Stipple> LBGStippling::stipple(const QImage& density, const Params& 
             break;
         }
 
-        auto indexMap = voronoi.calculate(points);
+         indexMap = voronoi.calculate(points);
         std::vector<VoronoiCell> cells = accumulateCells(indexMap, densityGray);
 
         assert(cells.size() == stipples.size());
@@ -190,7 +193,7 @@ std::vector<Stipple> LBGStippling::stipple(const QImage& density, const Params& 
 
         ++status.iteration;
     }
-    return stipples;
+    return {stipples, indexMap};
 }
 
 void LBGStippling::Params::saveParametersJSON(const QString& path) {

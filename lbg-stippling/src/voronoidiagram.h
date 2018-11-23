@@ -13,6 +13,7 @@ class IndexMap {
     size_t width;
     size_t height;
 
+    IndexMap()=default;
     IndexMap(size_t w, size_t h, size_t count);
     void set(size_t x, size_t y, uint32_t value);
     uint32_t get(size_t x, size_t y) const;

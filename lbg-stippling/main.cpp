@@ -17,6 +17,33 @@
 #include "lbgstippling.h"
 #include "mainwindow.h"
 
+QImage foveaSampling() {
+    auto ellipticalGauss2DAppox = [](float x, float y, //
+                                     float sigmaX, float sigmaY) -> float {
+        return qExp(-((x * x) / (2.0 * sigmaX * sigmaX) + (y * y) / (2.0 * sigmaY * sigmaY)));
+    };
+
+    const QSize screenSizePx(1920, 1080);
+    const QSizeF screenSizeCm(60, 33.5);
+    const qreal viewDistanceCm = 80;
+    const qreal foveaAlpha = 4.0 / 180.0 * M_PI;
+    const qreal foveaCm = viewDistanceCm * qSin(foveaAlpha);
+    const QSizeF foveaPx(screenSizePx.width() / screenSizeCm.width() * foveaCm,
+                         screenSizePx.height() / screenSizeCm.height() * foveaCm);
+
+    QImage gaussian(screenSizePx.width() * 3, screenSizePx.height() * 3, QImage::Format_Grayscale8);
+    //QImage gaussian(screenSizePx.width() , screenSizePx.height() , QImage::Format_Grayscale8);
+    for (int y = 0; y < gaussian.height(); ++y) {
+        uchar* line = gaussian.scanLine(y);
+        for (int x = 0; x < gaussian.width(); ++x) {
+            float g = ellipticalGauss2DAppox(x - gaussian.width() / 2, y - gaussian.height() / 2, //
+                                             foveaPx.width(), foveaPx.height());
+            line[x] = qMin(static_cast<int>((1.0 - g) * 255.0), 254);
+        }
+    }
+
+    return gaussian;
+}
 int main(int argc, char* argv[]) {
     QApplication app(argc, argv);
     app.setApplicationName("Weighted Linde-Buzo-Gray Stippling");
@@ -55,33 +82,7 @@ int main(int argc, char* argv[]) {
 
     parser.process(app);
 
-    /*
-    auto ellipticalGauss2D = [](float x, float y,     //
-                                float muX, float muY, //
-                                float sigmaX, float sigmaY) -> float {
-        return 1.0 / (2.0 * M_PI * sigmaX * sigmaY) *
-               qExp(-(qPow(x - muX, 2.0) / (2.0 * sigmaX * sigmaX) +
-                      qPow(y - muY, 2) / (2.0 * sigmaY * sigmaY)));
-    };
-    */
-
-    auto ellipticalGauss2DAppox = [](float x, float y, //
-                                     float sigmaX, float sigmaY) -> float {
-        return qExp(-((x * x) / (2.0 * sigmaX * sigmaX) + (y * y) / (2.0 * sigmaY * sigmaY)));
-    };
-
-//    QImage gaussian(1920 * 3, 1080 * 3, QImage::Format_Grayscale8);
-        QImage gaussian(1920, 1080 , QImage::Format_Grayscale8);
-    for (int y = 0; y < gaussian.height(); ++y) {
-        uchar * line = gaussian.scanLine(y);
-        for (int x = 0; x < gaussian.width(); ++x) {
-            float g = ellipticalGauss2DAppox(x - gaussian.width() / 2, y - gaussian.height() / 2, //
-                                            179, 28);
-            line[x] = qMin(static_cast<int>((1.0 - g) * 255.0), 254);
-        }
-    }
-
-    QImage density = gaussian; // QImage(":/input/input1.jpg");
+    QImage density = foveaSampling(); // QImage(":/input/input1.jpg");
     LBGStippling::Params params;
 
     if (parser.isSet("input")) {
@@ -137,70 +138,110 @@ int main(int argc, char* argv[]) {
         MainWindow* window = new MainWindow(density, params);
         window->show();
     } else {
-        QString outputPath = parser.value("output");
-        QStringList outputList = outputPath.split(",");
-        QStringList inputList = parser.value("input").split(",");
+        //QString outputPath = parser.value("output");
+        //QStringList outputList = outputPath.split(",");
+       // QStringList inputList = parser.value("input").split(",");
 
-        assert(inputList.size() > outputList.size());
+      //  assert(inputList.size() > outputList.size());
 
         LBGStippling stippling = LBGStippling();
 
-        if (outputList.size() == inputList.size()) {
-            // for each input one output
+            params.mapping =  LBGStippling::PointMappingFunction::LINEAR;
 
-            for (int i = 0; i < inputList.size(); ++i) {
-                const QString& in = inputList.at(i);
-                const QString& out = outputList.at(i);
-                density = QImage(in);
-                std::vector<Stipple> stipples = stippling.stipple(density, params);
+//        if (outputList.size() == inputList.size()) {
+//            // for each input one output
 
-                QSvgGenerator generator;
-                generator.setFileName(out);
-                generator.setSize(density.size());
-                generator.setViewBox(QRectF(0, 0, density.width(), density.height()));
-                generator.setTitle("Stippling Result");
-                generator.setDescription("SVG File created by Weighted Linde-Buzo-Gray Stippling");
+//            for (int i = 0; i < inputList.size(); ++i) {
+//                const QString& in = inputList.at(i);
+//                const QString& out = outputList.at(i);
+//                //density = QImage(in);
+                auto result = stippling.stipple(density, params);
+                std::vector<Stipple> stipples = result.stipples;
+                auto map = result.indexMap;
 
-                QPainter painter;
-                painter.begin(&generator);
-                painter.setPen(Qt::NoPen);
+                QImage stippleMap(stipples.size(), 2, QImage::Format_RGB32);
+                QRgb* stippleLine0 = reinterpret_cast<QRgb*>(stippleMap.scanLine(0));
+                QRgb* stippleLine1 = reinterpret_cast<QRgb*>(stippleMap.scanLine(1));
+//                QRgb* stippleLine2 = reinterpret_cast<QRgb*>(stippleMap.scanLine(2));
+//                QRgb* stippleLine3 = reinterpret_cast<QRgb*>(stippleMap.scanLine(3));
+//                QRgb* stippleLine4 = reinterpret_cast<QRgb*>(stippleMap.scanLine(4));
+//                QRgb* stippleLine5 = reinterpret_cast<QRgb*>(stippleMap.scanLine(5));
+//                QRgb* stippleLine6 = reinterpret_cast<QRgb*>(stippleMap.scanLine(6));
+//                QRgb* stippleLine7 = reinterpret_cast<QRgb*>(stippleMap.scanLine(7));
+                for (int i = 0; i < stipples.size(); ++i) {
+                    // Pos
+                    stippleLine0[i] = static_cast<uint>(stipples[i].pos.x() * density.width() );
+                    stippleLine1[i] = static_cast<uint>(stipples[i].pos.y() * density.height() );
 
-                for (const auto& s : stipples) {
-                    auto x = s.pos.x() * density.width();
-                    auto y = s.pos.y() * density.height();
-                    painter.setBrush(s.color);
-                    painter.drawEllipse(QPointF(x, y), s.size / 2.0, s.size / 2.0);
+//                    // Inner indices
+//                    stippleLine2[i] = i;
+//                    stippleLine3[i] = i;
+//                    stippleLine4[i] = i;
+
+//                    // Adjacent indices
+//                    stippleLine5[i] = i;
+//                    stippleLine6[i] = i;
+//                    stippleLine7[i] = i;
                 }
+                stippleMap.save("stippleMap.png");
 
-                painter.end();
-            }
-        } else if (outputList.size() == 1) {
-            // merge all inputs into one output
-
-            QSvgGenerator generator;
-            generator.setFileName(outputList.at(0));
-            generator.setSize(density.size());
-            generator.setViewBox(QRectF(0, 0, density.width(), density.height()));
-            generator.setTitle("Stippling Result");
-            generator.setDescription("SVG File created by Weighted Linde-Buzo-Gray Stippling");
-
-            QPainter painter;
-            painter.begin(&generator);
-            painter.setPen(Qt::NoPen);
-
-            for (const QString& in : inputList) {
-                density = QImage(in);
-                std::vector<Stipple> stipples = stippling.stipple(density, params);
-
-                for (const auto& s : stipples) {
-                    auto x = s.pos.x() * density.width();
-                    auto y = s.pos.y() * density.height();
-                    painter.setBrush(s.color);
-                    painter.drawEllipse(QPointF(x, y), s.size / 2.0, s.size / 2.0);
+                QImage indexMap(map.width, map.height, QImage::Format_RGB32);
+                for (size_t y = 0; y < map.height; ++y) {
+                    QRgb* indexMapLine = reinterpret_cast<QRgb*>(indexMap.scanLine(y));
+                    for (size_t x = 0; x < map.width; ++x) {
+                        uint index = map.get(x, y);
+                        indexMapLine[x] = index;
+                    }
                 }
-            }
-            painter.end();
-        }
+                indexMap.save("indexMap.png");
+
+//                QSvgGenerator generator;
+//                generator.setFileName(out);
+//                generator.setSize(density.size());
+//                generator.setViewBox(QRectF(0, 0, density.width(), density.height()));
+//                generator.setTitle("Stippling Result");
+//                generator.setDescription("SVG File created by Weighted Linde-Buzo-Gray Stippling");
+
+//                QPainter painter;
+//                painter.begin(&generator);
+//                painter.setPen(Qt::NoPen);
+
+//                for (const auto& s : stipples) {
+//                    auto x = s.pos.x() * density.width();
+//                    auto y = s.pos.y() * density.height();
+//                    painter.setBrush(s.color);
+//                    painter.drawEllipse(QPointF(x, y), s.size / 2.0, s.size / 2.0);
+//                }
+
+//                painter.end();
+//            }
+//        } else if (outputList.size() == 1) {
+//            // merge all inputs into one output
+
+//            QSvgGenerator generator;
+//            generator.setFileName(outputList.at(0));
+//            generator.setSize(density.size());
+//            generator.setViewBox(QRectF(0, 0, density.width(), density.height()));
+//            generator.setTitle("Stippling Result");
+//            generator.setDescription("SVG File created by Weighted Linde-Buzo-Gray Stippling");
+
+//            QPainter painter;
+//            painter.begin(&generator);
+//            painter.setPen(Qt::NoPen);
+
+//            for (const QString& in : inputList) {
+//                density = QImage(in);
+//                std::vector<Stipple> stipples = stippling.stipple(density, params).stipples;
+
+//                for (const auto& s : stipples) {
+//                    auto x = s.pos.x() * density.width();
+//                    auto y = s.pos.y() * density.height();
+//                    painter.setBrush(s.color);
+//                    painter.drawEllipse(QPointF(x, y), s.size / 2.0, s.size / 2.0);
+//                }
+//            }
+//            painter.end();
+//        }
         exit(0);
     }
 

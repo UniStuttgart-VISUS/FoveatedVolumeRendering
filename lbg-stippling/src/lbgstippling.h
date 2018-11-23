@@ -52,12 +52,17 @@ class LBGStippling {
         float hysteresis;
     };
 
+    struct Result {
+        std::vector<Stipple> stipples;
+        IndexMap indexMap;
+    };
+
     template <class T>
     using Report = std::function<void(const T&)>;
 
     LBGStippling();
 
-    std::vector<Stipple> stipple(const QImage& density, const Params& params) const;
+    Result stipple(const QImage& density, const Params& params) const;
 
     // TODO: Rename and method chaining.
     void setStatusCallback(Report<Status> statusCB);
