@@ -1,0 +1,90 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\Ruben\Desktop\FoveatedVolumeRendering\src\io\datrawreader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Ruben\Desktop\FoveatedVolumeRendering\src\oclutil\openclutilities.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Ruben\Desktop\FoveatedVolumeRendering\src\oclutil\openclglutilities.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Ruben\Desktop\FoveatedVolumeRendering\src\qt\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Ruben\Desktop\FoveatedVolumeRendering\src\qt\mainwindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Ruben\Desktop\FoveatedVolumeRendering\src\qt\transferfunctionwidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Ruben\Desktop\FoveatedVolumeRendering\src\qt\volumerenderwidget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Ruben\Desktop\FoveatedVolumeRendering\src\qt\colorutils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Ruben\Desktop\FoveatedVolumeRendering\src\qt\colorwheel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Ruben\Desktop\FoveatedVolumeRendering\src\qt\hoverpoints.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Ruben\Desktop\FoveatedVolumeRendering\src\core\volumerendercl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\Ruben\Desktop\FoveatedVolumeRendering\build\VolumeRaycasterCL_autogen\mocs_compilation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\Ruben\Desktop\FoveatedVolumeRendering\src\io\datrawreader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Ruben\Desktop\FoveatedVolumeRendering\src\oclutil\openclutilities.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Ruben\Desktop\FoveatedVolumeRendering\src\oclutil\openclglutilities.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Ruben\Desktop\FoveatedVolumeRendering\src\qt\mainwindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Ruben\Desktop\FoveatedVolumeRendering\src\qt\transferfunctionwidget.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Ruben\Desktop\FoveatedVolumeRendering\src\qt\volumerenderwidget.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Ruben\Desktop\FoveatedVolumeRendering\src\qt\colorutils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Ruben\Desktop\FoveatedVolumeRendering\src\qt\colorwheel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Ruben\Desktop\FoveatedVolumeRendering\src\qt\hoverpoints.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Ruben\Desktop\FoveatedVolumeRendering\src\core\volumerendercl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\Ruben\Desktop\FoveatedVolumeRendering\inc\CL\cl2.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\Ruben\Desktop\FoveatedVolumeRendering\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="C:\Users\Ruben\Desktop\FoveatedVolumeRendering\src\qt\mainwindow.ui" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{49363CE3-E2E7-38FA-A51D-F085C7A9C89C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{A61161BF-6517-3788-8832-25C17E8AB892}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
