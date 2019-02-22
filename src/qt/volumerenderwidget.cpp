@@ -635,11 +635,11 @@ void VolumeRenderWidget::paintGL()
 	{
 		if (_bench.do_all_benchmarks && _bench.needs_update) {	// new volume needs to be loaded and logFile needs to be updated
 																// set new path to save file to
-			
+
 			// load new volume and tff if finished with both rendering methods of the previous one
 			if (_renderingMethod == LBG_Sampling || _bench.curr_volume == 0) {
 				setVolumeData(std::get<0>(std::get<1>(_bench.volume_and_tff[_bench.curr_volume])));
-
+				setLoadingFinished(true);
 				// load raw values of tff
 				std::ifstream tff_file_((std::get<1>(std::get<1>(_bench.volume_and_tff[_bench.curr_volume]))).toStdString(), std::ios::in);
 				float value = 0;
@@ -662,55 +662,51 @@ void VolumeRenderWidget::paintGL()
 				setRenderingMethod(Standard);
 
 				_bench.logFileName = _bench.dir_to_save_to + QDir::separator() +
-					std::get<0>(_bench.volume_and_tff[_bench.curr_volume]) + '_';
+					std::get<0>(_bench.volume_and_tff[_bench.curr_volume]) + "_Standard";
 
 				_bench.curr_volume++;
 			}
 			else {
 				setRenderingMethod(LBG_Sampling);
-				_prng = QRandomGenerator64(42);	// reset seed for new gaze positions
+				_bench.logFileName = _bench.dir_to_save_to + QDir::separator() +
+					std::get<0>(_bench.volume_and_tff[_bench.curr_volume-1]) + "_LBG-Sampling";
 			}
-			
-			_bench.logFileName += _renderingMethod == 0 ? "Standard" : "LBG-Sampling";
 
 			_bench.iteration = 0;
 			_bench.needs_update = false;
+			_prng = QRandomGenerator64(42);	// reset seed for new gaze positions
 
 		}
-		if (_renderingMethod == LBG_Sampling) {
-			if (_bench.active && _bench.isCameraIteration())
-				updateView();
-				else
-			{
-				lcpf.x = static_cast<float>(std::generate_canonical<float, std::numeric_limits<float>::digits>(_prng));
-				lcpf.y = static_cast<float>(std::generate_canonical<float, std::numeric_limits<float>::digits>(_prng));
-			}
+		if (_bench.active && _bench.isCameraIteration())
+			updateView();
+			else
+		{
+			lcpf.x = static_cast<float>(std::generate_canonical<float, std::numeric_limits<float>::digits>(_prng));
+			lcpf.y = static_cast<float>(std::generate_canonical<float, std::numeric_limits<float>::digits>(_prng));
 		}
+		
 		
 		_bench.iteration++;
 	}
 	else
 	{
-		if (_renderingMethod == LBG_Sampling) {
-			if (_useEyetracking && _gaze_data.right_eye.gaze_point.validity == TOBII_RESEARCH_VALIDITY_VALID)
-			{
-				lcpf.x = _gaze_data.right_eye.gaze_point.position_on_display_area.x;
-				lcpf.y = _gaze_data.right_eye.gaze_point.position_on_display_area.y;
-				_last_valid_gaze_position = lcpf;
-			}
-			else
-				lcpf = _last_valid_gaze_position;
-
-			// log gaze data
-			if (_logInteraction && _renderingMethod == LBG_Sampling)
-			{
-				QString s;
-				s += QString::number(_timer.elapsed());
-				s += "; gaze; ";
-				s += QString::number(_last_valid_gaze_position.x) + " ";
-				s += QString::number(_last_valid_gaze_position.y) + "\n";
-				logInteraction(s);
-			}
+		if (_useEyetracking && _gaze_data.right_eye.gaze_point.validity == TOBII_RESEARCH_VALIDITY_VALID)
+		{
+			lcpf.x = _gaze_data.right_eye.gaze_point.position_on_display_area.x;
+			lcpf.y = _gaze_data.right_eye.gaze_point.position_on_display_area.y;
+			_last_valid_gaze_position = lcpf;
+		}
+		else
+			lcpf = _last_valid_gaze_position;
+		// log gaze data
+		if (_logInteraction && _renderingMethod == LBG_Sampling)
+		{
+			QString s;
+			s += QString::number(_timer.elapsed());
+			s += "; gaze; ";
+			s += QString::number(_last_valid_gaze_position.x) + " ";
+			s += QString::number(_last_valid_gaze_position.y) + "\n";
+			logInteraction(s);
 		}
 		
 	}
@@ -739,12 +735,13 @@ void VolumeRenderWidget::paintGL()
 
 		if (_bench.do_all_benchmarks 
 			&& _bench.iteration >= _bench.max_different_camera_positions * _bench.gaze_iterations) {
-			if (_bench.curr_volume < _bench.volume_and_tff.size()) {
+			if (_renderingMethod == Standard || _bench.curr_volume < _bench.volume_and_tff.size()) {
 				_bench.needs_update = true;
 			}
 			else {
 				_bench.active = false;
 				_bench.do_all_benchmarks = false;
+				setContRendering(false);
 			}
 			_bench.f.close();
 		}
@@ -2006,12 +2003,13 @@ void VolumeRenderWidget::do_all_Benchmarks()
 
 		}
 
+		/*
 		bool ok;
 		_bench.gaze_iterations = QInputDialog::getInt(this, tr("Gaze iterations per camera position"),
 			tr("Select gaze iterations:"), 100, 1, 10000, 1, &ok);
 
 		_bench.max_different_camera_positions = QInputDialog::getInt(this, tr("Amount of camera positions"),
-			tr("Select amount of camera positions:"), 15, 1, 100, 1, &ok);
+			tr("Select amount of camera positions:"), 15, 1, 100, 1, &ok);*/
 		
 		_bench.dir_to_save_to = directorySavePath;
 		
@@ -2032,6 +2030,8 @@ void VolumeRenderWidget::do_all_Benchmarks()
 
 	_bench.active = !_bench.active;
 	_bench.do_all_benchmarks = !_bench.do_all_benchmarks;
+
+	setContRendering(true);
 
 	updateView();
 }

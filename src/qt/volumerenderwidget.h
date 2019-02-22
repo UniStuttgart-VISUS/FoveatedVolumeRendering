@@ -91,6 +91,18 @@ struct Benchmark
         QTextStream fileStream(&f);
         fileStream << str;
     }
+
+	void printState() {
+		std::cout << "_bench: " << std::endl;
+		std::cout << "ative: " << active << std::endl;
+		std::cout << "do_all_benchmarks: " << do_all_benchmarks << std::endl;
+		std::cout << "iteration: " << iteration << std::endl;
+		std::cout << "gaze_iterations: " << gaze_iterations << std::endl;
+		std::cout << "logFileName: " << logFileName.toStdString() << std::endl;
+		std::cout << "needs_update: " << needs_update << std::endl;
+		std::cout << "curr_volume: " << curr_volume << std::endl;
+		std::cout << std::endl;
+	}
 };
 
 class VolumeRenderWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_Core
