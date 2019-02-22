@@ -57,7 +57,8 @@ struct Benchmark
 {
     bool active = false;
     quint64 iteration = 0;
-    quint64 gaze_iterations = 100;    // gaze iterations per camera state
+    quint64 gaze_iterations = 10;    // gaze iterations per camera state
+	quint64 iterations_per_gaze = 5;
     QString logFileName = "";
     QFile f;
 
@@ -65,7 +66,7 @@ struct Benchmark
 	// members for multiple benchmarks (do_all_Benchmarks())
 	bool do_all_benchmarks = false;	// it holds: do_all_benchmarks implicates active
 	bool needs_update = false;	// tells if the Benchmark Parameter should be updated (e.g. new volume)
-	quint64 max_different_camera_positions = 15;	// amount of different camera positions
+	quint64 max_different_camera_positions = 10;	// amount of different camera positions
 	quint64 curr_volume = -1;	// no initial volume
 	QString dir_to_save_to;	// directory to save all benchmarks to
 	std::vector<std::tuple<QString, std::tuple<QString, QString>>> volume_and_tff;	// (directory_name, (volume_path, tff_path))
@@ -300,6 +301,8 @@ private:
     QPoint _lastLocalCursorPos;
     QQuaternion _rotQuat;
     QVector3D _translation;
+
+	cl_float2 _lcpf = { 0,0 };
 
 	bool _useEyetracking;
     bool _noUpdate;

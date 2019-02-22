@@ -630,7 +630,6 @@ void VolumeRenderWidget::gaze_data_callback(TobiiResearchGazeData * gaze_data, v
  */
 void VolumeRenderWidget::paintGL()
 {
-	cl_float2 lcpf = { 0.f, 0.f };
 	if (_bench.active)
 	{
 		if (_bench.do_all_benchmarks && _bench.needs_update) {	// new volume needs to be loaded and logFile needs to be updated
@@ -681,8 +680,10 @@ void VolumeRenderWidget::paintGL()
 			updateView();
 			else
 		{
-			lcpf.x = static_cast<float>(std::generate_canonical<float, std::numeric_limits<float>::digits>(_prng));
-			lcpf.y = static_cast<float>(std::generate_canonical<float, std::numeric_limits<float>::digits>(_prng));
+				if (_bench.iteration % _bench.iterations_per_gaze) {
+					_lcpf.x = static_cast<float>(std::generate_canonical<float, std::numeric_limits<float>::digits>(_prng));
+					_lcpf.y = static_cast<float>(std::generate_canonical<float, std::numeric_limits<float>::digits>(_prng));
+				}
 		}
 		
 		
@@ -692,12 +693,12 @@ void VolumeRenderWidget::paintGL()
 	{
 		if (_useEyetracking && _gaze_data.right_eye.gaze_point.validity == TOBII_RESEARCH_VALIDITY_VALID)
 		{
-			lcpf.x = _gaze_data.right_eye.gaze_point.position_on_display_area.x;
-			lcpf.y = _gaze_data.right_eye.gaze_point.position_on_display_area.y;
-			_last_valid_gaze_position = lcpf;
+			_lcpf.x = _gaze_data.right_eye.gaze_point.position_on_display_area.x;
+			_lcpf.y = _gaze_data.right_eye.gaze_point.position_on_display_area.y;
+			_last_valid_gaze_position = _lcpf;
 		}
 		else
-			lcpf = _last_valid_gaze_position;
+			_lcpf = _last_valid_gaze_position;
 		// log gaze data
 		if (_logInteraction && _renderingMethod == LBG_Sampling)
 		{
@@ -713,7 +714,7 @@ void VolumeRenderWidget::paintGL()
 
 	switch (_renderingMethod) {
 	case LBG_Sampling:
-		_volumerender.setGazePoint(lcpf);
+		_volumerender.setGazePoint(_lcpf);
 		paintGL_LBG_sampling();
 		break;
 	default:
@@ -729,12 +730,12 @@ void VolumeRenderWidget::paintGL()
 		out << _rotQuat.toVector4D().w() << " " << _rotQuat.x() << " " << _rotQuat.y() << " "
 			<< _rotQuat.z() << "; ";
 		out << _translation.x() << " " << _translation.y() << " " << _translation.z() << "; ";
-		out << lcpf.x << " " << lcpf.y << "; ";
+		out << _lcpf.x << " " << _lcpf.y << "; ";
 		out << _volumerender.getLastExecTime() << "\n";
 		_bench.writeState(out.readAll());
 
 		if (_bench.do_all_benchmarks 
-			&& _bench.iteration >= _bench.max_different_camera_positions * _bench.gaze_iterations) {
+			&& _bench.iteration >= _bench.max_different_camera_positions * _bench.gaze_iterations * _bench.iterations_per_gaze) {
 			if (_renderingMethod == Standard || _bench.curr_volume < _bench.volume_and_tff.size()) {
 				_bench.needs_update = true;
 			}
@@ -1516,7 +1517,7 @@ void VolumeRenderWidget::updateView(float dx, float dy)
 {
     if (_bench.active && _bench.isCameraIteration())
     {
-        _bench.iteration++;
+        // _bench.iteration++;
         dx = static_cast<float>(std::generate_canonical<float, std::numeric_limits<float>::digits>(_prng));
         dy = static_cast<float>(std::generate_canonical<float, std::numeric_limits<float>::digits>(_prng));
         _translation.setZ(static_cast<float>(std::generate_canonical<float, std::numeric_limits<float>::digits>(_prng)) * 4);
@@ -2003,8 +2004,8 @@ void VolumeRenderWidget::do_all_Benchmarks()
 
 		}
 
-		/*
-		bool ok;
+		
+		/*bool ok;
 		_bench.gaze_iterations = QInputDialog::getInt(this, tr("Gaze iterations per camera position"),
 			tr("Select gaze iterations:"), 100, 1, 10000, 1, &ok);
 
