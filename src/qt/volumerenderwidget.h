@@ -61,6 +61,15 @@ struct Benchmark
     QString logFileName = "";
     QFile f;
 
+
+	// members for multiple benchmarks (do_all_Benchmarks())
+	bool do_all_benchmarks = false;	// it holds: do_all_benchmarks implicates active
+	bool needs_update = false;	// tells if the Benchmark Parameter should be updated (e.g. new volume)
+	quint64 max_different_camera_positions = 15;	// amount of different camera positions
+	quint64 curr_volume = -1;	// no initial volume
+	QString dir_to_save_to;	// directory to save all benchmarks to
+	std::vector<std::tuple<QString, std::tuple<QString, QString>>> volume_and_tff;	// (directory_name, (volume_path, tff_path))
+
     bool isCameraIteration()
     {
 //        std::cout << this->iteration << " " << (this->iteration % this->gaze_iterations) << std::endl;
