@@ -57,9 +57,19 @@ struct Benchmark
 {
     bool active = false;
     quint64 iteration = 0;
-    quint64 gaze_iterations = 100;    // gaze iterations per camera state
+    quint64 gaze_iterations = 256;    // gaze iterations per camera state
+	quint64 iterations_per_gaze = 5;
     QString logFileName = "";
     QFile f;
+
+
+	// members for multiple benchmarks (do_all_Benchmarks())
+	bool do_all_benchmarks = false;	// it holds: do_all_benchmarks implicates active
+	bool needs_update = false;	// tells if the Benchmark Parameter should be updated (e.g. new volume)
+	quint64 max_different_camera_positions = 256;	// amount of different camera positions
+	quint64 curr_volume = -1;	// no initial volume
+	QString dir_to_save_to;	// directory to save all benchmarks to
+	std::vector<std::tuple<QString, std::tuple<QString, QString>>> volume_and_tff;	// (directory_name, (volume_path, tff_path))
 
     bool isCameraIteration()
     {
@@ -82,6 +92,18 @@ struct Benchmark
         QTextStream fileStream(&f);
         fileStream << str;
     }
+
+	void printState() {
+		std::cout << "_bench: " << std::endl;
+		std::cout << "ative: " << active << std::endl;
+		std::cout << "do_all_benchmarks: " << do_all_benchmarks << std::endl;
+		std::cout << "iteration: " << iteration << std::endl;
+		std::cout << "gaze_iterations: " << gaze_iterations << std::endl;
+		std::cout << "logFileName: " << logFileName.toStdString() << std::endl;
+		std::cout << "needs_update: " << needs_update << std::endl;
+		std::cout << "curr_volume: " << curr_volume << std::endl;
+		std::cout << std::endl;
+	}
 };
 
 class VolumeRenderWidget : public QOpenGLWidget, protected QOpenGLFunctions_4_3_Core
@@ -280,6 +302,8 @@ private:
     QQuaternion _rotQuat;
     QVector3D _translation;
 
+	cl_float2 _lcpf = { 0,0 };
+
 	bool _useEyetracking;
     bool _noUpdate;
     bool _loadingFinished;
@@ -298,6 +322,7 @@ private:
     QGradientStops _tffStops;
 	QElapsedTimer _timer;
 	RenderingMethod _renderingMethod;	// selects the rendering method which will be called within paintGL()
-    QRandomGenerator64 _prng;
+    QRandomGenerator64 _prng_camera;
+	QRandomGenerator64 _prng_gaze;
     Benchmark _bench;
 };

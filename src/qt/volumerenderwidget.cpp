@@ -624,67 +624,137 @@ void VolumeRenderWidget::gaze_data_callback(TobiiResearchGazeData * gaze_data, v
 	memcpy(user_data, gaze_data, sizeof(*gaze_data));
 }
 
+
 /**
  * @brief VolumeRenderWidget::paintGL
  */
 void VolumeRenderWidget::paintGL()
 {
+	if (_bench.active)
+	{
+		if (_bench.do_all_benchmarks && _bench.needs_update) {	// new volume needs to be loaded and logFile needs to be updated
+																// set new path to save file to
+
+			// load new volume and tff if finished with both rendering methods of the previous one
+			if (_renderingMethod == LBG_Sampling || _bench.curr_volume == 0) 
+			{
+				setVolumeData(std::get<0>(std::get<1>(_bench.volume_and_tff[_bench.curr_volume])));
+				setLoadingFinished(true);
+				// load raw values of tff
+				std::ifstream tff_file_((std::get<1>(std::get<1>(_bench.volume_and_tff[_bench.curr_volume]))).toStdString(), std::ios::in);
+				float value = 0;
+				std::vector<unsigned char> values;
+				// read lines from file and split on whitespace
+				if (tff_file_.is_open())
+				{
+					while (tff_file_ >> value)
+					{
+						values.push_back((char)value);
+					}
+					tff_file_.close();
+					setRawTransferFunction(values);
+				}
+				else
+				{
+					std::cout << "Could not open transfer function file " + std::get<1>(std::get<1>(_bench.volume_and_tff[_bench.curr_volume])).toStdString();
+				}
+
+				//setRenderingMethod(Standard);
+				//_bench.gaze_iterations = _bench.iterations_per_gaze;
+
+				//_bench.logFileName = _bench.dir_to_save_to + QDir::separator() +
+				//	std::get<0>(_bench.volume_and_tff[_bench.curr_volume]) + "_Standard";
+
+				_bench.curr_volume++;
+			}
+			//else 
+			//{
+				setRenderingMethod(LBG_Sampling);
+				//_bench.gaze_iterations = 256;
+				_bench.logFileName = _bench.dir_to_save_to + QDir::separator() +
+					std::get<0>(_bench.volume_and_tff[_bench.curr_volume-1]) + "_LBG-Sampling";
+			//}
+
+			_bench.iteration = 0;
+			_bench.needs_update = false;
+			_prng_gaze = QRandomGenerator64(42);	// reset seed for new gaze positions
+			_prng_camera = QRandomGenerator64(42);
+			this->resetCam();
+		}
+		if (_bench.active && _bench.isCameraIteration())
+			updateView();
+		else
+		{
+			if ((_bench.iteration % _bench.iterations_per_gaze) == 0) // update gaze
+			{
+				_lcpf.x = _prng_gaze.generateDouble();
+				_lcpf.y = _prng_gaze.generateDouble();
+			}
+		}
+		_bench.iteration++;
+	}
+	else
+	{
+		if (_useEyetracking && _gaze_data.right_eye.gaze_point.validity == TOBII_RESEARCH_VALIDITY_VALID)
+		{
+			_lcpf.x = _gaze_data.right_eye.gaze_point.position_on_display_area.x;
+			_lcpf.y = _gaze_data.right_eye.gaze_point.position_on_display_area.y;
+			_last_valid_gaze_position = _lcpf;
+		}
+		else
+			_lcpf = _last_valid_gaze_position;
+		// log gaze data
+		if (_logInteraction && _renderingMethod == LBG_Sampling)
+		{
+			QString s;
+			s += QString::number(_timer.elapsed());
+			s += "; gaze; ";
+			s += QString::number(_last_valid_gaze_position.x) + " ";
+			s += QString::number(_last_valid_gaze_position.y) + "\n";
+			logInteraction(s);
+		}
+		
+	}
+
 	switch (_renderingMethod) {
 	case LBG_Sampling:
-		cl_float2 lcpf;
-        if (_bench.active)
-        {
-            if (_bench.active && _bench.isCameraIteration())
-                updateView();
-            else
-            {
-                lcpf.x = static_cast<float>(std::generate_canonical<float, std::numeric_limits<float>::digits>(_prng));
-                lcpf.y = static_cast<float>(std::generate_canonical<float, std::numeric_limits<float>::digits>(_prng));
-            }
-            _bench.iteration++;
-        }
-        else
-        {
-            if (_useEyetracking && _gaze_data.right_eye.gaze_point.validity == TOBII_RESEARCH_VALIDITY_VALID)
-            {
-					lcpf.x = _gaze_data.right_eye.gaze_point.position_on_display_area.x;
-					lcpf.y = _gaze_data.right_eye.gaze_point.position_on_display_area.y;
-                    _last_valid_gaze_position = lcpf;
-			}
-            else
-                lcpf = _last_valid_gaze_position;
-
-            // log gaze data
-            if (_logInteraction && _renderingMethod == LBG_Sampling)
-            {
-                QString s;
-                s += QString::number(_timer.elapsed());
-                s += "; gaze; ";
-                s += QString::number(_last_valid_gaze_position.x) + " ";
-                s += QString::number(_last_valid_gaze_position.y) + "\n";
-                logInteraction(s);
-            }
-        }
-		_volumerender.setGazePoint(lcpf);
+		_volumerender.setGazePoint(_lcpf);
 		paintGL_LBG_sampling();
-
-        if (_bench.active)
-        {
-            QString outString;
-            QTextStream out(&outString);
-            out << _bench.iteration << "; ";
-            out << _rotQuat.toVector4D().w() << " " << _rotQuat.x() << " " << _rotQuat.y() << " "
-                       << _rotQuat.z() << "; ";
-            out << _translation.x() << " " << _translation.y() << " " << _translation.z() << "; ";
-            out << lcpf.x << " " << lcpf.y << "; ";
-            out << _volumerender.getLastExecTime() << "\n";
-            _bench.writeState(out.readAll());
-        }
 		break;
 	default:
 		paintGL_standard();
 		break;
 	}
+
+	if (_bench.active)
+	{
+		QString outString;
+		QTextStream out(&outString);
+		out << _bench.iteration << "; ";
+		out << _rotQuat.toVector4D().w() << " " << _rotQuat.x() << " " << _rotQuat.y() << " "
+			<< _rotQuat.z() << "; ";
+		out << _translation.x() << " " << _translation.y() << " " << _translation.z() << "; ";
+		out << _lcpf.x << " " << _lcpf.y << "; ";
+		out << _volumerender.getLastExecTime() << "\n";
+		_bench.writeState(out.readAll());
+
+		if (_bench.do_all_benchmarks &&
+			_bench.iteration >= _bench.max_different_camera_positions * (_renderingMethod == Standard ? 1 : _bench.gaze_iterations) * _bench.iterations_per_gaze)
+		{
+			if (_renderingMethod == Standard || _bench.curr_volume < _bench.volume_and_tff.size()) 
+			{
+				_bench.needs_update = true;
+			}
+			else 
+			{
+				_bench.active = false;
+				_bench.do_all_benchmarks = false;
+				setContRendering(false);
+			}
+			_bench.f.close();
+		}
+	}
+
     if (_contRendering)
         update();
 }
@@ -1377,9 +1447,12 @@ void VolumeRenderWidget::cleanup()
  */
 void VolumeRenderWidget::mousePressEvent(QMouseEvent *event)
 {
-    _lastLocalCursorPos = event->pos();
-    _last_valid_gaze_position = {{event->pos().x() / static_cast<float>(width()),
-                                  event->pos().y() / static_cast<float>(height())}};
+	if (!_bench.active) {
+		_lastLocalCursorPos = event->pos();
+		_last_valid_gaze_position = { { event->pos().x() / static_cast<float>(width()),
+			event->pos().y() / static_cast<float>(height()) } };
+	}
+    
 }
 
 
@@ -1451,10 +1524,10 @@ void VolumeRenderWidget::updateView(float dx, float dy)
 {
     if (_bench.active && _bench.isCameraIteration())
     {
-        _bench.iteration++;
-        dx = static_cast<float>(std::generate_canonical<float, std::numeric_limits<float>::digits>(_prng));
-        dy = static_cast<float>(std::generate_canonical<float, std::numeric_limits<float>::digits>(_prng));
-        _translation.setZ(static_cast<float>(std::generate_canonical<float, std::numeric_limits<float>::digits>(_prng)) * 4);
+        // _bench.iteration++;
+        dx = _prng_camera.generateDouble();
+        dy = _prng_camera.generateDouble();
+        _translation.setZ(_prng_camera.generateDouble() * 2);
     }
 
     QVector3D rotAxis = QVector3D(dy, dx, 0.0f).normalized();
@@ -1512,34 +1585,37 @@ void VolumeRenderWidget::updateView(float dx, float dy)
  */
 void VolumeRenderWidget::mouseMoveEvent(QMouseEvent *event)
 {
-    float dx = (float)(event->pos().x() - _lastLocalCursorPos.x()) / width();
-    float dy = (float)(event->pos().y() - _lastLocalCursorPos.y()) / height();
+	if (!_bench.active) {
+		float dx = (float)(event->pos().x() - _lastLocalCursorPos.x()) / width();
+		float dy = (float)(event->pos().y() - _lastLocalCursorPos.y()) / height();
 
-    // rotate object
-    if (event->buttons() & Qt::LeftButton)
-    {
-        if (event->modifiers() & Qt::ShiftModifier)
-        {
-            dx *= 0.1f;
-            dy *= 0.1f;
-        }
-        updateView(dx, dy);
-    }
-    // translate object
-    if (event->buttons() & Qt::MiddleButton)
-    {
-        int sensitivity = 6;
-        if (event->modifiers() & Qt::ShiftModifier)
-            sensitivity = 1;
+		// rotate object
+		if (event->buttons() & Qt::LeftButton)
+		{
+			if (event->modifiers() & Qt::ShiftModifier)
+			{
+				dx *= 0.1f;
+				dy *= 0.1f;
+			}
+			updateView(dx, dy);
+		}
+		// translate object
+		if (event->buttons() & Qt::MiddleButton)
+		{
+			int sensitivity = 6;
+			if (event->modifiers() & Qt::ShiftModifier)
+				sensitivity = 1;
 
-        _translation.setX(_translation.x() - dx*sensitivity);
-        _translation.setY(_translation.y() + dy*sensitivity);
-        updateView();
-    }
+			_translation.setX(_translation.x() - dx * sensitivity);
+			_translation.setY(_translation.y() + dy * sensitivity);
+			updateView();
+		}
 
-    _lastLocalCursorPos = event->pos();
-    _last_valid_gaze_position = {{event->pos().x() / static_cast<float>(width()),
-                                  event->pos().y() / static_cast<float>(height())}};
+		_lastLocalCursorPos = event->pos();
+		_last_valid_gaze_position = { { event->pos().x() / static_cast<float>(width()),
+			event->pos().y() / static_cast<float>(height()) } };
+	}
+    
     event->accept();
 }
 
@@ -1550,13 +1626,16 @@ void VolumeRenderWidget::mouseMoveEvent(QMouseEvent *event)
  */
 void VolumeRenderWidget::wheelEvent(QWheelEvent *event)
 {
-    double t = 1600.0;
-    if (event->modifiers() & Qt::ShiftModifier)
-        t *= 6.0;
+	if (!_bench.active) {
+		double t = 1600.0;
+		if (event->modifiers() & Qt::ShiftModifier)
+			t *= 6.0;
 
-    // limit translation to origin, otherwise camera setup breaks (flips)
-    _translation.setZ(qMax(0.01, _translation.z() - event->angleDelta().y() / t));
-    updateView();
+		// limit translation to origin, otherwise camera setup breaks (flips)
+		_translation.setZ(qMax(0.01, _translation.z() - event->angleDelta().y() / t));
+		updateView();
+	}
+	
     event->accept();
 }
 
@@ -1844,6 +1923,8 @@ void VolumeRenderWidget::toggleBenchmark() //QString logFileName, int gaze_itera
     qInfo() << (_bench.active ? "Stopped benchmark run." : "Started benchmark run.");
 
     _bench.active = !_bench.active;
+	_bench.do_all_benchmarks = false;
+
     if (_bench.active)
     {
 		if (logFileName.isEmpty()) {
@@ -1870,7 +1951,9 @@ void VolumeRenderWidget::toggleBenchmark() //QString logFileName, int gaze_itera
 			_bench.gaze_iterations = gaze_iterations;
 		}
         
-        _prng = QRandomGenerator64(42);
+		_prng_camera = QRandomGenerator64(42);
+		this->resetCam();
+		_prng_gaze = QRandomGenerator64(42);
         _bench.iteration = 0;
     }
     updateView();
@@ -1885,83 +1968,84 @@ void VolumeRenderWidget::toggleBenchmark() //QString logFileName, int gaze_itera
 */
 void VolumeRenderWidget::do_all_Benchmarks()
 {
-	std::cout << "Starting to do all benchmarks." << std::endl;
-
-	QFileDialog dialog;
-	QString directorySavePath = dialog.getExistingDirectory(this, tr("Select the Folder to save the benchmarks results to."),
-		QDir::currentPath());
 	
-	QString directoryVolumesPath = dialog.getExistingDirectory(this, tr("Select the Folder containing the the folders to the volumes and transferfunctions."),
-		QDir::currentPath());
-
-	std::cout << "directorySavePath: " << directorySavePath.toStdString() << std::endl;
-	std::cout << "directoryVolumesPath: " << directoryVolumesPath.toStdString() << std::endl;
-
-	QDirIterator it(directoryVolumesPath, QDirIterator::NoIteratorFlags);
-	std::cout << "Direcotries in directoryVolumesPath:" << std::endl;
-	
-	// iterate the directories and do the benchmarks for each of them
-	while (it.hasNext()) {
-		it.next();
+	if (!_bench.active && !_bench.do_all_benchmarks)
+	{
+		std::cout << "Starting to do all benchmarks." << std::endl;
 		
-		if (it.fileName() == "." || it.fileName() == "..") {
-			// skip '.' and '..' directories, only want folders
+		QFileDialog dialog;
+		QString directorySavePath = dialog.getExistingDirectory(this, tr("Select the Folder to save the benchmarks results to."),
+			QDir::currentPath());
+
+		QString directoryVolumesPath = dialog.getExistingDirectory(this, tr("Select the Folder containing the the folders to the volumes and transferfunctions."),
+			QDir::currentPath());
+
+		QDirIterator it(directoryVolumesPath, QDir::Dirs | QDir::NoDotAndDotDot);
+
+		// iterate the directories and do the benchmarks for each of them
+		while (it.hasNext()) 
+		{
 			it.next();
-			continue;
+
+			//if (it.fileName() == "." || it.fileName() == "..") {
+			//	// skip '.' and '..' directories, only want folders
+			//	//it.next();
+			//	continue;
+			//}
+			//else
+			//{
+				QDir cBD = QDir(it.filePath());
+
+				// search for .dat file
+				cBD.setNameFilters(QStringList() << "*.dat");
+				if (cBD.entryList().isEmpty()) {
+					std::cout << "could not find the volume file for : " << cBD.dirName().toStdString() << std::endl;
+					continue;
+				}
+				QString volume_file = cBD.entryList().first();
+
+				cBD.setNameFilters(QStringList() << "*.tff");
+				if (cBD.entryList().isEmpty()) {
+					std::cout << "could not find the tff file for : " << cBD.dirName().toStdString() << std::endl;
+					continue;
+				}
+				QString tff_file = cBD.entryList().first();
+
+				_bench.volume_and_tff.push_back({ cBD.dirName(),{ cBD.absolutePath() + QDir::separator() + volume_file, cBD.absolutePath() + QDir::separator() + tff_file } });
+			//}
 		}
 
-		QDir cBD = QDir(it.filePath());
-
-		std::cout << "currentBenchmarkDirectoryPath: " << cBD.absolutePath().toStdString() << std::endl;
-		std::cout << "currentBenchmarkDirectoryName: " << cBD.dirName().toStdString() << std::endl;
 		
-		// search for .dat file
-		cBD.setNameFilters(QStringList() << "*.dat");
-		if (cBD.entryList().isEmpty()) {
-			std::cout << "could not find the volume file for : " << cBD.dirName().toStdString() << std::endl;
-			continue;
-		}
-		QString volume_file = cBD.entryList().first();
+		/*bool ok;
+		_bench.gaze_iterations = QInputDialog::getInt(this, tr("Gaze iterations per camera position"),
+			tr("Select gaze iterations:"), 100, 1, 10000, 1, &ok);
 
-		cBD.setNameFilters(QStringList() << "*.tff");
-		if (cBD.entryList().isEmpty()) {
-			std::cout << "could not find the tff file for : " << cBD.dirName().toStdString() << std::endl;
-			continue;
-		}
-		QString tff_file = cBD.entryList().first();
-
-		std::cout << "volume_file: " << volume_file.toStdString() << std::endl;
-		std::cout << "tff_file: " << tff_file.toStdString() << std::endl;
-
-		// load volume
-		setVolumeData(cBD.absolutePath() + QDir::separator() + volume_file);
+		_bench.max_different_camera_positions = QInputDialog::getInt(this, tr("Amount of camera positions"),
+			tr("Select amount of camera positions:"), 15, 1, 100, 1, &ok);*/
 		
-		// load raw values of tff
-		std::ifstream tff_file_((cBD.absolutePath() + QDir::separator() + tff_file).toStdString(), std::ios::in);
-		float value = 0;
-		std::vector<unsigned char> values;
-		// read lines from file and split on whitespace
-		if (tff_file_.is_open())
-		{
-			while (tff_file_ >> value)
-			{
-				values.push_back((char)value);
-			}
-			tff_file_.close();
-			setRawTransferFunction(values);
+		_bench.dir_to_save_to = directorySavePath;
+		
+		if (!_bench.volume_and_tff.empty()) {
+			_bench.curr_volume = 0;
 		}
-		else
-		{
-			qDebug() << "Could not open transfer function file " + tff_file;
+		else {
+			_bench.curr_volume = -1;
+			_bench.active = false;
+			_bench.do_all_benchmarks = false;
+			return;
 		}
-
-		// TODO: Benchmark with Standard
-
-		// TODO: Benchmark with LBG-Sampling
-				
-
+		
+		_prng_camera = QRandomGenerator64(42);
+		this->resetCam();
+		_prng_gaze = QRandomGenerator64(42);
+		_bench.iteration = 0;
+		_bench.needs_update = true;
 	}
 
+	_bench.active = !_bench.active;
+	_bench.do_all_benchmarks = !_bench.do_all_benchmarks;
+
+	setContRendering(true);
 
 	updateView();
 }
