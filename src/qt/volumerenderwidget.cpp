@@ -708,9 +708,47 @@ void VolumeRenderWidget::paintGL()
         {
             if (_useEyetracking && _gaze_data.right_eye.gaze_point.validity == TOBII_RESEARCH_VALIDITY_VALID)
             {
-					lcpf.x = _gaze_data.right_eye.gaze_point.position_on_display_area.x;
-					lcpf.y = _gaze_data.right_eye.gaze_point.position_on_display_area.y;
-                    _last_valid_gaze_position = lcpf;
+				QRect widgetRect = this->geometry();
+				QPoint globalCorner = this->parentWidget()->mapToGlobal(widgetRect.topLeft());
+				globalCorner.setX(globalCorner.x() - 1920);
+				//qDebug() << globalCorner;
+				//widgetRect.moveTopLeft(globalCorner);
+
+				lcpf.x = _gaze_data.right_eye.gaze_point.position_on_display_area.x * (1920.f/ 1024.f);
+				lcpf.y = _gaze_data.right_eye.gaze_point.position_on_display_area.y * (1080.f/ 1024.f);
+				
+				lcpf.x -= 14.f / 1920.f;
+				lcpf.y -= 74.f / 1080.f;
+				//std::cout << lcpf.x << " " << lcpf.y << std::endl;
+
+				lcpf.x = qBound(0.f, lcpf.x, 1.f);
+				lcpf.y = qBound(0.f, lcpf.y, 1.f);
+
+                _last_valid_gaze_position = lcpf;
+
+				// TEST: anamorphic rendering
+				if (_anamorphic)
+				{
+					TobiiResearchPoint3D eye_r = _gaze_data.right_eye.gaze_origin.position_in_user_coordinates;
+					TobiiResearchPoint3D eye_l = _gaze_data.left_eye.gaze_origin.position_in_user_coordinates;
+
+					float dx = (eye_r.x) - 10.f; // offset for 1024² image on full HD screen
+					float dy = (eye_r.y) + 0.f;
+
+					float sensitivity = 0.005f;
+					_translation.setX(dx * sensitivity);
+					_translation.setY(dy * sensitivity);
+
+					// TODO: fix to "local" rotation 
+					float delta_z = (eye_r.z - eye_l.z);
+					QVector3D qEye_r(eye_r.x, eye_r.y, eye_r.z);
+					QVector3D qEye_l(eye_l.x, eye_l.y, eye_l.z);
+					float dist = qEye_r.distanceToPoint(qEye_l);
+					//if (!isnan(delta_z) && abs(delta_z) > 5.f)
+					//	_rotQuat *= _rotQuat.fromAxisAndAngle(QVector3D(0,1,0), -sin(delta_z/dist)*1.f);
+
+					updateView();
+				}
 			}
             else
                 lcpf = _last_valid_gaze_position;
@@ -951,7 +989,7 @@ void VolumeRenderWidget::paintGL_LBG_sampling() {
         p.setPen(QPen(QBrush(Qt::red, Qt::SolidPattern), _writeImage ? 10 : 3));
         QPoint gaze = QPoint(qRound(_last_valid_gaze_position.x * width()),
                              qRound(_last_valid_gaze_position.y * height()));
-        int r = _writeImage ? 20 : 5;
+        int r = _writeImage ? 20 : 15;
         p.drawLine(gaze - QPoint(r,0), gaze + QPoint(r,0));
         p.drawLine(gaze - QPoint(0,r), gaze + QPoint(0,r));
         //p.drawEllipse(QPointF(_last_valid_gaze_position.x * width(), _last_valid_gaze_position.y * height()), 5, 5);

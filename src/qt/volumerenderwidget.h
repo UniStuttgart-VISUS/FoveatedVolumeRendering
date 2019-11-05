@@ -143,6 +143,11 @@ public:
     static bool MonitorEnumProc(HMONITOR monitor, HDC hdcMnitor, LPRECT rect, LPARAM param);
 #endif
 
+	void toggleAnamorphic()
+	{
+		this->_anamorphic = !this->_anamorphic;
+	}
+
 public slots:
     void cleanup();
     void resetCam();
@@ -307,4 +312,5 @@ private:
     QStringList _interactionSequence;
     int _interactionSequencePos = 0;
     bool _playInteraction = false;
+	bool _anamorphic = false;
 };

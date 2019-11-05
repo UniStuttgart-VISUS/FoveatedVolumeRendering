@@ -220,6 +220,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
         case Qt::Key_Right:
         case Qt::Key_D: ui->volumeRenderWidget->updateView(+factor, 0.000f); break;
         // TODO: zoom
+		case Qt::Key_V: ui->volumeRenderWidget->toggleAnamorphic(); break;
     }
     event->accept();
 }
